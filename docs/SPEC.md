@@ -54,7 +54,7 @@ Out of scope for now: other islands (Aruba, Bonaire), user accounts, push notifi
 
 ## 4. Experience requirements
 
-### 4.1 Desktop (viewport width 900 px and up)
+### 4.1 Wide desktop (viewport width over 1440 px)
 
 - **Left column (about 424 px wide)**: main information only.
   1. Brand card: "Example data" tag (until live), Auto/Day/Night control, large title "Grid Watch Curaçao", one-line description.
@@ -65,12 +65,20 @@ Out of scope for now: other islands (Aruba, Bonaire), user accounts, push notifi
 - **Bottom row, full page width** (about 284 px tall): "Next 7 days" chart on the left (about 40 percent), reported events on the right (about 60 percent) as horizontally scrolling cards. The status legend lives in the chart card header.
 - The seven-day chart is also the day picker. Selecting a day updates the risk card, stat tiles, site status, tile colours, mascot and island tint.
 
-### 4.2 Mobile and narrow windows (under 900 px)
+### 4.2 Phones, tablets and windows up to 1440 px
+
+**Decided (12.12):** the side column and bottom row of 4.1 are only used above 1440 px; they are too cluttered on tablets and laptops. Up to 1440 px:
+
+- **Portrait** (and near-square windows): the stacked layout below.
+- **Landscape** (aspect ratio 5:4 or wider, phones to laptops): risk card on the left (about 300 to 400 px), island on the right, seven-day strip along the bottom, reported events behind the button. Stat tiles and the large chart are not shown. An open site card replaces the risk card in the left column, so the island stays fully visible.
+- **Site labels** are name-only buttons docked at the top of the island area: a column in portrait, a single horizontally scrolling row in landscape. In portrait the column folds into a row while a site card is open. Hovering or focusing a label lifts its tile; the selected label is joined to its site by the dashed leader line.
+
+Stacked layout:
 
 - Risk card at the top (title, mascot, percentage, level, driver chips), island below it, seven-day strip pinned to the bottom. Reported events open in a panel from a button at the top left. The Auto/Day/Night control sits top right.
 - **Requirement**: the island must be fully visible in the space between the risk card and the day strip. Do this with layout, not by letting the card cover the canvas. Preferred implementation: the canvas area is a flex or grid row between the card and the strip, or the camera view is offset so the island centres in the free area. The site info card is a bottom sheet (max about 54 percent of the height) above the strip and must not hide the island entirely when open.
 - Safe-area insets respected (notch, home indicator). No horizontal page scroll. Minimum side gutter 16 px.
-- Test sizes: 360x740, 390x844, 430x932, 768x1024 (uses the mobile layout), plus landscape phone.
+- Test sizes: 360x740, 390x844, 430x932, 768x1024 (stacked); 844x390, 1024x768, 1280x800, 1440x900 (landscape, card left); 1920x1080 (wide desktop).
 
 ### 4.3 Day and night
 
@@ -414,12 +422,12 @@ Shape: pill-shaped controls and chips (999 px), cards 24 px radius (20 px for th
 
 3D palette: grass #aee04f, hills #c3ea6a, bushes #52b53a / #6cc443, rim #b9784a with band #d9a06a, turbines white with #ffc93c hubs, plant #fff0cf with #ff7a5c roof.
 
-Breakpoint: 900 px (desktop at 900 and up). Side gutter 16 px.
+Breakpoint: 1440 px (wide desktop layout above 1440; see 4.2 for portrait and landscape below it). Side gutter 16 px.
 
 ## 11. Testing and acceptance
 
 Automated (Playwright):
-- Screenshots at 390x844, 768x1024, 1440x900 in day and night; assert no horizontal scroll and that no overlay hides the island on mobile.
+- Screenshots at 390x844, 768x1024, 844x390, 1280x800, 1440x900 and 1920x1080 in day and night; assert no horizontal scroll and that no overlay hides the island on mobile.
 - Select each site, assert the card appears and Esc closes it; select each day, assert risk card, chart and site statuses update.
 - Mode switch: Auto follows a mocked clock (05:59, 06:00, 17:59, 18:00), explicit Day/Night persists across reload.
 - WebGL disabled: fallback renders and is usable.
@@ -452,6 +460,9 @@ Acceptance by phase:
 10. **Community reports**: optional later feature (residents report outages). Noisy; treat as a review signal, never as ground truth.
 11. **DECIDED, Hosting and brand**: Hostinger VPS with Coolify already set up; site at `grid.noirvisuals.studio` (domain already owned). Credit line is "Grid Watch by Noir Visuals" (plain text until that site exists). Details in 7.6.
 
+12. **DECIDED, Layout breakpoint (8 Oct 2026)**: the side column plus bottom row layout is used only above 1440 px. Up to 1440 px, portrait uses the stacked layout and landscape uses risk card left, island right, day strip below; site labels are docked name-only buttons (column in portrait, row in landscape). Details in 4.2.
+13. **DECIDED, Copyright holder**: "Noir Visuals" in `LICENSE` (not yet a registered company; revisit if it becomes one).
+
 ## 12b. Licensing and public repository
 
 **Decision: the repository is public and open source, with a split licence.** Not legal advice; review once before launch.
@@ -469,7 +480,7 @@ Acceptance by phase:
 Required files in the repo root: `LICENSE`, `README.md` (what it is, what it is not, how to run, how to contribute), `DATA_LICENSES.md` (every third-party data source with licence, attribution text and retrieval date), `TRADEMARKS.md`, `CONTRIBUTING.md` (short: issues welcome, discuss before large PRs, contributions are accepted under the repo licences), `CODE_OF_CONDUCT.md` (a standard short one), `SECURITY.md` (how to report a vulnerability privately).
 
 Public-repo hygiene:
-- No secrets in the repo or its history. Secrets live in Coolify environment variables. Ship `.env.example` files with placeholder values only. Add a secret scanner (for example gitleaks) to CI and as a pre-commit hook, and run it over the full history before the repo is made public.
+- No secrets in the repo or its history. Secrets live in Coolify environment variables. Ship `.env.example` files with placeholder values only. Add a secret scanner (betterleaks, the maintained successor to gitleaks) to CI and as a pre-commit hook, and run it over the full history before the repo is made public.
 - `pb_data/`, `.env*` (except examples), local databases and Telegram bot configuration are git-ignored.
 - No personal data. The Telegram allowlist (user IDs) is configuration, not committed.
 - Every event in the database carries its source link; no unsourced claims about the utility in the repo or docs.
