@@ -1,5 +1,5 @@
 {
-  "_comment": "Placeholder export of the CMS sites and island records. Positions are stylised scene coordinates (placeholder_uv: u runs west to east along the island), kept in the real west-to-east order Tera Kora, Dokweg, Playa Kanoa, Koraal Tabak; exact coordinates come from OpenStreetMap in a later step.",
+  "_comment": "Placeholder export of the CMS sites and island records. Positions are stylised scene coordinates (placeholder_uv), not geography. On screen they keep the real west-to-east order Tera Kora, Dokweg, Playa Kanoa, Koraal Tabak; exact coordinates come from OpenStreetMap in a later step.",
   "exported_at": null,
   "island": {
     "version": "stylised-0",
@@ -32,7 +32,7 @@
       "modelOffset": null,
       "modelRotation": null,
       "placeholder_uv": [
-        -12,
+        12,
         1.8
       ]
     },
@@ -55,7 +55,7 @@
       "modelOffset": null,
       "modelRotation": null,
       "placeholder_uv": [
-        9.5,
+        -9.5,
         -1.8
       ]
     },
@@ -78,7 +78,7 @@
       "modelOffset": null,
       "modelRotation": null,
       "placeholder_uv": [
-        15.5,
+        -15.5,
         2.2
       ]
     },
@@ -101,7 +101,7 @@
       "modelOffset": null,
       "modelRotation": null,
       "placeholder_uv": [
-        22,
+        -22,
         0.4
       ]
     }

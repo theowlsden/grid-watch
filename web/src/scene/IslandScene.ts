@@ -52,7 +52,7 @@ const K = 1.3;
 const AXIS = -Math.atan2(UD.y, UD.x);
 
 // Desktop label nudges for the seed sites, so the floating labels overlap less.
-const LABEL_OFFSET: Record<string, [number, number]> = { dokweg: [-64, 24], koraaltabak: [40, 14] };
+const LABEL_OFFSET: Record<string, [number, number]> = { dokweg: [64, 24], koraaltabak: [-64, 22] };
 
 function toXZ(u: number, v: number): [number, number] {
   return [UD.x * u + VD.x * v, UD.y * u + VD.y * v];
