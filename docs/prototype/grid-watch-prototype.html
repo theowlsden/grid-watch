@@ -728,7 +728,7 @@
     }
 
     /* ---------- Desktop: cards left, island right ---------- */
-    @media (min-width: 1441px) {
+    @media (min-width: 1501px) {
       body {
         background: radial-gradient(ellipse at 70% 36%, var(--glow) 0%, var(--sea) 60%, var(--edge) 100%) var(--sea);
       }
@@ -1105,8 +1105,8 @@
         font-size: 12px;
       }
 
-      #evBtn,
-      #mseg,
+      #topbar,
+      #tapHint,
       #days,
       #events {
         display: none !important;
@@ -1164,12 +1164,12 @@
       }
     }
 
-    /* ---------- Up to 1440 px (phones, tablets, laptops): layout-based canvas area (spec 4.2, 12.12) ----------
-       Portrait: rows of controls / risk card / island / day strip.
-       Landscape: risk card left, island right, day strip below.
-       The island always has its own grid cell, so no overlay covers it. Site labels are
-       name-only buttons docked at the top of the island cell (column in portrait, row in landscape). */
-    @media (max-width: 1440px) {
+    /* ---------- Up to 1500 px (phones, tablets, laptops): layout-based canvas area (spec 4.2, 12.12) ----------
+       Portrait: rows of top bar / risk card / island / day strip.
+       Landscape: top bar, then risk card left and island right, day strip below.
+       The island always has its own grid cell, so no overlay covers it. Sites are picked by
+       tapping their tile; the label buttons stay in the page for keyboard and screen readers. */
+    @media (max-width: 1500px) {
       #side {
         display: contents;
       }
@@ -1184,6 +1184,25 @@
         padding: var(--gutter) max(var(--gutter), env(safe-area-inset-right, 0px)) var(--gutter) max(var(--gutter), env(safe-area-inset-left, 0px));
       }
 
+      /* top bar: app name, reported events, day/night */
+      #topbar {
+        grid-area: top;
+        display: grid;
+        grid-template-columns: auto auto;
+        grid-template-areas: "name name" "ev mode";
+        align-items: center;
+        gap: 8px;
+        padding: 10px 8px 8px 14px;
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+      }
+
+      #topbar .appname {
+        grid-area: name;
+        font: 800 20px/1.05 var(--font-display);
+        letter-spacing: -.01em;
+      }
+
       #evBtn,
       #mseg,
       #hud,
@@ -1192,21 +1211,68 @@
       }
 
       #evBtn {
-        grid-area: top;
+        grid-area: ev;
         justify-self: start;
+        padding: 9px 14px;
+        background: var(--soft);
+        box-shadow: none;
       }
 
       #mseg {
-        grid-area: top;
+        grid-area: mode;
         justify-self: end;
-        align-self: center;
-        border-radius: 999px;
+        background: none;
+        box-shadow: none;
       }
 
+      /* risk card: tag across the top, mascot beside date and level, then explanation and drivers */
       #hud {
         grid-area: hud;
         width: auto;
         min-width: 0;
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-areas: "tag tag" "mascot when" "mascot readout" "sub sub" "drivers drivers";
+        align-items: center;
+        gap: 6px 12px;
+        box-sizing: border-box;
+      }
+
+      #hud .top,
+      #hud .ttl {
+        display: contents;
+      }
+
+      #hud .mh1 {
+        display: none;
+      }
+
+      #hud .tag {
+        grid-area: tag;
+        justify-self: start;
+        margin-bottom: 2px;
+      }
+
+      #mascot {
+        grid-area: mascot;
+      }
+
+      #hud .when {
+        grid-area: when;
+        margin: 0;
+        align-self: end;
+      }
+
+      #hud .readout {
+        grid-area: readout;
+        align-self: start;
+      }
+
+      #hud .sub {
+        grid-area: sub;
+      }
+
+      #hud .drivers {
+        grid-area: drivers;
       }
 
       #main {
@@ -1225,66 +1291,77 @@
         bottom: 6px;
       }
 
-      /* docked site labels */
-      #labels {
-        inset: 6px var(--gutter) auto;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-        z-index: 1;
+      #tapHint {
+        position: absolute;
+        left: var(--gutter);
+        bottom: 10px;
+        margin: 0;
+        font: 700 12px/1.2 var(--font-body);
+        color: var(--muted);
+        pointer-events: none;
       }
 
+      body.sheet-open #tapHint,
+      body.picked #tapHint {
+        display: none;
+      }
+
+      /* site labels: hidden, but still buttons for keyboard and screen readers; shown while focused */
       .site {
-        position: static;
-        display: inline-flex;
-        gap: 8px;
-        padding: 7px 12px 7px 9px;
+        position: absolute;
+        left: var(--gutter);
+        top: 8px;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        border: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
         transform: none;
         will-change: auto;
-        /* tighter shadow: the scrolling row would clip the large one */
-        box-shadow: 0 3px 8px rgba(0, 30, 50, 0.18);
+      }
+
+      .site:focus-visible {
+        width: auto;
+        height: auto;
+        padding: 7px 12px 7px 9px;
+        border: 2px solid var(--ink);
+        overflow: visible;
+        clip-path: none;
+        z-index: 1;
       }
 
       .site .mt {
         display: none;
       }
 
-      /* portrait: while the site card is open the column folds into one scrolling row,
-         so the island keeps the space between the labels and the card */
-      body.sheet-open #labels {
-        flex-direction: row;
-        right: 0;
-        overflow-x: auto;
-        touch-action: pan-x;
-        pointer-events: auto;
-        scrollbar-width: none;
-        padding: 2px 0 12px;
-        margin-top: -2px;
-      }
-
-      body.sheet-open .site {
-        flex: none;
-      }
-
       #card {
         position: absolute;
         bottom: 0;
         /* about 54 percent of the screen, but always leave part of the island in view */
-        max-height: min(54vh, calc(100% - 150px));
+        max-height: min(54vh, calc(100% - 120px));
       }
 
       #events {
-        top: calc(var(--gutter) + 46px);
         bottom: calc(var(--gutter) + 82px);
         max-width: 440px;
       }
     }
 
+    /* top bar in one row when there is room */
+    @media (min-width: 600px) and (max-width: 1500px) {
+      #topbar {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        grid-template-areas: "name ev mode";
+        padding: 6px 6px 6px 18px;
+        border-radius: 999px;
+      }
+    }
+
     /* Landscape: risk card left, island right. The site card replaces the risk card while open. */
-    @media (max-width: 1440px) and (orientation: landscape) and (min-aspect-ratio: 5/4) {
+    @media (max-width: 1500px) and (orientation: landscape) and (min-aspect-ratio: 5/4) {
       body {
-        grid-template-columns: minmax(0, clamp(300px, 32vw, 400px)) minmax(0, 1fr);
+        grid-template-columns: minmax(0, clamp(300px, 30vw, 400px)) minmax(0, 1fr);
         grid-template-rows: auto minmax(0, 1fr) auto;
         grid-template-areas: "top top" "hud stage" "days days";
         column-gap: 10px;
@@ -1294,31 +1371,20 @@
         overflow-y: auto;
         align-self: start;
         max-height: 100%;
-        box-sizing: border-box;
       }
 
       body.sheet-open #hud {
         visibility: hidden;
       }
 
+      /* the island fills the short landscape cell, so the hint goes above it */
+      #tapHint {
+        top: 8px;
+        bottom: auto;
+      }
+
       #main {
         margin: 0 calc(-1 * var(--gutter)) 0 0;
-      }
-
-      #labels {
-        flex-direction: row;
-        right: 0;
-        overflow-x: auto;
-        touch-action: pan-x;
-        pointer-events: auto;
-        scrollbar-width: none;
-        /* room for the label shadows */
-        padding: 2px 0 12px;
-        margin-top: -2px;
-      }
-
-      .site {
-        flex: none;
       }
 
       /* placed over the risk card column by script */
@@ -1331,7 +1397,40 @@
       }
     }
 
-    @media (max-width: 1440px) and (max-height: 520px) {
+    /* short landscape screens (phones): tighter risk card and day strip so everything fits */
+    @media (max-width: 1500px) and (max-height: 520px) {
+      #topbar .appname {
+        font-size: 18px;
+      }
+
+      #hud {
+        padding: 10px 12px;
+        gap: 4px 10px;
+      }
+
+      #mascot {
+        width: 38px;
+        height: 38px;
+      }
+
+      .pct {
+        font-size: 32px;
+      }
+
+      #hud .sub {
+        font-size: 12px;
+        line-height: 1.3;
+      }
+
+      .drivers {
+        gap: 4px;
+      }
+
+      .drivers li {
+        padding: 3px 7px;
+        font-size: 10.5px;
+      }
+
       #days button {
         padding: 6px 2px 5px;
       }
@@ -1353,6 +1452,7 @@
       <div id="labels"></div>
 
       <div id="hint" class="card">Drag to rotate, scroll to zoom</div>
+      <p id="tapHint">Tap a site on the island for details</p>
       <article id="card" hidden></article>
       <div id="compass" aria-hidden="true"><span id="needle">N</span></div>
     </div>
@@ -1408,8 +1508,11 @@
 
   </div>
 
-  <div id="mseg" class="segHost"></div>
-  <button id="evBtn" aria-expanded="false" aria-controls="events">Reported events</button>
+  <header id="topbar" class="card">
+    <span class="appname">Grid Watch Curaçao</span>
+    <button id="evBtn" aria-expanded="false" aria-controls="events">Reported events</button>
+    <div id="mseg" class="segHost"></div>
+  </header>
   <aside id="events" class="card" hidden aria-label="Reported grid events">
     <h2 class="evh">Reported grid events</h2>
     <p class="sub">From public reports. Source links still to be added to each entry.</p>
@@ -1657,10 +1760,10 @@
 
       /* ---------- Camera orbit ---------- */
       var cam = { az: -0.45, pol: 0.95, r: 80, tr: 80 };
-      var touched = false, deskMQ = window.matchMedia('(min-width: 1441px)');
-      var sideMQ = window.matchMedia('(max-width: 1440px) and (orientation: landscape) and (min-aspect-ratio: 5/4)');
+      var touched = false, deskMQ = window.matchMedia('(min-width: 1501px)');
+      var sideMQ = window.matchMedia('(max-width: 1500px) and (orientation: landscape) and (min-aspect-ratio: 5/4)');
       function desktop() { return deskMQ.matches; }
-      // landscape up to 1440 px: the site card is shown over the risk card column
+      // landscape up to 1500 px: the site card is shown over the risk card column
       function sideCard() { return sideMQ.matches; }
       function fitRadius() { var asp = stage.clientWidth / stage.clientHeight; return Math.max(58, Math.min(215, 76 / (0.69 * asp))); }
       function resize() {
@@ -1686,7 +1789,29 @@
         p.x = e.clientX; p.y = e.clientY;
         if (ks.length === 2) { var d = dist(); if (pinch0) cam.tr = Math.max(35, Math.min(230, cam.tr * pinch0 / d)); pinch0 = d; }
       });
-      function up(e) { delete ptrs[e.pointerId]; pinch0 = 0; if (!Object.keys(ptrs).length) stage.classList.remove('drag'); }
+      // a short tap without dragging picks the site whose tile is under the pointer
+      var tap = null, ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+      stage.addEventListener('pointerdown', function (e) { tap = Object.keys(ptrs).length === 1 ? { id: e.pointerId, x: e.clientX, y: e.clientY } : null; });
+      function pick(e) {
+        var r = stage.getBoundingClientRect();
+        ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+        ray.setFromCamera(ndc, camera);
+        var hit = ray.intersectObjects(SITES.map(function (x) { return x.g; }), true)[0];
+        if (hit) return SITES.filter(function (x) { var o = hit.object; while (o && o !== x.g) o = o.parent; return o === x.g; })[0] || null;
+        // tiles are small on phones: otherwise take the nearest site within finger reach (30 px)
+        var best = null, bd = 30, px = e.clientX - r.left, py = e.clientY - r.top;
+        SITES.forEach(function (x) { var q = project(x.ax, x.g.position.y + world.position.y + 1, x.az), dd = Math.hypot(q[0] - px, q[1] - py); if (dd < bd) { bd = dd; best = x; } });
+        return best;
+      }
+      function up(e) {
+        if (tap && tap.id === e.pointerId && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) < 6) {
+          var hitSite = pick(e);
+          if (hitSite) { document.body.classList.add('picked'); select(selected === hitSite ? null : hitSite); }
+          else if (selected) select(null);
+        }
+        tap = null;
+        delete ptrs[e.pointerId]; pinch0 = 0; if (!Object.keys(ptrs).length) stage.classList.remove('drag');
+      }
       stage.addEventListener('pointerup', up); stage.addEventListener('pointercancel', up);
       stage.addEventListener('wheel', function (e) { e.preventDefault(); touched = true; cam.tr = Math.max(35, Math.min(230, cam.tr * (1 + e.deltaY * 0.001))); }, { passive: false });
 
@@ -1726,7 +1851,7 @@
         b.innerHTML = '<span class="dot"></span><span class="nm"></span><span class="mt"></span>';
         b.querySelector('.nm').textContent = s.name;
         b.addEventListener('click', function () { select(selected === s ? null : s); });
-        // hovering or focusing a label lifts its tile a little, so docked labels still point at their site
+        // hovering or focusing a label lifts its tile a little, so it is clear which site it names
         ['pointerenter', 'focus'].forEach(function (ev) { b.addEventListener(ev, function () { s.hot = true; }); });
         ['pointerleave', 'blur'].forEach(function (ev) { b.addEventListener(ev, function () { s.hot = false; }); });
         s.el = b; labelsEl.appendChild(b);
@@ -1806,16 +1931,15 @@
         document.body.classList.toggle('sheet-open', !!s);
         if (!s) { cardEl.hidden = true; ln.setAttribute('hidden', ''); return; }
         renderCard(s); cardEl.hidden = false;
-        // keep the chosen label in view when the docked row scrolls sideways
-        if (!desktop()) {
-          var l = s.el.offsetLeft, r = l + s.el.offsetWidth;
-          if (l < labelsEl.scrollLeft) labelsEl.scrollLeft = l; else if (r > labelsEl.scrollLeft + labelsEl.clientWidth) labelsEl.scrollLeft = r - labelsEl.clientWidth;
-        }
       }
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { select(null); setEvents(false); } });
 
       var evBtn = document.getElementById('evBtn'), evEl = document.getElementById('events');
-      function setEvents(on) { evEl.hidden = !on; evBtn.setAttribute('aria-expanded', on ? 'true' : 'false'); }
+      function setEvents(on) {
+        // below 1500 px the panel opens just under the top bar, whose height depends on the layout
+        if (on && !desktop()) { var tb = document.getElementById('topbar'); evEl.style.top = (tb.offsetTop + tb.offsetHeight + 10) + 'px'; }
+        evEl.hidden = !on; evBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+      }
       evBtn.addEventListener('click', function () { setEvents(evEl.hidden); });
 
       /* ---------- Render loop ---------- */
@@ -1824,14 +1948,13 @@
       var cDay = new THREE.Color(0xffd23f), cNight = new THREE.Color(0xe3ebff), eDay = new THREE.Color(0x6a4a00), eNight = new THREE.Color(0x24365f), tmp = new THREE.Color();
       function project(x, y, z) { v3.set(x, y, z).project(camera); return [(v3.x * 0.5 + 0.5) * stage.clientWidth, (-v3.y * 0.5 + 0.5) * stage.clientHeight]; }
 
-      // Up to 1440 px: centre the island in the free part of its cell, below the docked labels and,
-      // in portrait, above the bottom sheet. Positive offsets move the island up.
+      // Portrait up to 1500 px: while the bottom sheet is open, centre the island in the space above it.
+      // Positive offsets move the island up.
       var viewOff = 0, sheetPx = 0;
       function sheetView() {
-        var dock = desktop() ? 0 : labelsEl.offsetTop + labelsEl.offsetHeight;
         var sheet = (!desktop() && !sideCard() && selected && !cardEl.hidden) ? cardEl.offsetHeight + 8 : 0;
         var k = reduce ? 1 : 0.15;
-        viewOff += ((sheet - dock) / 2 - viewOff) * k; sheetPx += (sheet - sheetPx) * k;
+        viewOff += (sheet / 2 - viewOff) * k; sheetPx += (sheet - sheetPx) * k;
         var w = stage.clientWidth, h = stage.clientHeight;
         if (Math.abs(viewOff) > 0.5) camera.setViewOffset(w, h, 0, viewOff, w, h);
         else if (camera.view && camera.view.enabled) camera.clearViewOffset();
@@ -1882,7 +2005,7 @@
           }
           if (site.bolt && !reduce) { site.bolt.rotation.y = s * 1.2; site.bolt.position.y = 3.0 + Math.sin(s * 1.5) * 0.12; }
           var p = project(site.ax, SURF + site.h + site.lift + bob, site.az);
-          // over 1440 px labels float above their site; below that they are docked by CSS
+          // over 1500 px labels float above their site; below that they are hidden by CSS
           site.el.style.transform = desktop() ? 'translate(' + (p[0] + site.off[0]) + 'px,' + (p[1] + site.off[1]) + 'px) translate(-50%,-100%)' : '';
         });
 
@@ -1900,11 +2023,7 @@
           } else {
             cardEl.style.transform = 'none';
             if (sideCard()) placeSideCard(); else clearSideCard();
-            // dashed line from the docked label to its site
-            var sr = stage.getBoundingClientRect(), lr = selected.el.getBoundingClientRect();
-            var p3 = project(selected.ax, SURF + selected.h * 0.6 + selected.lift + bob, selected.az);
-            var lx = Math.max(4, Math.min(sr.width - 4, lr.left - sr.left + lr.width / 2)), ly = lr.bottom - sr.top;
-            ln.setAttribute('x1', p3[0]); ln.setAttribute('y1', p3[1]); ln.setAttribute('x2', lx); ln.setAttribute('y2', ly); ln.removeAttribute('hidden');
+            ln.setAttribute('hidden', '');
           }
         }
         renderer.render(scene, camera);
