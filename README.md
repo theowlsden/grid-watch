@@ -47,6 +47,17 @@ To check a production build locally, serve `web/out/` with any static server, fo
 
 The page loads `/data/forecast.json` and `/data/events.json` at runtime. In development these come from `web/public/data/`, which currently holds **example data** (shown with an "Example data" tag on screen). Site positions come from `data/sites.snapshot.json` and are placeholders on a stylised map until the OpenStreetMap step lands.
 
+### Data
+
+- `data/events/events.yaml` is the sourced event database; `web/public/data/events.json` is built from it.
+- `schemas/` holds JSON Schemas for every published file; `pipeline/validate.py` checks them.
+
+```sh
+python3 -m venv pipeline/.venv && pipeline/.venv/bin/pip install -r pipeline/requirements-dev.txt
+pipeline/.venv/bin/python pipeline/tools/build_events.py   # after editing events.yaml
+pipeline/.venv/bin/python pipeline/validate.py             # add --strict before publishing
+```
+
 The original single-file prototype is kept as the visual reference in `docs/prototype/grid-watch-prototype.html`; open it through any static server.
 
 ## Configuration and secrets

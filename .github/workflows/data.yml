@@ -1,0 +1,31 @@
+name: Data and pipeline
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/requirements-dev.txt
+
+      - name: Install
+        run: pip install -r pipeline/requirements-dev.txt
+
+      - name: Unit tests
+        run: python -m pytest -q pipeline/tests
+
+      # Schemas plus rules; TODO event sources are warnings here. The deploy build runs
+      # validate.py --strict, which blocks publishing until every event has a source (spec 4.6).
+      - name: Validate published JSON
+        run: python pipeline/validate.py

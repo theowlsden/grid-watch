@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://grid.noirvisuals.studio/schemas/forecast.schema.json",
+  "title": "Grid Watch forecast",
+  "description": "Stress outlook for the next days, served as /data/forecast.json (spec 7.1). The index is a 0 to 100 rule-based stress index, not a probability.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["issued_at", "timezone", "data_mode", "model", "window_local", "days", "sources", "limitations"],
+  "properties": {
+    "issued_at": { "type": "string", "format": "date-time", "pattern": "Z$", "description": "Issue time in UTC." },
+    "timezone": { "const": "America/Curacao" },
+    "data_mode": { "enum": ["example", "live"], "description": "Example data must always carry the example tag on screen." },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "label"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "label": { "type": "string", "minLength": 1 }
+      }
+    },
+    "window_local": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "$ref": "#/$defs/hhmm" },
+        "end": { "$ref": "#/$defs/hhmm" }
+      }
+    },
+    "days": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 7,
+      "items": { "$ref": "#/$defs/day" }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "url", "retrieved_at"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "url": { "type": "string", "pattern": "^https://" },
+          "retrieved_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "limitations": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  },
+  "$defs": {
+    "hhmm": { "type": "string", "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$" },
+    "level": { "enum": ["low", "moderate", "elevated", "high"] },
+    "day": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["date", "index", "level", "confidence", "drivers", "sites"],
+      "properties": {
+        "date": { "type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "index": { "type": "number", "minimum": 0, "maximum": 100 },
+        "level": { "$ref": "#/$defs/level" },
+        "confidence": { "enum": ["low", "medium", "high"] },
+        "drivers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["wind_ms_100m", "wind_output_pct_est", "temp_c", "demand", "capacity"],
+          "properties": {
+            "wind_ms_100m": { "type": "number", "minimum": 0, "maximum": 80 },
+            "wind_output_pct_est": { "type": "number", "minimum": 0, "maximum": 100 },
+            "temp_c": { "type": "number", "minimum": 0, "maximum": 50 },
+            "demand": { "enum": ["normal", "raised", "high"] },
+            "capacity": { "const": "unknown", "description": "Generator availability is not public." }
+          }
+        },
+        "sites": {
+          "type": "object",
+          "description": "Statuses keyed by site slug (spec 7.4).",
+          "propertyNames": { "pattern": "^[a-z0-9_]+$" },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["status"],
+            "properties": {
+              "status": { "enum": ["low", "moderate", "elevated", "high", "unknown"] },
+              "est_output_pct": { "type": "number", "minimum": 0, "maximum": 100 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,3 @@
+# Pipeline runtime dependencies (pinned; all MIT licensed)
+PyYAML==6.0.3
+jsonschema==4.26.0
