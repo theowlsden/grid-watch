@@ -1,0 +1,110 @@
+{
+  "_comment": "Placeholder export of the CMS sites and island records. Positions are stylised scene coordinates (placeholder_uv), not geography; real coordinates come from OpenStreetMap in a later step.",
+  "exported_at": null,
+  "island": {
+    "version": "stylised-0",
+    "outline": null,
+    "anchorLat": null,
+    "anchorLon": null,
+    "metresPerUnit": null,
+    "rotation": 0
+  },
+  "sites": [
+    {
+      "slug": "playakanoa",
+      "name_en": "Playa Kanoa wind park",
+      "name_pap": null,
+      "kind": "wind",
+      "park_count": 1,
+      "parks": null,
+      "lat": null,
+      "lon": null,
+      "placement": "approximate",
+      "enabled": true,
+      "sortOrder": 1,
+      "description_en": null,
+      "description_pap": null,
+      "pap_reviewed": false,
+      "source_url": null,
+      "source_note": "Placeholder position",
+      "modelOffset": null,
+      "modelRotation": null,
+      "placeholder_uv": [
+        -14,
+        2.4
+      ]
+    },
+    {
+      "slug": "koraaltabak",
+      "name_en": "Koraal Tabak wind park",
+      "name_pap": null,
+      "kind": "wind",
+      "park_count": 1,
+      "parks": null,
+      "lat": null,
+      "lon": null,
+      "placement": "approximate",
+      "enabled": true,
+      "sortOrder": 2,
+      "description_en": null,
+      "description_pap": null,
+      "pap_reviewed": false,
+      "source_url": null,
+      "source_note": "Placeholder position",
+      "modelOffset": null,
+      "modelRotation": null,
+      "placeholder_uv": [
+        -2,
+        -1.0
+      ]
+    },
+    {
+      "slug": "dokweg",
+      "name_en": "Dokweg power plant",
+      "name_pap": null,
+      "kind": "thermal",
+      "park_count": null,
+      "parks": null,
+      "lat": null,
+      "lon": null,
+      "placement": "approximate",
+      "enabled": true,
+      "sortOrder": 3,
+      "description_en": null,
+      "description_pap": null,
+      "pap_reviewed": false,
+      "source_url": null,
+      "source_note": "Placeholder position",
+      "modelOffset": null,
+      "modelRotation": null,
+      "placeholder_uv": [
+        9.5,
+        -1.8
+      ]
+    },
+    {
+      "slug": "terakora",
+      "name_en": "Tera Kora wind parks",
+      "name_pap": null,
+      "kind": "wind",
+      "park_count": 2,
+      "parks": null,
+      "lat": null,
+      "lon": null,
+      "placement": "approximate",
+      "enabled": true,
+      "sortOrder": 4,
+      "description_en": null,
+      "description_pap": null,
+      "pap_reviewed": false,
+      "source_url": null,
+      "source_note": "Placeholder position",
+      "modelOffset": null,
+      "modelRotation": null,
+      "placeholder_uv": [
+        21,
+        1.8
+      ]
+    }
+  ]
+}

@@ -1,0 +1,211 @@
+{
+  "issued_at": "2026-10-07T12:00:00Z",
+  "timezone": "America/Curacao",
+  "data_mode": "example",
+  "model": {
+    "name": "example",
+    "version": "0.0.0",
+    "label": "Stress outlook"
+  },
+  "window_local": {
+    "start": "19:00",
+    "end": "22:00"
+  },
+  "days": [
+    {
+      "date": "2026-10-07",
+      "index": 18,
+      "level": "low",
+      "confidence": "high",
+      "drivers": {
+        "wind_ms_100m": 11.2,
+        "wind_output_pct_est": 76,
+        "temp_c": 31,
+        "demand": "normal",
+        "capacity": "unknown"
+      },
+      "sites": {
+        "playakanoa": {
+          "status": "low",
+          "est_output_pct": 76
+        },
+        "terakora": {
+          "status": "low",
+          "est_output_pct": 76
+        },
+        "koraaltabak": {
+          "status": "low",
+          "est_output_pct": 76
+        }
+      }
+    },
+    {
+      "date": "2026-10-08",
+      "index": 29,
+      "level": "moderate",
+      "confidence": "high",
+      "drivers": {
+        "wind_ms_100m": 9.8,
+        "wind_output_pct_est": 43,
+        "temp_c": 32,
+        "demand": "normal",
+        "capacity": "unknown"
+      },
+      "sites": {
+        "playakanoa": {
+          "status": "low",
+          "est_output_pct": 43
+        },
+        "terakora": {
+          "status": "low",
+          "est_output_pct": 43
+        },
+        "koraaltabak": {
+          "status": "low",
+          "est_output_pct": 43
+        }
+      }
+    },
+    {
+      "date": "2026-10-09",
+      "index": 48,
+      "level": "elevated",
+      "confidence": "medium",
+      "drivers": {
+        "wind_ms_100m": 7.5,
+        "wind_output_pct_est": 12,
+        "temp_c": 33,
+        "demand": "raised",
+        "capacity": "unknown"
+      },
+      "sites": {
+        "playakanoa": {
+          "status": "elevated",
+          "est_output_pct": 12
+        },
+        "terakora": {
+          "status": "elevated",
+          "est_output_pct": 12
+        },
+        "koraaltabak": {
+          "status": "elevated",
+          "est_output_pct": 12
+        }
+      }
+    },
+    {
+      "date": "2026-10-10",
+      "index": 67,
+      "level": "high",
+      "confidence": "medium",
+      "drivers": {
+        "wind_ms_100m": 4.6,
+        "wind_output_pct_est": 1,
+        "temp_c": 34,
+        "demand": "high",
+        "capacity": "unknown"
+      },
+      "sites": {
+        "playakanoa": {
+          "status": "high",
+          "est_output_pct": 1
+        },
+        "terakora": {
+          "status": "high",
+          "est_output_pct": 1
+        },
+        "koraaltabak": {
+          "status": "high",
+          "est_output_pct": 1
+        }
+      }
+    },
+    {
+      "date": "2026-10-11",
+      "index": 55,
+      "level": "elevated",
+      "confidence": "low",
+      "drivers": {
+        "wind_ms_100m": 5.8,
+        "wind_output_pct_est": 3,
+        "temp_c": 33,
+        "demand": "raised",
+        "capacity": "unknown"
+      },
+      "sites": {
+        "playakanoa": {
+          "status": "elevated",
+          "est_output_pct": 3
+        },
+        "terakora": {
+          "status": "elevated",
+          "est_output_pct": 3
+        },
+        "koraaltabak": {
+          "status": "elevated",
+          "est_output_pct": 3
+        }
+      }
+    },
+    {
+      "date": "2026-10-12",
+      "index": 34,
+      "level": "moderate",
+      "confidence": "low",
+      "drivers": {
+        "wind_ms_100m": 8.4,
+        "wind_output_pct_est": 22,
+        "temp_c": 32,
+        "demand": "normal",
+        "capacity": "unknown"
+      },
+      "sites": {
+        "playakanoa": {
+          "status": "low",
+          "est_output_pct": 22
+        },
+        "terakora": {
+          "status": "low",
+          "est_output_pct": 22
+        },
+        "koraaltabak": {
+          "status": "low",
+          "est_output_pct": 22
+        }
+      }
+    },
+    {
+      "date": "2026-10-13",
+      "index": 22,
+      "level": "low",
+      "confidence": "low",
+      "drivers": {
+        "wind_ms_100m": 10.1,
+        "wind_output_pct_est": 49,
+        "temp_c": 31,
+        "demand": "normal",
+        "capacity": "unknown"
+      },
+      "sites": {
+        "playakanoa": {
+          "status": "low",
+          "est_output_pct": 49
+        },
+        "terakora": {
+          "status": "low",
+          "est_output_pct": 49
+        },
+        "koraaltabak": {
+          "status": "low",
+          "est_output_pct": 49
+        }
+      }
+    }
+  ],
+  "sources": [],
+  "limitations": [
+    "Generator availability is not public",
+    "Demand is a weather-based proxy",
+    "Example data, not a forecast"
+  ]
+}
