@@ -24,8 +24,8 @@ interface Props {
 }
 
 // The island area (#main): canvas, site buttons, the site card and the compass.
-// Site buttons are real <button>s (spec 4.4): floating labels over 1500 px, visually hidden
-// below that (sites are tapped on the island), and a plain list when WebGL is unavailable.
+// Site buttons are real <button>s (spec 4.4): floating labels in the wide layout, visually hidden
+// otherwise (sites are tapped on the island), and a plain list when WebGL is unavailable.
 export function IslandStage({ sites, windMs, selected, onSelect, night, card, onWebgl, t }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);

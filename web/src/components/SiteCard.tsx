@@ -28,8 +28,8 @@ function Tile({ b, s }: { b: string; s: string }) {
 export function SiteCard({ site, name, forecast, day, locale, t, onClose }: Props) {
   const v = siteView(site, day);
   const wind = site.kind === "wind";
-  const parks = site.park_count ?? 1;
-  const kind = wind ? t(parks > 1 ? "site.kind.wind_many" : "site.kind.wind") : t(site.kind === "thermal" ? "site.kind.thermal" : "site.kind.other");
+  const parks = site.parks ?? [];
+  const kind = wind ? t(parks.length > 1 ? "site.kind.wind_many" : "site.kind.wind") : t(site.kind === "thermal" ? "site.kind.thermal" : "site.kind.other");
   const status = !v.hasData ? t("site.noData") : wind ? t("site.status.wind", { word: t(`wind.${windWordOf(day)}`) }) : t("site.status.thermal");
   const out = v.estOutputPct ?? day.drivers.wind_output_pct_est;
   return (
@@ -47,6 +47,11 @@ export function SiteCard({ site, name, forecast, day, locale, t, onClose }: Prop
       <div>
         <span className={`pill ${v.tone === "unknown" ? "" : v.tone}`}>{status}</span>
       </div>
+      {parks.length > 0 && (
+        <p className="parks">
+          {t("site.parks", { names: parks.join(", ") })}
+        </p>
+      )}
       {wind && v.hasData && (
         <div>
           <div className="pr">
@@ -75,7 +80,7 @@ export function SiteCard({ site, name, forecast, day, locale, t, onClose }: Prop
         )}
       </div>
       <p className="note">
-        {wind ? `${t(parks > 1 ? "site.wind.parks_other" : "site.wind.parks_one", { count: parks })} ${t("site.wind.note")}` : t("site.thermal.note")}
+        {wind ? t("site.wind.note") : t("site.thermal.note")}
         {site.placement === "approximate" && ` ${t("site.approximate")}`}
       </p>
     </>

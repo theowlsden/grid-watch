@@ -63,7 +63,8 @@ export interface Site {
   name_en: string;
   name_pap: string | null;
   kind: SiteKind;
-  park_count: number | null;
+  // Names of the parks at this location (e.g. Tera Kora I and II); edited in the CMS.
+  // Output is never split by park (spec 12.6).
   parks: string[] | null;
   lat: number | null;
   lon: number | null;

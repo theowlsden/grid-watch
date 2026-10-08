@@ -6,7 +6,7 @@ import { dayOfMonth, weekdayShort } from "@/lib/time";
 import type { Translate } from "@/i18n";
 import { dayAriaLabel, onDayKey } from "./dayLabel";
 
-// Seven-day strip pinned to the bottom up to 1500 px (spec 4.2).
+// Seven-day strip pinned to the bottom outside the wide layout (spec 4.2).
 export function DayStrip({ days, selected, onSelect, locale, t }: { days: ForecastDay[]; selected: number; onSelect: (i: number) => void; locale: string; t: Translate }) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   return (

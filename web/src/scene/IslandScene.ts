@@ -12,7 +12,7 @@ export interface SceneSite {
   slug: string;
   kind: SiteKind;
   uv: [number, number]; // stylised position (u along the island NW to SE, v across), placeholder until projection lands
-  parkCount: number | null;
+  parkCount: number; // one turbine cluster per park
 }
 
 export interface SceneElements {
@@ -52,7 +52,7 @@ const K = 1.3;
 const AXIS = -Math.atan2(UD.y, UD.x);
 
 // Desktop label nudges for the seed sites, so the floating labels overlap less.
-const LABEL_OFFSET: Record<string, [number, number]> = { dokweg: [52, 20] };
+const LABEL_OFFSET: Record<string, [number, number]> = { dokweg: [-64, 24], koraaltabak: [40, 14] };
 
 function toXZ(u: number, v: number): [number, number] {
   return [UD.x * u + VD.x * v, UD.y * u + VD.y * v];
@@ -292,7 +292,7 @@ export class IslandScene {
       this.world.add(shade(m));
     }
     const near = (u: number, v: number, d: number) =>
-      this.sites.some((s) => Math.hypot(s.uv[0] - u, s.uv[1] - v) < d + (s.parkCount && s.parkCount > 1 ? 1.4 : 0)) ||
+      this.sites.some((s) => Math.hypot(s.uv[0] - u, s.uv[1] - v) < d + (s.parkCount > 1 ? 1.4 : 0)) ||
       freeHills.some((h) => Math.hypot(h[0] - u, h[1] - v) < h[2] + 0.8);
     const inside = (u: number, v: number) => u > -27 && u < 27 && v < topV(u) * 0.7 && v > botV(u) * 0.7;
     let placed = 0;
@@ -325,7 +325,7 @@ export class IslandScene {
     const g = new THREE.Group();
     g.position.set(x, SURF, z);
     g.rotation.y = AXIS;
-    const twoParks = s.kind === "wind" && (s.parkCount ?? 1) > 1;
+    const twoParks = s.kind === "wind" && s.parkCount > 1;
     const w = twoParks ? 7.4 : s.kind === "wind" ? 5.0 : 4.4;
     const d = s.kind === "wind" ? 5.0 : 4.4;
     const base = rbox(w + 0.4, 0.3, d + 0.4, 1.2, mat(0xffffff)) as BuiltSite["base"];
@@ -511,7 +511,7 @@ export class IslandScene {
     return [(v.x * 0.5 + 0.5) * stage.clientWidth, (-v.y * 0.5 + 0.5) * stage.clientHeight];
   }
 
-  // Portrait up to 1500 px: while the bottom sheet is open, centre the island in the space
+  // Portrait layout: while the bottom sheet is open, centre the island in the space
   // above it (positive offsets move the island up) and pull back a little.
   private sheetView(reduce: boolean): number {
     const { card, stage } = this.els;
@@ -578,7 +578,7 @@ export class IslandScene {
       site.tile.material.emissive.copy(this.tones[site.tone]).multiplyScalar(0.5 * nk);
       const el = els.labels.get(site.slug);
       if (!el) return;
-      // over 1500 px labels float above their site; below that CSS hides them
+      // in the wide layout labels float above their site; otherwise CSS hides them
       if (wide) {
         const [px, py] = this.project(site.ax, SURF + site.h + site.lift + bob, site.az);
         el.style.transform = `translate(${px + site.off[0]}px,${py + site.off[1]}px) translate(-50%,-100%)`;

@@ -1,7 +1,9 @@
 /* Grid Watch Curaçao styles, ported from docs/prototype/grid-watch-prototype.html.
    Tokens follow spec 10. Two looks, Day and Night, switched by data-mode on the root.
-   Layout: over 1500 px info cards in a left column and the island on the right; up to
-   1500 px a grid of top bar, risk card, island and day strip (spec 4.1, 4.2, 12.12). */
+   Layout: wide (over 1500 px wide and at least 1182 px tall) has info cards in a left
+   column and the island on the right; everything else is a grid of top bar, risk card,
+   island and day strip, in portrait or landscape (spec 4.1, 4.2, 12.12).
+   Keep the media queries in step with src/scene/layout.ts. */
 :root {
   --sea: #e6f4f9;
   --glow: #f6fcfe;
@@ -707,7 +709,7 @@ h2 {
 }
 
 /* ---------- Desktop: cards left, island right ---------- */
-@media (min-width: 1501px) {
+@media (min-width: 1501px) and (min-height: 1182px) {
   body {
     background: radial-gradient(ellipse at 70% 36%, var(--glow) 0%, var(--sea) 60%, var(--edge) 100%) var(--sea);
   }
@@ -1148,7 +1150,7 @@ h2 {
    Landscape: top bar, then risk card left and island right, day strip below.
    The island always has its own grid cell, so no overlay covers it. Sites are picked by
    tapping their tile; the label buttons stay in the page for keyboard and screen readers. */
-@media (max-width: 1500px) {
+@media (max-width: 1500px), (max-height: 1181px) {
   #side {
     display: contents;
   }
@@ -1328,7 +1330,7 @@ h2 {
 }
 
 /* top bar in one row when there is room */
-@media (min-width: 600px) and (max-width: 1500px) {
+@media (min-width: 600px) and (max-width: 1500px), (min-width: 600px) and (max-height: 1181px) {
   #topbar {
     grid-template-columns: minmax(0, 1fr) auto auto;
     grid-template-areas: "name ev mode";
@@ -1338,7 +1340,8 @@ h2 {
 }
 
 /* Landscape: risk card left, island right. The site card replaces the risk card while open. */
-@media (max-width: 1500px) and (orientation: landscape) and (min-aspect-ratio: 5/4) {
+@media (max-width: 1500px) and (orientation: landscape) and (min-aspect-ratio: 5/4),
+  (max-height: 1181px) and (orientation: landscape) and (min-aspect-ratio: 5/4) {
   #app {
     grid-template-columns: minmax(0, clamp(300px, 30vw, 400px)) minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr) auto;
@@ -1377,7 +1380,7 @@ h2 {
 }
 
 /* short landscape screens (phones): tighter risk card and day strip so everything fits */
-@media (max-width: 1500px) and (max-height: 520px) {
+@media (max-height: 520px) {
   #topbar .appname {
     font-size: 18px;
   }
@@ -1546,10 +1549,15 @@ h2 {
   display: block;
 }
 
-@media (min-width: 1501px) {
+@media (min-width: 1501px) and (min-height: 1182px) {
   #app.no-webgl #card {
     left: auto;
     right: var(--gutter);
     top: var(--gutter);
   }
+}
+
+#card .parks {
+  margin: 0;
+  font: 700 13px/1.35 var(--font-body);
 }

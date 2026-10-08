@@ -90,7 +90,7 @@ export function Dashboard() {
       name: (lang !== "en" && s.name_pap) || s.name_en,
       meta,
       tone: v?.tone ?? "unknown",
-      scene: { slug: s.slug, kind: s.kind, uv: s.placeholder_uv ?? [0, 0], parkCount: s.park_count },
+      scene: { slug: s.slug, kind: s.kind, uv: s.placeholder_uv ?? [0, 0], parkCount: Math.max(1, s.parks?.length ?? 1) },
     };
   });
   const site = SITES.find((s) => s.slug === selected);
