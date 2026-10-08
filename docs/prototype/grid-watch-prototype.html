@@ -728,7 +728,7 @@
     }
 
     /* ---------- Desktop: cards left, island right ---------- */
-    @media (min-width: 900px) {
+    @media (min-width: 1441px) {
       body {
         background: radial-gradient(ellipse at 70% 36%, var(--glow) 0%, var(--sea) 60%, var(--edge) 100%) var(--sea);
       }
@@ -1164,10 +1164,12 @@
       }
     }
 
-    /* ---------- Mobile: layout-based canvas area (spec 4.2) ----------
-       Rows: top controls / risk card / island / day strip. The island gets its own
-       grid row, so no overlay covers it; the site card is a bottom sheet inside that row. */
-    @media (max-width: 899px) {
+    /* ---------- Up to 1440 px (phones, tablets, laptops): layout-based canvas area (spec 4.2, 12.12) ----------
+       Portrait: rows of controls / risk card / island / day strip.
+       Landscape: risk card left, island right, day strip below.
+       The island always has its own grid cell, so no overlay covers it. Site labels are
+       name-only buttons docked at the top of the island cell (column in portrait, row in landscape). */
+    @media (max-width: 1440px) {
       #side {
         display: contents;
       }
@@ -1223,6 +1225,48 @@
         bottom: 6px;
       }
 
+      /* docked site labels */
+      #labels {
+        inset: 6px var(--gutter) auto;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        z-index: 1;
+      }
+
+      .site {
+        position: static;
+        display: inline-flex;
+        gap: 8px;
+        padding: 7px 12px 7px 9px;
+        transform: none;
+        will-change: auto;
+        /* tighter shadow: the scrolling row would clip the large one */
+        box-shadow: 0 3px 8px rgba(0, 30, 50, 0.18);
+      }
+
+      .site .mt {
+        display: none;
+      }
+
+      /* portrait: while the site card is open the column folds into one scrolling row,
+         so the island keeps the space between the labels and the card */
+      body.sheet-open #labels {
+        flex-direction: row;
+        right: 0;
+        overflow-x: auto;
+        touch-action: pan-x;
+        pointer-events: auto;
+        scrollbar-width: none;
+        padding: 2px 0 12px;
+        margin-top: -2px;
+      }
+
+      body.sheet-open .site {
+        flex: none;
+      }
+
       #card {
         position: absolute;
         bottom: 0;
@@ -1233,13 +1277,14 @@
       #events {
         top: calc(var(--gutter) + 46px);
         bottom: calc(var(--gutter) + 82px);
+        max-width: 440px;
       }
     }
 
-    /* Landscape phones: not enough height for card above island, so card left, island right. */
-    @media (max-width: 899px) and (max-height: 520px) and (orientation: landscape) {
+    /* Landscape: risk card left, island right. The site card replaces the risk card while open. */
+    @media (max-width: 1440px) and (orientation: landscape) and (min-aspect-ratio: 5/4) {
       body {
-        grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+        grid-template-columns: minmax(0, clamp(300px, 32vw, 400px)) minmax(0, 1fr);
         grid-template-rows: auto minmax(0, 1fr) auto;
         grid-template-areas: "top top" "hud stage" "days days";
         column-gap: 10px;
@@ -1252,16 +1297,43 @@
         box-sizing: border-box;
       }
 
+      body.sheet-open #hud {
+        visibility: hidden;
+      }
+
       #main {
         margin: 0 calc(-1 * var(--gutter)) 0 0;
       }
 
-      #days button {
-        padding: 6px 2px 5px;
+      #labels {
+        flex-direction: row;
+        right: 0;
+        overflow-x: auto;
+        touch-action: pan-x;
+        pointer-events: auto;
+        scrollbar-width: none;
+        /* room for the label shadows */
+        padding: 2px 0 12px;
+        margin-top: -2px;
       }
 
+      .site {
+        flex: none;
+      }
+
+      /* placed over the risk card column by script */
       #card {
-        max-height: calc(100% - 70px);
+        position: fixed;
+        box-sizing: border-box;
+        right: auto;
+        bottom: auto;
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 1440px) and (max-height: 520px) {
+      #days button {
+        padding: 6px 2px 5px;
       }
     }
 
@@ -1585,8 +1657,11 @@
 
       /* ---------- Camera orbit ---------- */
       var cam = { az: -0.45, pol: 0.95, r: 80, tr: 80 };
-      var touched = false, deskMQ = window.matchMedia('(min-width: 900px)');
+      var touched = false, deskMQ = window.matchMedia('(min-width: 1441px)');
+      var sideMQ = window.matchMedia('(max-width: 1440px) and (orientation: landscape) and (min-aspect-ratio: 5/4)');
       function desktop() { return deskMQ.matches; }
+      // landscape up to 1440 px: the site card is shown over the risk card column
+      function sideCard() { return sideMQ.matches; }
       function fitRadius() { var asp = stage.clientWidth / stage.clientHeight; return Math.max(58, Math.min(215, 76 / (0.69 * asp))); }
       function resize() {
         var w = stage.clientWidth, h = stage.clientHeight;
@@ -1599,7 +1674,7 @@
 
       var ptrs = {}, pinch0 = 0;
       stage.addEventListener('pointerdown', function (e) {
-        if (e.target.closest('.site, #card, .legend, #hint')) return;
+        if (e.target.closest('.site, #labels, #card, .legend, #hint')) return;
         stage.setPointerCapture(e.pointerId); ptrs[e.pointerId] = { x: e.clientX, y: e.clientY }; stage.classList.add('drag'); touched = true;
         if (Object.keys(ptrs).length === 2) pinch0 = dist();
       });
@@ -1651,6 +1726,9 @@
         b.innerHTML = '<span class="dot"></span><span class="nm"></span><span class="mt"></span>';
         b.querySelector('.nm').textContent = s.name;
         b.addEventListener('click', function () { select(selected === s ? null : s); });
+        // hovering or focusing a label lifts its tile a little, so docked labels still point at their site
+        ['pointerenter', 'focus'].forEach(function (ev) { b.addEventListener(ev, function () { s.hot = true; }); });
+        ['pointerleave', 'blur'].forEach(function (ev) { b.addEventListener(ev, function () { s.hot = false; }); });
         s.el = b; labelsEl.appendChild(b);
       });
 
@@ -1725,8 +1803,14 @@
       function select(s) {
         selected = s;
         SITES.forEach(function (x) { x.el.setAttribute('aria-pressed', x === s ? 'true' : 'false'); });
-        if (!s) { cardEl.hidden = true; ln.hidden = true; return; }
+        document.body.classList.toggle('sheet-open', !!s);
+        if (!s) { cardEl.hidden = true; ln.setAttribute('hidden', ''); return; }
         renderCard(s); cardEl.hidden = false;
+        // keep the chosen label in view when the docked row scrolls sideways
+        if (!desktop()) {
+          var l = s.el.offsetLeft, r = l + s.el.offsetWidth;
+          if (l < labelsEl.scrollLeft) labelsEl.scrollLeft = l; else if (r > labelsEl.scrollLeft + labelsEl.clientWidth) labelsEl.scrollLeft = r - labelsEl.clientWidth;
+        }
       }
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { select(null); setEvents(false); } });
 
@@ -1740,23 +1824,26 @@
       var cDay = new THREE.Color(0xffd23f), cNight = new THREE.Color(0xe3ebff), eDay = new THREE.Color(0x6a4a00), eNight = new THREE.Color(0x24365f), tmp = new THREE.Color();
       function project(x, y, z) { v3.set(x, y, z).project(camera); return [(v3.x * 0.5 + 0.5) * stage.clientWidth, (-v3.y * 0.5 + 0.5) * stage.clientHeight]; }
 
-      // Mobile: while the bottom sheet is open, shift the view up so the island centres in the space above it.
-      var sheetOff = 0;
+      // Up to 1440 px: centre the island in the free part of its cell, below the docked labels and,
+      // in portrait, above the bottom sheet. Positive offsets move the island up.
+      var viewOff = 0, sheetPx = 0;
       function sheetView() {
-        var target = (!desktop() && selected && !cardEl.hidden) ? (cardEl.offsetHeight + 8) / 2 : 0;
-        sheetOff += (target - sheetOff) * (reduce ? 1 : 0.15);
+        var dock = desktop() ? 0 : labelsEl.offsetTop + labelsEl.offsetHeight;
+        var sheet = (!desktop() && !sideCard() && selected && !cardEl.hidden) ? cardEl.offsetHeight + 8 : 0;
+        var k = reduce ? 1 : 0.15;
+        viewOff += ((sheet - dock) / 2 - viewOff) * k; sheetPx += (sheet - sheetPx) * k;
         var w = stage.clientWidth, h = stage.clientHeight;
-        if (sheetOff > 0.5) camera.setViewOffset(w, h, 0, sheetOff, w, h);
+        if (Math.abs(viewOff) > 0.5) camera.setViewOffset(w, h, 0, viewOff, w, h);
         else if (camera.view && camera.view.enabled) camera.clearViewOffset();
-        // pull back a little so the island fits the smaller free area
-        return h > 0 ? Math.min(1.35, h / Math.max(h - 2 * sheetOff, 1)) : 1;
+        // pull back a little while the sheet is open so the island fits the smaller free area
+        return h > 0 ? Math.min(1.35, h / Math.max(h - sheetPx, 1)) : 1;
       }
-      // Mobile: keep site labels inside the canvas row.
-      function clampLabel(x, y, el) {
-        if (desktop()) return [x, y];
-        var hw = el.offsetWidth / 2, g = 6;
-        return [Math.max(hw + g, Math.min(stage.clientWidth - hw - g, x)), Math.max(el.offsetHeight + g, y)];
+      function placeSideCard() {
+        var hr = document.getElementById('hud').getBoundingClientRect(), dr = daysEl.getBoundingClientRect();
+        cardEl.style.left = hr.left + 'px'; cardEl.style.top = hr.top + 'px'; cardEl.style.width = hr.width + 'px';
+        cardEl.style.maxHeight = Math.max(120, dr.top - 10 - hr.top) + 'px';
       }
+      function clearSideCard() { cardEl.style.left = cardEl.style.top = cardEl.style.width = cardEl.style.maxHeight = ''; }
 
       function frame(t) {
         requestAnimationFrame(frame);
@@ -1786,7 +1873,7 @@
           p.m.position.set(p.x + k * 0.5, 4.4 + k * 2.2, -0.5); p.m.scale.setScalar(0.18 + k * 0.38); p.m.material.opacity = 0.9 * (1 - k);
         });
         SITES.forEach(function (site, i) {
-          var target = selected === site ? 0.45 : 0;
+          var target = selected === site ? 0.45 : site.hot ? 0.25 : 0;
           site.lift += (target - site.lift) * 0.14; site.g.position.y = SURF + site.lift + (reduce ? 0 : Math.sin(s * 1.6 + i) * 0.04);
           if (site.st) site.tile.material.emissive.set(TONE[site.st.k]).multiplyScalar(0.5 * nk);
           if (site.sun) {
@@ -1795,8 +1882,8 @@
           }
           if (site.bolt && !reduce) { site.bolt.rotation.y = s * 1.2; site.bolt.position.y = 3.0 + Math.sin(s * 1.5) * 0.12; }
           var p = project(site.ax, SURF + site.h + site.lift + bob, site.az);
-          var lp = clampLabel(p[0] + site.off[0], p[1] + site.off[1], site.el);
-          site.el.style.transform = 'translate(' + lp[0] + 'px,' + lp[1] + 'px) translate(-50%,-100%)';
+          // over 1440 px labels float above their site; below that they are docked by CSS
+          site.el.style.transform = desktop() ? 'translate(' + (p[0] + site.off[0]) + 'px,' + (p[1] + site.off[1]) + 'px) translate(-50%,-100%)' : '';
         });
 
         if (selected && !cardEl.hidden) {
@@ -1809,8 +1896,16 @@
             var y = Math.max(70, Math.min(h - ch - 70, p2[1] - ch / 2));
             cardEl.style.transform = 'translate(' + x + 'px,' + y + 'px)';
             var ex = Math.max(x, Math.min(x + cw, p2[0])), ey = Math.max(y, Math.min(y + ch, p2[1]));
-            ln.setAttribute('x1', p2[0]); ln.setAttribute('y1', p2[1]); ln.setAttribute('x2', ex); ln.setAttribute('y2', ey); ln.hidden = false;
-          } else { cardEl.style.transform = 'none'; ln.hidden = true; }
+            ln.setAttribute('x1', p2[0]); ln.setAttribute('y1', p2[1]); ln.setAttribute('x2', ex); ln.setAttribute('y2', ey); ln.removeAttribute('hidden');
+          } else {
+            cardEl.style.transform = 'none';
+            if (sideCard()) placeSideCard(); else clearSideCard();
+            // dashed line from the docked label to its site
+            var sr = stage.getBoundingClientRect(), lr = selected.el.getBoundingClientRect();
+            var p3 = project(selected.ax, SURF + selected.h * 0.6 + selected.lift + bob, selected.az);
+            var lx = Math.max(4, Math.min(sr.width - 4, lr.left - sr.left + lr.width / 2)), ly = lr.bottom - sr.top;
+            ln.setAttribute('x1', p3[0]); ln.setAttribute('y1', p3[1]); ln.setAttribute('x2', lx); ln.setAttribute('y2', ly); ln.removeAttribute('hidden');
+          }
         }
         renderer.render(scene, camera);
       }
