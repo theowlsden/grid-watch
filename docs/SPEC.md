@@ -54,7 +54,7 @@ Out of scope for now: other islands (Aruba, Bonaire), user accounts, push notifi
 
 ## 4. Experience requirements
 
-### 4.1 Wide desktop (viewport width over 1500 px)
+### 4.1 Wide desktop (viewport over 1500 px wide and at least 1182 px tall)
 
 - **Left column (about 424 px wide)**: main information only.
   1. Brand card: "Example data" tag (until live), Auto/Day/Night control, large title "Grid Watch Curaçao", one-line description.
@@ -65,12 +65,12 @@ Out of scope for now: other islands (Aruba, Bonaire), user accounts, push notifi
 - **Bottom row, full page width** (about 284 px tall): "Next 7 days" chart on the left (about 40 percent), reported events on the right (about 60 percent) as horizontally scrolling cards. The status legend lives in the chart card header.
 - The seven-day chart is also the day picker. Selecting a day updates the risk card, stat tiles, site status, tile colours, mascot and island tint.
 
-### 4.2 Phones, tablets and windows up to 1500 px
+### 4.2 Everything else: phones, tablets, laptops and shorter desktop windows
 
-**Decided (12.12):** the side column and bottom row of 4.1 are only used above 1500 px; they are too cluttered on tablets and laptops. Up to 1500 px:
+**Decided (12.12):** the side column and bottom row of 4.1 are only used when the viewport is over 1500 px wide **and** at least 1182 px tall; they are too cluttered on tablets, laptops and shorter desktop screens (for example 1920x1080). Everywhere else:
 
 - **Portrait** (and near-square windows): the stacked layout below.
-- **Landscape** (aspect ratio 5:4 or wider, phones to laptops): risk card on the left (about 300 to 400 px), island on the right, seven-day strip along the bottom. Stat tiles and the large chart are not shown. The risk card must fit without scrolling, also on a landscape phone. An open site card replaces the risk card in the left column, so the island stays fully visible.
+- **Landscape** (aspect ratio 5:4 or wider, phones to desktops under 1182 px tall): risk card on the left (about 300 to 400 px), island on the right, seven-day strip along the bottom. Stat tiles and the large chart are not shown. The risk card must fit without scrolling, also on a landscape phone. An open site card replaces the risk card in the left column, so the island stays fully visible.
 - **Top bar** (both orientations): one container with the app name, the "Reported events" button and the Auto/Day/Night control (and later EN / PAP). The app name is not repeated in the risk card. One row where it fits, otherwise the name above the controls.
 - **No site labels on screen** (they cluttered the view): sites are opened by tapping their tile on the island, with a short hint "Tap a site on the island for details" until the first tap. The label buttons stay in the page, visually hidden, for keyboard and screen-reader users; a focused one becomes visible and lifts its tile.
 - In portrait the island is centred in its row; while a site card is open the view shifts so the island centres in the space above the card.
@@ -80,7 +80,7 @@ Stacked layout:
 - Risk card at the top (title, mascot, percentage, level, driver chips), island below it, seven-day strip pinned to the bottom. Reported events open in a panel from a button at the top left. The Auto/Day/Night control sits top right.
 - **Requirement**: the island must be fully visible in the space between the risk card and the day strip. Do this with layout, not by letting the card cover the canvas. Preferred implementation: the canvas area is a flex or grid row between the card and the strip, or the camera view is offset so the island centres in the free area. The site info card is a bottom sheet (max about 54 percent of the height) above the strip and must not hide the island entirely when open.
 - Safe-area insets respected (notch, home indicator). No horizontal page scroll. Minimum side gutter 16 px.
-- Test sizes: 360x740, 390x844, 430x932, 768x1024 (stacked); 667x375, 844x390, 1024x768, 1280x800, 1500x900 (landscape, card left); 1600x900, 1920x1080 (wide desktop).
+- Test sizes: 360x740, 390x844, 430x932, 768x1024 (stacked); 667x375, 844x390, 1024x768, 1280x800, 1500x900, 1920x1080, 1600x1181 (landscape, card left); 1600x1182, 1920x1200 (wide desktop).
 
 ### 4.3 Day and night
 
@@ -320,11 +320,13 @@ Requirements:
 
 `sites` collection (one record per place on the map):
 - Seed slugs: wind `terakora` (2 parks), `playakanoa` (1 park), `koraaltabak` (1 park); `dokweg` (thermal, Aqualectra's main site, `placement = exact`). Solar and battery are not seeded (out of scope for v1). (The prototype's `kanoa` becomes `playakanoa`; no forecast has been issued yet, so renaming is safe.)
-- `parks` (optional, list of park names at that location), `slug` (unique, lowercase, `[a-z0-9_]`; this is the join key everywhere: the model node `site_<slug>`, the keys in `forecast.json`, the card, the label)
+- `parks` (optional, list of park names at that location, edited in the CMS and shown on the site card; seed: Tera Kora I and Tera Kora II at `terakora`), `slug` (unique, lowercase, `[a-z0-9_]`; this is the join key everywhere: the model node `site_<slug>`, the keys in `forecast.json`, the card, the label)
 - `name_en`, `name_pap`, `kind` (`wind|thermal|other`; `solar` and `battery` can be added later), `lat`, `lon`, `enabled`, `sortOrder`
 - `description_en`, `description_pap`, `pap_reviewed`, `source_url`, `source_note`
 - `placement`: `exact` (public location, placed by `lat`/`lon`) or `approximate` (area known; the card shows a soft "approximate location" note)
 - optional `modelOffset` (x, z metres) and `modelRotation` (degrees) to nudge a model without moving the real coordinate
+
+**Seed order of the sites from west to east (decided):** Tera Kora, Dokweg, Playa Kanoa, Koraal Tabak. Until the OpenStreetMap step, the placeholder positions on the stylised island keep this order; afterwards each site is placed at its exact location.
 
 **Outline source (decided): OpenStreetMap.** Take the Curaçao coastline (the island's land polygon, excluding Klein Curaçao unless wanted) from OSM via Overpass or a Geofabrik extract, then simplify with `mapshaper` or `shapely` to about 150 to 400 vertices (enough for the toy look, small enough to extrude cheaply), smooth slightly, and store the result as GeoJSON in the `island` record. Keep the script in `pipeline/tools/build_island.py` so it is reproducible. OSM is detailed, current and free; the licence (ODbL) only requires attribution for this use (see 8.3). Fallback if OSM is awkward: Natural Earth 10m land (public domain, coarse but fine for a low-poly island).
 
@@ -424,12 +426,12 @@ Shape: pill-shaped controls and chips (999 px), cards 24 px radius (20 px for th
 
 3D palette: grass #aee04f, hills #c3ea6a, bushes #52b53a / #6cc443, rim #b9784a with band #d9a06a, turbines white with #ffc93c hubs, plant #fff0cf with #ff7a5c roof.
 
-Breakpoint: 1500 px (wide desktop layout above 1500; see 4.2 for portrait and landscape below it). Side gutter 16 px.
+Breakpoint: wide desktop layout when the viewport is over 1500 px wide and at least 1182 px tall; see 4.2 for portrait and landscape otherwise. Side gutter 16 px.
 
 ## 11. Testing and acceptance
 
 Automated (Playwright):
-- Screenshots at 390x844, 768x1024, 844x390, 1280x800, 1500x900 and 1600x900 in day and night; assert no horizontal scroll and that no overlay hides the island on mobile.
+- Screenshots at 390x844, 768x1024, 844x390, 1280x800, 1920x1080 and 1920x1200 in day and night; assert no horizontal scroll and that no overlay hides the island on mobile.
 - Select each site, assert the card appears and Esc closes it; select each day, assert risk card, chart and site statuses update.
 - Mode switch: Auto follows a mocked clock (05:59, 06:00, 17:59, 18:00), explicit Day/Night persists across reload.
 - WebGL disabled: fallback renders and is usable.
@@ -462,8 +464,9 @@ Acceptance by phase:
 10. **Community reports**: optional later feature (residents report outages). Noisy; treat as a review signal, never as ground truth.
 11. **DECIDED, Hosting and brand**: Hostinger VPS with Coolify already set up; site at `grid.noirvisuals.studio` (domain already owned). Credit line is "Grid Watch by Noir Visuals" (plain text until that site exists). Details in 7.6.
 
-12. **DECIDED, Layout breakpoint (8 Oct 2026, revised)**: the side column plus bottom row layout is used only above 1500 px. Up to 1500 px, portrait uses the stacked layout and landscape uses risk card left, island right, day strip below, with a shared top bar for name, events and mode. No on-screen site labels below 1500 px; sites are picked by tapping the island. Details in 4.2.
+12. **DECIDED, Layout breakpoint (8 Oct 2026, revised)**: the side column plus bottom row layout is used only when the viewport is over 1500 px wide and at least 1182 px tall. Otherwise portrait uses the stacked layout and landscape uses risk card left, island right, day strip below, with a shared top bar for name, events and mode. No on-screen site labels outside the wide layout; sites are picked by tapping the island. Details in 4.2.
 13. **DECIDED, Copyright holder**: "Noir Visuals" in `LICENSE` (not yet a registered company; revisit if it becomes one).
+14. **DECIDED, Readout format**: the stress index is shown as "18 / 100" with the level, a confidence label and "Not a probability" (spec 5.1); day buttons show the bare index.
 
 ## 12b. Licensing and public repository
 
