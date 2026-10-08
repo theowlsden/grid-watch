@@ -80,6 +80,25 @@ def test_dates_must_be_consecutive(forecast):
     assert any("consecutive" in e for e in report.errors)
 
 
+@pytest.mark.parametrize("n,ok", [(2, False), (3, True), (6, True), (7, True)])
+def test_forecast_needs_3_to_7_days(forecast, n, ok):
+    forecast["days"] = forecast["days"][:n]
+    report = Report()
+    check_forecast(forecast, report, SLUGS)
+    assert report.ok is ok
+    if ok and n < 7:
+        assert any("instead of 7" in w for w in report.warnings)
+
+
+def test_more_than_7_days_is_rejected(forecast):
+    extra = copy.deepcopy(forecast["days"][-1])
+    extra["date"] = "2026-10-14"
+    forecast["days"].append(extra)
+    report = Report()
+    check_forecast(forecast, report, SLUGS)
+    assert not report.ok
+
+
 def test_capacity_is_always_unknown(forecast):
     forecast["days"][0]["drivers"]["capacity"] = "ok"
     report = Report()

@@ -31,8 +31,9 @@
     },
     "days": {
       "type": "array",
-      "minItems": 1,
+      "minItems": 3,
       "maxItems": 7,
+      "description": "At least 3 and at most 7 consecutive days; fewer than 7 is allowed but flagged.",
       "items": { "$ref": "#/$defs/day" }
     },
     "sources": {

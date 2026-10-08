@@ -275,6 +275,8 @@ Decisions to confirm (recommendation in bold):
 ]
 ```
 
+`days` holds at least 3 and at most 7 consecutive days starting on the local issue date or later; fewer than 7 is published but flagged by the validator.
+
 `history/YYYY/MM/DD/HH.json`: immutable copies of every `forecast.json` issuance (Phase 3 onward).
 
 ### 7.2 Staleness behaviour
