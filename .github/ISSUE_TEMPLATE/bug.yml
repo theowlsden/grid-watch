@@ -1,0 +1,41 @@
+name: Bug report
+description: Something looks wrong or does not work
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect instead?
+    validations:
+      required: true
+  - type: input
+    id: viewport
+    attributes:
+      label: Viewport or device
+      placeholder: e.g. iPhone 13 (390x844), or desktop 1440x900
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: e.g. Safari 18, Chrome 130
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Display mode
+      options: [Auto, Day, Night]
+    validations:
+      required: true
+  - type: dropdown
+    id: lang
+    attributes:
+      label: Language
+      options: [EN, PAP]
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or other details

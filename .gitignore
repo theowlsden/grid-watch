@@ -1,0 +1,57 @@
+# Secrets and local config (only .env.example files are committed)
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.key
+
+# Telegram bot local config (allowlisted user IDs are configuration, not code)
+bot/config.local.*
+bot/*.session
+
+# PocketBase data and local databases
+pb_data/
+**/pb_data/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+web/out/
+*.tsbuildinfo
+next-env.d.ts
+npm-debug.log*
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Pipeline output written at runtime (served from a volume, not committed)
+web/public/data/history/
+
+# 3D tool backups
+*.blend1
+*.blend2
+
+# Editors and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
