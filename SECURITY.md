@@ -17,6 +17,6 @@ Out of scope: the hosting provider's infrastructure, third-party services (Open-
 ## What the project does to stay safe
 
 - No accounts, no tracking and no personal data on the public site.
-- No secrets in the repository; secrets live in the deployment's environment variables. CI runs a secret scanner (gitleaks) on every push and pull request.
+- No secrets in the repository; secrets live in the deployment's environment variables. CI runs a secret scanner (betterleaks) on every push and pull request.
 - A strict Content Security Policy; news text is rendered as text, never as HTML.
 - The CMS admin UI is not exposed to the public site, and the bot uses a restricted account that can only change news items.

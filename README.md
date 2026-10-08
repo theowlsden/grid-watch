@@ -46,7 +46,7 @@ The prototype loads three.js and fonts from public CDNs, so it needs a network c
 
 ## Configuration and secrets
 
-No secrets are committed. Copy `.env.example` to `.env` for local work; in production, values live in Coolify environment variables. Secret scanning (gitleaks) runs in CI and can run as a pre-commit hook:
+No secrets are committed. Copy `.env.example` to `.env` for local work; in production, values live in Coolify environment variables. Secret scanning ([betterleaks](https://github.com/betterleaks/betterleaks), the successor to gitleaks) runs in CI and can run as a pre-commit hook:
 
 ```sh
 pipx install pre-commit   # or: pip install pre-commit

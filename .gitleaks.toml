@@ -1,7 +1,0 @@
-# Default gitleaks rules plus project allowlist.
-[extend]
-useDefault = true
-
-[allowlist]
-description = "Placeholder-only example env files"
-paths = ['''(^|/)\.env\.example$''']
