@@ -1164,9 +1164,104 @@
       }
     }
 
+    /* ---------- Mobile: layout-based canvas area (spec 4.2) ----------
+       Rows: top controls / risk card / island / day strip. The island gets its own
+       grid row, so no overlay covers it; the site card is a bottom sheet inside that row. */
     @media (max-width: 899px) {
       #side {
         display: contents;
+      }
+
+      body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
+        grid-template-areas: "top" "hud" "stage" "days";
+        row-gap: 10px;
+        box-sizing: border-box;
+        padding: var(--gutter) max(var(--gutter), env(safe-area-inset-right, 0px)) var(--gutter) max(var(--gutter), env(safe-area-inset-left, 0px));
+      }
+
+      #evBtn,
+      #mseg,
+      #hud,
+      #days {
+        position: static;
+      }
+
+      #evBtn {
+        grid-area: top;
+        justify-self: start;
+      }
+
+      #mseg {
+        grid-area: top;
+        justify-self: end;
+        align-self: center;
+        border-radius: 999px;
+      }
+
+      #hud {
+        grid-area: hud;
+        width: auto;
+        min-width: 0;
+      }
+
+      #main {
+        grid-area: stage;
+        position: relative;
+        min-height: 0;
+        /* let the island use the full screen width, edge to edge */
+        margin: 0 calc(-1 * var(--gutter));
+      }
+
+      #days {
+        grid-area: days;
+      }
+
+      #compass {
+        bottom: 6px;
+      }
+
+      #card {
+        position: absolute;
+        bottom: 0;
+        /* about 54 percent of the screen, but always leave part of the island in view */
+        max-height: min(54vh, calc(100% - 150px));
+      }
+
+      #events {
+        top: calc(var(--gutter) + 46px);
+        bottom: calc(var(--gutter) + 82px);
+      }
+    }
+
+    /* Landscape phones: not enough height for card above island, so card left, island right. */
+    @media (max-width: 899px) and (max-height: 520px) and (orientation: landscape) {
+      body {
+        grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        grid-template-areas: "top top" "hud stage" "days days";
+        column-gap: 10px;
+      }
+
+      #hud {
+        overflow-y: auto;
+        align-self: start;
+        max-height: 100%;
+        box-sizing: border-box;
+      }
+
+      #main {
+        margin: 0 calc(-1 * var(--gutter)) 0 0;
+      }
+
+      #days button {
+        padding: 6px 2px 5px;
+      }
+
+      #card {
+        max-height: calc(100% - 70px);
       }
     }
 
@@ -1499,6 +1594,8 @@
         if (!touched) { cam.r = cam.tr = fitRadius(); cam.pol = desktop() ? 0.95 : 0.82; }
       }
       window.addEventListener('resize', resize);
+      // On mobile the canvas row also changes size when the risk card reflows (fonts, wrapping chips).
+      if (window.ResizeObserver) new ResizeObserver(function () { if (!desktop()) resize(); }).observe(stage);
 
       var ptrs = {}, pinch0 = 0;
       stage.addEventListener('pointerdown', function (e) {
@@ -1643,11 +1740,30 @@
       var cDay = new THREE.Color(0xffd23f), cNight = new THREE.Color(0xe3ebff), eDay = new THREE.Color(0x6a4a00), eNight = new THREE.Color(0x24365f), tmp = new THREE.Color();
       function project(x, y, z) { v3.set(x, y, z).project(camera); return [(v3.x * 0.5 + 0.5) * stage.clientWidth, (-v3.y * 0.5 + 0.5) * stage.clientHeight]; }
 
+      // Mobile: while the bottom sheet is open, shift the view up so the island centres in the space above it.
+      var sheetOff = 0;
+      function sheetView() {
+        var target = (!desktop() && selected && !cardEl.hidden) ? (cardEl.offsetHeight + 8) / 2 : 0;
+        sheetOff += (target - sheetOff) * (reduce ? 1 : 0.15);
+        var w = stage.clientWidth, h = stage.clientHeight;
+        if (sheetOff > 0.5) camera.setViewOffset(w, h, 0, sheetOff, w, h);
+        else if (camera.view && camera.view.enabled) camera.clearViewOffset();
+        // pull back a little so the island fits the smaller free area
+        return h > 0 ? Math.min(1.35, h / Math.max(h - 2 * sheetOff, 1)) : 1;
+      }
+      // Mobile: keep site labels inside the canvas row.
+      function clampLabel(x, y, el) {
+        if (desktop()) return [x, y];
+        var hw = el.offsetWidth / 2, g = 6;
+        return [Math.max(hw + g, Math.min(stage.clientWidth - hw - g, x)), Math.max(el.offsetHeight + g, y)];
+      }
+
       function frame(t) {
         requestAnimationFrame(frame);
         var s = t * 0.001;
         cam.r += (cam.tr - cam.r) * 0.12;
-        camera.position.set(cam.r * Math.sin(cam.pol) * Math.sin(cam.az), cam.r * Math.cos(cam.pol), cam.r * Math.sin(cam.pol) * Math.cos(cam.az));
+        var rr = cam.r * sheetView();
+        camera.position.set(rr * Math.sin(cam.pol) * Math.sin(cam.az), rr * Math.cos(cam.pol), rr * Math.sin(cam.pol) * Math.cos(cam.az));
         camera.lookAt(0, 0, 0);
         needle.style.transform = 'rotate(' + cam.az + 'rad)';
 
@@ -1679,7 +1795,8 @@
           }
           if (site.bolt && !reduce) { site.bolt.rotation.y = s * 1.2; site.bolt.position.y = 3.0 + Math.sin(s * 1.5) * 0.12; }
           var p = project(site.ax, SURF + site.h + site.lift + bob, site.az);
-          site.el.style.transform = 'translate(' + (p[0] + site.off[0]) + 'px,' + (p[1] + site.off[1]) + 'px) translate(-50%,-100%)';
+          var lp = clampLabel(p[0] + site.off[0], p[1] + site.off[1], site.el);
+          site.el.style.transform = 'translate(' + lp[0] + 'px,' + lp[1] + 'px) translate(-50%,-100%)';
         });
 
         if (selected && !cardEl.hidden) {
