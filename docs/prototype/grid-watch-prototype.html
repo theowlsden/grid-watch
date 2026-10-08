@@ -1,0 +1,1706 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset=utf8>
+  <meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <style>
+    :root {
+      color-scheme: light;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font: 14px -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #faf9f5;
+      color: #141413
+    }
+
+    img {
+      max-width: 100%
+    }
+
+    [hidden]:not([hidden=until-found i]) {
+      display: none !important
+    }
+  </style>
+</head>
+
+<body>
+  <title>Grid Watch Curaçao</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    /* Layout: desktop = info cards in a left column, island on the right (Bonaire reference). Mobile = risk card on top, island below, day strip at the bottom.
+     Two looks, Day and Night, switched by data-mode on the root (auto from local time, or chosen by the viewer). */
+    :root {
+      --sea: #e6f4f9;
+      --glow: #f6fcfe;
+      --edge: #d3eaf2;
+      --ink: #10312a;
+      --muted: #5f7f7c;
+      --panel: #ffffff;
+      --soft: #eef7fa;
+      --line: #d5e8ee;
+      --blue: #1b7bff;
+      --ok: #27c76f;
+      --watch: #f4c20d;
+      --warn: #ff8a2b;
+      --crit: #ff4d4f;
+      --unknown: #9fb6c0;
+      --on-tone: #10312a;
+      --sel-bg: #10312a;
+      --sel-fg: #ffffff;
+      --tag-bg: #10312a;
+      --tag-fg: #ffffff;
+      --hl: rgba(174, 224, 79, 0.38);
+      --ring: rgba(174, 224, 79, 0.4);
+      --mbg: #10312a;
+      --shadow: 0 10px 28px rgba(40, 100, 125, 0.16);
+      --font-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+      --font-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --gutter: 16px;
+      color-scheme: light;
+    }
+
+    :root[data-mode="night"] {
+      --sea: #070d14;
+      --glow: #16314a;
+      --edge: #04080d;
+      --ink: #e8f3f1;
+      --muted: #8ea9ad;
+      --panel: rgba(16, 28, 39, 0.9);
+      --soft: #1a2b3a;
+      --line: #26394a;
+      --blue: #5aa2ff;
+      --unknown: #6f8794;
+      --sel-bg: #aee04f;
+      --sel-fg: #10312a;
+      --tag-bg: #aee04f;
+      --tag-fg: #10312a;
+      --hl: rgba(174, 224, 79, 0.2);
+      --ring: rgba(174, 224, 79, 0.28);
+      --mbg: #2b5a4c;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      color-scheme: dark;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font: 600 14px/1.45 var(--font-body);
+      overflow: hidden;
+      position: relative;
+      background: radial-gradient(ellipse at 50% 45%, var(--glow) 0%, var(--sea) 62%, var(--edge) 100%) var(--sea);
+    }
+
+    #stage {
+      position: absolute;
+      inset: 0;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    #stage.drag {
+      cursor: grabbing;
+    }
+
+    #c {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #leader {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    #leader line {
+      stroke: var(--blue);
+      stroke-width: 2;
+      stroke-dasharray: 2 6;
+      stroke-linecap: round;
+    }
+
+    #labels {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+    }
+
+    button:focus-visible {
+      outline: 3px solid var(--blue);
+      outline-offset: 2px;
+    }
+
+    h1,
+    h2 {
+      margin: 0;
+    }
+
+    .card {
+      background: var(--panel);
+      border-radius: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .site {
+      position: absolute;
+      left: 0;
+      top: 0;
+      pointer-events: auto;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 8px;
+      align-items: center;
+      padding: 6px 12px 6px 9px;
+      background: var(--panel);
+      border: 2px solid transparent;
+      border-radius: 999px;
+      text-align: left;
+      white-space: nowrap;
+      box-shadow: var(--shadow);
+      will-change: transform;
+    }
+
+    .site .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      grid-row: span 2;
+      background: var(--unknown);
+    }
+
+    .site .nm {
+      font: 800 13px/1.15 var(--font-body);
+    }
+
+    .site .mt {
+      font: 700 11px/1.15 var(--font-body);
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .site[aria-pressed="true"] {
+      border-color: var(--ink);
+    }
+
+    .tag {
+      display: inline-block;
+      font: 800 10.5px/1 var(--font-body);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--tag-fg);
+      background: var(--tag-bg);
+      border-radius: 999px;
+      padding: 5px 9px;
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      font: 800 12px/1 var(--font-body);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 7px 12px;
+      border-radius: 999px;
+      color: var(--on-tone);
+      background: var(--unknown);
+    }
+
+    .pill.ok {
+      background: var(--ok);
+    }
+
+    .pill.watch {
+      background: var(--watch);
+    }
+
+    .pill.warn {
+      background: var(--warn);
+    }
+
+    .pill.crit {
+      background: var(--crit);
+      color: #fff;
+    }
+
+    /* segmented day/night control */
+    .seg {
+      display: inline-flex;
+      padding: 3px;
+      gap: 2px;
+      background: var(--soft);
+      border-radius: 999px;
+    }
+
+    .seg button {
+      cursor: pointer;
+      border: 0;
+      background: none;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font: 800 12px/1 var(--font-body);
+      color: var(--muted);
+    }
+
+    .seg button[aria-pressed="true"] {
+      background: var(--sel-bg);
+      color: var(--sel-fg);
+    }
+
+    #mseg {
+      position: absolute;
+      right: var(--gutter);
+      top: var(--gutter);
+      z-index: 2;
+      box-shadow: var(--shadow);
+      background: var(--panel);
+    }
+
+    #hud {
+      position: absolute;
+      left: var(--gutter);
+      top: 62px;
+      width: calc(100% - 2 * var(--gutter));
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 20px;
+    }
+
+    #hud .top {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    #mascot {
+      width: 46px;
+      height: 46px;
+      flex: none;
+    }
+
+    #mascot svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .mh1 {
+      margin-top: 6px;
+      font: 800 20px/1 var(--font-display);
+      letter-spacing: -.01em;
+    }
+
+    .when {
+      margin-top: 3px;
+      font: 700 12px/1.3 var(--font-body);
+      color: var(--muted);
+    }
+
+    .readout {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pct {
+      font: 800 40px/0.9 var(--font-display);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .drivers {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .drivers li {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      padding: 4px 8px;
+      background: var(--soft);
+      border-radius: 999px;
+      font: 700 11px/1.2 var(--font-body);
+    }
+
+    .drivers li::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--unknown);
+    }
+
+    .drivers .t-ok::before {
+      background: var(--ok);
+    }
+
+    .drivers .t-watch::before {
+      background: var(--watch);
+    }
+
+    .drivers .t-warn::before {
+      background: var(--warn);
+    }
+
+    .drivers .t-crit::before {
+      background: var(--crit);
+    }
+
+    .drivers b {
+      font-weight: 800;
+    }
+
+    #brand,
+    #stats,
+    #week,
+    #evCard,
+    #below,
+    .legend,
+    #hint {
+      display: none;
+    }
+
+    #evBtn {
+      position: absolute;
+      left: var(--gutter);
+      top: var(--gutter);
+      padding: 11px 16px;
+      cursor: pointer;
+      background: var(--panel);
+      border: 0;
+      border-radius: 999px;
+      font: 800 13px/1 var(--font-body);
+      box-shadow: var(--shadow);
+      z-index: 2;
+    }
+
+    #evBtn[aria-expanded="true"] {
+      background: var(--sel-bg);
+      color: var(--sel-fg);
+    }
+
+    #events {
+      position: absolute;
+      left: var(--gutter);
+      top: 66px;
+      bottom: 104px;
+      width: calc(100% - 2 * var(--gutter));
+      overflow: auto;
+      padding: 18px;
+      z-index: 4;
+    }
+
+    .evh {
+      font: 800 20px/1.15 var(--font-display);
+      margin-bottom: 4px;
+    }
+
+    .evl {
+      list-style: none;
+      margin: 14px 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .evl li {
+      display: grid;
+      gap: 3px;
+      padding: 12px 14px;
+      background: var(--soft);
+      border-radius: 16px;
+    }
+
+    .evl time {
+      justify-self: start;
+      font: 800 11px/1 var(--font-body);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--crit);
+      color: #fff;
+    }
+
+    .evl li.minor time {
+      background: var(--warn);
+      color: var(--on-tone);
+    }
+
+    .evl strong {
+      font-weight: 800;
+      margin-top: 4px;
+    }
+
+    .evl p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    #card {
+      position: fixed;
+      left: var(--gutter);
+      right: var(--gutter);
+      bottom: 104px;
+      max-height: 54%;
+      overflow: auto;
+      background: var(--panel);
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: 0 14px 34px rgba(0, 20, 40, 0.28);
+      z-index: 3;
+      display: grid;
+      gap: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    #card .head {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    #card .ic {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex: none;
+      background: var(--soft);
+    }
+
+    #card .ic svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--ink);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #card .hd {
+      flex: 1;
+      min-width: 0;
+    }
+
+    #card .kind {
+      font: 800 11px/1 var(--font-body);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    #card h2 {
+      margin: 3px 0 0;
+      font: 800 20px/1.05 var(--font-display);
+      text-wrap: balance;
+    }
+
+    #card .x {
+      cursor: pointer;
+      background: var(--soft);
+      border: 0;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      line-height: 1;
+      font-size: 18px;
+      flex: none;
+    }
+
+    #card .pr {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font: 800 14px/1 var(--font-body);
+    }
+
+    #card .pr span:last-child {
+      color: var(--blue);
+      font-size: 15px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #card .bar {
+      height: 10px;
+      background: var(--soft);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    #card .bar i {
+      display: block;
+      height: 100%;
+      background: var(--blue);
+      border-radius: 999px;
+    }
+
+    #card .tiles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    #card .tile {
+      background: var(--soft);
+      border-radius: 16px;
+      padding: 10px 12px;
+      min-width: 0;
+    }
+
+    #card .tile b {
+      display: block;
+      font: 800 14px/1.2 var(--font-body);
+    }
+
+    #card .tile span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.25;
+    }
+
+    #card .note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    #compass {
+      position: absolute;
+      right: var(--gutter);
+      bottom: 104px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      pointer-events: none;
+    }
+
+    #compass span {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: start center;
+      font: 800 11px/1 var(--font-body);
+      color: var(--ink);
+      padding-top: 4px;
+      transition: transform .1s linear;
+    }
+
+    #compass span::after {
+      content: "";
+      position: absolute;
+      top: 17px;
+      left: 50%;
+      width: 3px;
+      height: 14px;
+      margin-left: -1.5px;
+      border-radius: 2px;
+      background: var(--crit);
+    }
+
+    #days {
+      position: absolute;
+      left: var(--gutter);
+      right: var(--gutter);
+      bottom: var(--gutter);
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+      z-index: 2;
+    }
+
+    #days button {
+      cursor: pointer;
+      display: grid;
+      gap: 3px;
+      justify-items: center;
+      padding: 9px 2px 8px;
+      background: var(--panel);
+      border: 0;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    #days .wd {
+      font: 800 11px/1 var(--font-body);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    #days .dn {
+      font: 800 16px/1 var(--font-display);
+    }
+
+    #days .dp {
+      font: 800 10.5px/1 var(--font-body);
+      padding: 3px 5px;
+      border-radius: 999px;
+      background: var(--unknown);
+      font-variant-numeric: tabular-nums;
+      color: var(--on-tone);
+    }
+
+    #days .ok .dp {
+      background: var(--ok);
+    }
+
+    #days .watch .dp {
+      background: var(--watch);
+    }
+
+    #days .warn .dp {
+      background: var(--warn);
+    }
+
+    #days .crit .dp {
+      background: var(--crit);
+      color: #fff;
+    }
+
+    #days button[aria-pressed="true"] {
+      background: var(--sel-bg);
+      color: var(--sel-fg);
+    }
+
+    #days button[aria-pressed="true"] .wd {
+      color: inherit;
+      opacity: .75;
+    }
+
+    #fail {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    /* ---------- Desktop: cards left, island right ---------- */
+    @media (min-width: 900px) {
+      body {
+        background: radial-gradient(ellipse at 70% 36%, var(--glow) 0%, var(--sea) 60%, var(--edge) 100%) var(--sea);
+      }
+
+      #main {
+        position: absolute;
+        left: 456px;
+        right: var(--gutter);
+        top: var(--gutter);
+        bottom: calc(var(--gutter) + 296px);
+      }
+
+      #stage {
+        position: absolute;
+        inset: 0;
+      }
+
+      #below {
+        display: grid;
+        position: absolute;
+        left: var(--gutter);
+        right: var(--gutter);
+        bottom: var(--gutter);
+        height: 284px;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+        gap: 12px;
+      }
+
+      #side {
+        position: absolute;
+        left: var(--gutter);
+        top: var(--gutter);
+        bottom: calc(var(--gutter) + 296px);
+        width: 424px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        overflow-y: auto;
+        padding: 4px 8px 4px 4px;
+        margin: -4px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--line) transparent;
+      }
+
+      #side>* {
+        flex: none;
+      }
+
+      #brand {
+        display: grid;
+        gap: 10px;
+        padding: 18px;
+      }
+
+      #brand .brow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      #brand h1 {
+        font: 800 46px/0.95 var(--font-display);
+        letter-spacing: -.015em;
+      }
+
+      #hud {
+        position: static;
+        width: auto;
+        padding: 16px;
+        border-radius: 24px;
+        gap: 4px 16px;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+      }
+
+      #hud .top,
+      #hud .ttl {
+        display: contents;
+      }
+
+      #hud .tag,
+      #hud .mh1,
+      #hud .drivers {
+        display: none;
+      }
+
+      #mascot {
+        width: 72px;
+        height: 72px;
+        grid-row: span 2;
+      }
+
+      #hud .when {
+        margin: 0;
+        grid-column: 2;
+      }
+
+      #hud .readout {
+        grid-column: 2;
+      }
+
+      .pct {
+        font-size: 56px;
+      }
+
+      #hud .sub {
+        grid-column: 1 / -1;
+        margin-top: 4px;
+      }
+
+      #stats {
+        display: grid;
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .stat {
+        display: grid;
+        gap: 6px;
+        padding: 14px;
+        justify-items: start;
+      }
+
+      .stat .si {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--soft);
+        display: grid;
+        place-items: center;
+      }
+
+      .stat .si svg {
+        width: 18px;
+        height: 18px;
+        stroke: var(--ink);
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .stat .sv {
+        font: 800 24px/1 var(--font-display);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .stat .sv small {
+        font: 700 12px/1 var(--font-body);
+        color: var(--muted);
+        margin-left: 2px;
+      }
+
+      .stat .sl {
+        font: 700 12px/1.2 var(--font-body);
+        color: var(--muted);
+      }
+
+      .chip {
+        font: 800 11px/1 var(--font-body);
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: var(--unknown);
+        color: var(--on-tone);
+      }
+
+      .chip.ok {
+        background: var(--ok);
+      }
+
+      .chip.watch {
+        background: var(--watch);
+      }
+
+      .chip.warn {
+        background: var(--warn);
+      }
+
+      .chip.crit {
+        background: var(--crit);
+        color: #fff;
+      }
+
+      #week {
+        display: block;
+        padding: 16px 16px 12px;
+      }
+
+      #week .wh {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+
+      #week h2 {
+        font: 800 19px/1.1 var(--font-display);
+      }
+
+      #plot {
+        position: relative;
+        height: 196px;
+      }
+
+      #plot .grid,
+      #plot .cols {
+        position: absolute;
+        inset: 0;
+      }
+
+      #plot .gl {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: calc(38px + var(--p) * 1.4px);
+        border-top: 1px dashed var(--line);
+      }
+
+      #plot .gl span {
+        position: absolute;
+        right: 0;
+        bottom: 3px;
+        font: 700 10px/1 var(--font-body);
+        color: var(--muted);
+      }
+
+      #plot .cols {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+      }
+
+      #plot .col {
+        position: relative;
+        border: 0;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+      }
+
+      #plot .stem {
+        position: absolute;
+        left: 50%;
+        bottom: 38px;
+        width: 2px;
+        margin-left: -1px;
+        height: calc(var(--p) * 1.4px);
+        background: var(--line);
+      }
+
+      #plot .dot {
+        position: absolute;
+        left: 50%;
+        width: 16px;
+        height: 16px;
+        margin-left: -8px;
+        bottom: calc(38px + var(--p) * 1.4px - 8px);
+        border-radius: 50%;
+        background: var(--unknown);
+        border: 3px solid var(--panel);
+        box-sizing: border-box;
+      }
+
+      #plot .ok .dot {
+        background: var(--ok);
+      }
+
+      #plot .watch .dot {
+        background: var(--watch);
+      }
+
+      #plot .warn .dot {
+        background: var(--warn);
+      }
+
+      #plot .crit .dot {
+        background: var(--crit);
+      }
+
+      #plot .tip {
+        display: none;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: calc(38px + var(--p) * 1.4px + 16px);
+        background: var(--sel-bg);
+        color: var(--sel-fg);
+        font: 800 12px/1 var(--font-body);
+        padding: 6px 9px;
+        border-radius: 999px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      #plot .lab {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 4px;
+        font: 800 11px/1 var(--font-body);
+        padding: 7px 8px;
+        border-radius: 999px;
+        background: var(--soft);
+        color: var(--muted);
+      }
+
+      #plot .col[aria-pressed="true"]::before {
+        content: "";
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        top: 0;
+        bottom: 34px;
+        border-radius: 0 0 1rem 1rem;
+        background: linear-gradient(to top, var(--hl), transparent);
+      }
+
+      #plot .col[aria-pressed="true"] .tip {
+        display: block;
+      }
+
+      #plot .col[aria-pressed="true"] .dot {
+        width: 22px;
+        height: 22px;
+        margin-left: -11px;
+        bottom: calc(38px + var(--p) * 1.4px - 11px);
+        box-shadow: 0 0 0 6px var(--ring);
+      }
+
+      #plot .col[aria-pressed="true"] .lab {
+        background: var(--sel-bg);
+        color: var(--sel-fg);
+      }
+
+      #evCard {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 16px;
+        overflow: hidden;
+        min-width: 0;
+      }
+
+      #evCard .evh {
+        margin: 0;
+      }
+
+      #evCard .evl {
+        display: flex;
+        gap: 10px;
+        margin: 4px 0 0;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        scroll-snap-type: x proximity;
+        scrollbar-width: thin;
+        scrollbar-color: var(--line) transparent;
+      }
+
+      #evCard .evl li {
+        flex: 0 0 224px;
+        scroll-snap-align: start;
+        align-content: start;
+      }
+
+      #evCard .evl p {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      #evCard>.sub:last-child {
+        font-size: 12px;
+      }
+
+      #evBtn,
+      #mseg,
+      #days,
+      #events {
+        display: none !important;
+      }
+
+      .legend {
+        display: flex;
+        gap: 14px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        flex-wrap: wrap;
+        font: 700 12px/1 var(--font-body);
+        color: var(--muted);
+      }
+
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .legend i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: block;
+      }
+
+      #hint {
+        display: block;
+        position: absolute;
+        right: 0;
+        top: 0;
+        font: 700 12px/1 var(--font-body);
+        color: var(--muted);
+        padding: 9px 14px;
+        border-radius: 999px;
+      }
+
+      #compass {
+        bottom: 4px;
+        right: 0;
+      }
+
+      #card {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: auto;
+        bottom: auto;
+        width: 330px;
+        max-width: calc(100% - 2 * var(--gutter));
+        max-height: none;
+        overflow: visible;
+      }
+    }
+
+    @media (max-width: 899px) {
+      #side {
+        display: contents;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #compass span {
+        transition: none;
+      }
+    }
+  </style>
+
+  <div id="main">
+    <div id="stage">
+      <canvas id="c" aria-label="3D model of Curaçao with its power sites"></canvas>
+      <svg id="leader" aria-hidden="true">
+        <line id="ln" x1="0" y1="0" x2="0" y2="0" hidden></line>
+      </svg>
+      <div id="labels"></div>
+
+      <div id="hint" class="card">Drag to rotate, scroll to zoom</div>
+      <article id="card" hidden></article>
+      <div id="compass" aria-hidden="true"><span id="needle">N</span></div>
+    </div>
+  </div>
+
+  <div id="below">
+    <section id="week" class="card">
+      <div class="wh">
+        <h2>Next 7 days</h2>
+        <div class="legend" aria-label="Status colours">
+          <span><i style="background:var(--ok)"></i>Normal</span><span><i
+              style="background:var(--watch)"></i>Watch</span><span><i
+              style="background:var(--warn)"></i>Strained</span><span><i
+              style="background:var(--crit)"></i>Critical</span><span><i style="background:var(--unknown)"></i>Not
+            public</span>
+        </div>
+        <span class="sub">Pick a day</span>
+      </div>
+      <div id="plot"></div>
+    </section>
+
+    <section id="evCard" class="card">
+      <h2 class="evh">Reported grid events</h2>
+      <p class="sub">From public reports. Source links still to be added to each entry.</p>
+      <ol class="evl" id="evList2"></ol>
+      <p class="sub">What this page cannot show yet: which generators are running, real electricity demand, and how full
+        the batteries are. Only the utility has those numbers.</p>
+    </section>
+  </div>
+
+  <div id="side">
+    <section id="brand" class="card">
+      <div class="brow"><span class="tag">Example data, not a live forecast</span><span class="segHost"></span></div>
+      <h1>Grid Watch<br>Curaçao</h1>
+      <p class="sub">What public data suggests about electricity supply stress in the week ahead.</p>
+    </section>
+
+    <section id="hud" class="card">
+      <div class="top">
+        <div id="mascot" aria-hidden="true"></div>
+        <div class="ttl">
+          <span class="tag">Example data, not a live forecast</span>
+          <div class="mh1">Grid Watch Curaçao</div>
+          <div class="when" id="when"></div>
+        </div>
+      </div>
+      <div class="readout"><span class="pct" id="pct">--</span><span class="pill" id="lvl">--</span></div>
+      <p class="sub">Chance of elevated grid stress during the evening peak.</p>
+      <ul class="drivers" id="drivers"></ul>
+    </section>
+
+    <div id="stats"></div>
+
+  </div>
+
+  <div id="mseg" class="segHost"></div>
+  <button id="evBtn" aria-expanded="false" aria-controls="events">Reported events</button>
+  <aside id="events" class="card" hidden aria-label="Reported grid events">
+    <h2 class="evh">Reported grid events</h2>
+    <p class="sub">From public reports. Source links still to be added to each entry.</p>
+    <ol class="evl" id="evList1"></ol>
+    <p class="sub">What this page cannot show yet: which generators are running, real electricity demand, and how full
+      the batteries are. Only the utility has those numbers.</p>
+  </aside>
+
+  <nav id="days" aria-label="Choose a day"></nav>
+  <div id="fail" hidden>This page needs WebGL to draw the island. Try another browser or device.</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    (function () {
+      var css = function (n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
+      var TONE = { ok: css('--ok'), watch: css('--watch'), warn: css('--warn'), crit: css('--crit'), unknown: css('--unknown') };
+
+      /* ---------- Sample data (clearly example values) ---------- */
+      var DAYS = [
+        { wd: 'Wed', n: 7, pct: 18, wind: 11.2, temp: 31 },
+        { wd: 'Thu', n: 8, pct: 29, wind: 9.8, temp: 32 },
+        { wd: 'Fri', n: 9, pct: 48, wind: 7.5, temp: 33 },
+        { wd: 'Sat', n: 10, pct: 67, wind: 4.6, temp: 34 },
+        { wd: 'Sun', n: 11, pct: 55, wind: 5.8, temp: 33 },
+        { wd: 'Mon', n: 12, pct: 34, wind: 8.4, temp: 32 },
+        { wd: 'Tue', n: 13, pct: 22, wind: 10.1, temp: 31 }
+      ];
+      var EVENTS = [
+        { d: '27 Aug 2025', t: 'Island-wide blackout', p: 'Wind output fell sharply around 02:30 and the disturbance grew into a full system collapse. Investigated by Aqualectra and DNV.', big: true },
+        { d: '25 to 26 Apr 2026', t: 'Major outage', p: 'Units in maintenance, higher evening demand, reliance on battery storage and not enough generation, so customers were switched off.', big: true },
+        { d: '15 Aug 2026', t: 'Controlled switching', p: 'Wind dropped earlier than expected, high temperatures raised demand and some capacity was in maintenance.' },
+        { d: '18 to 19 Aug 2026', t: 'Supply shortage', p: 'Strongly reduced wind and too little available generation.' },
+        { d: '6 Oct 2026', t: 'Controlled outages', p: 'Insufficient available capacity, units under repair and very low wind speeds.' }
+      ];
+      var evHTML = EVENTS.map(function (e) { return '<li' + (e.big ? '' : ' class="minor"') + '><time>' + e.d + '</time><strong>' + e.t + '</strong><p>' + e.p + '</p></li>'; }).join('');
+      document.getElementById('evList1').innerHTML = evHTML; document.getElementById('evList2').innerHTML = evHTML;
+
+      function level(p) {
+        if (p < 25) return { name: 'Low', k: 'ok' };
+        if (p < 45) return { name: 'Moderate', k: 'watch' };
+        if (p < 60) return { name: 'Elevated', k: 'warn' };
+        return { name: 'High', k: 'crit' };
+      }
+      function windOut(w) { return Math.round(Math.max(0, Math.min(1, Math.pow((w - 3) / 9, 3))) * 100); }
+      function windTone(w) { return w < 5.5 ? 'crit' : w < 8 ? 'warn' : 'ok'; }
+      function windWord(w) { return w < 5.5 ? 'Very low' : w < 8 ? 'Light' : 'Steady'; }
+      function demandTone(t) { return t >= 34 ? 'crit' : t >= 33 ? 'warn' : 'ok'; }
+      function demandWord(t) { return t >= 34 ? 'High' : t >= 33 ? 'Raised' : 'Normal'; }
+
+      var SITES = [
+        { id: 'kanoa', name: 'Playa Kanoa wind park', kind: 'wind', u: -14, v: 2.4, off: [0, -8] },
+        { id: 'solar', name: 'Solar sites', kind: 'solar', u: -2, v: -1.0, off: [0, -8] },
+        { id: 'bess', name: 'Battery storage', kind: 'battery', u: 4.5, v: 3.6, off: [-46, -22] },
+        { id: 'dokweg', name: 'Dokweg power plant', kind: 'conv', u: 9.5, v: -1.8, off: [52, 20] },
+        { id: 'terakora', name: 'Tera Kora wind park', kind: 'wind', u: 21, v: 1.8, off: [0, -8] }
+      ];
+      function status(s, d) {
+        if (s.kind === 'wind') return { k: windTone(d.wind), txt: windWord(d.wind) + ' wind', mt: '~' + windOut(d.wind) + '% of rated' };
+        if (s.kind === 'solar') return { k: 'ok', txt: 'Normal sun', mt: 'sample' };
+        if (s.kind === 'battery') return { k: 'unknown', txt: 'Charge not public', mt: 'charge: n/a' };
+        return { k: 'unknown', txt: 'Units in service not public', mt: 'availability: n/a' };
+      }
+
+      /* ---------- Mascot ---------- */
+      function mascot(k) {
+        var mouth = { ok: '<path d="M26 42q6 7 12 0" />', watch: '<path d="M27 43q5 3.5 10 0" />', warn: '<path d="M27 44.5h10" />', crit: '<ellipse cx="32" cy="45" rx="3.4" ry="4.4" fill="#10312a" stroke="none" />' }[k];
+        var brows = (k === 'warn' || k === 'crit') ? '<path d="M20 28l7 2.5M44 28l-7 2.5" />' : '';
+        var sweat = k === 'crit' ? '<path d="M50 20q4 6 0 9q-4-3 0-9z" fill="#7cc9ff" stroke="none" />' : '';
+        return '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" style="fill:var(--mbg)"/><ellipse cx="32" cy="37" rx="19" ry="17.5" fill="#5fd987"/><ellipse cx="25" cy="29" rx="7" ry="4" fill="#9af2b4" opacity=".7"/>' +
+          '<path d="M32 21c0-6 4-9.5 10-9.5 0 6-3.5 9.5-10 9.5z" fill="#2fb86a"/><path d="M32 21c0-5-3-8-8.5-8 0 5 3.5 8 8.5 8z" fill="#46cf7c"/>' +
+          '<circle cx="25" cy="36" r="3.2" fill="#10312a"/><circle cx="39" cy="36" r="3.2" fill="#10312a"/><circle cx="26" cy="35" r="1" fill="#fff"/><circle cx="40" cy="35" r="1" fill="#fff"/>' +
+          '<circle cx="20" cy="42" r="3" fill="#ff9aa8" opacity=".75"/><circle cx="44" cy="42" r="3" fill="#ff9aa8" opacity=".75"/>' +
+          '<g fill="none" stroke="#10312a" stroke-width="2.3" stroke-linecap="round">' + brows + mouth + '</g>' + sweat + '</svg>';
+      }
+
+      /* ---------- Three.js scene ---------- */
+      var cv = document.getElementById('c'), stage = document.getElementById('stage');
+      var renderer;
+      try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); }
+      catch (e) { document.getElementById('fail').hidden = false; return; }
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setClearColor(0x000000, 0);
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(38, 1, 1, 800);
+
+      var hemi = new THREE.HemisphereLight(0xffffff, 0xbfe0ea, 0.95); scene.add(hemi);
+      var sun = new THREE.DirectionalLight(0xfff6e6, 0.85); sun.position.set(34, 60, 26);
+      sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0006;
+      var sc = sun.shadow.camera; sc.left = -48; sc.right = 48; sc.top = 48; sc.bottom = -48; sc.near = 5; sc.far = 160;
+      scene.add(sun);
+      var fill = new THREE.DirectionalLight(0xcfe9ff, 0.35); fill.position.set(-30, 20, -20); scene.add(fill);
+      var ENV = {
+        d: { hs: new THREE.Color(0xffffff), hg: new THREE.Color(0xbfe0ea), hi: 0.95, sc: new THREE.Color(0xfff6e6), si: 0.85, fi: 0.35 },
+        n: { hs: new THREE.Color(0x86a4ea), hg: new THREE.Color(0x0e1c30), hi: 0.7, sc: new THREE.Color(0xa6c4ff), si: 0.62, fi: 0.14 }
+      };
+
+      // stars, only visible at night
+      var starPos = new Float32Array(240 * 3);
+      for (var si = 0; si < 240; si++) {
+        var th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1), rr = 420;
+        starPos[si * 3] = rr * Math.sin(ph) * Math.cos(th); starPos[si * 3 + 1] = rr * Math.cos(ph); starPos[si * 3 + 2] = rr * Math.sin(ph) * Math.sin(th);
+      }
+      var starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+      var stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xd6e6ff, size: 2.2, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false }));
+      scene.add(stars);
+
+      var world = new THREE.Group(); scene.add(world);
+
+      function mat(c, o) { o = o || {}; return new THREE.MeshStandardMaterial({ color: c, roughness: o.r == null ? 0.55 : o.r, metalness: 0, emissive: o.e || 0x000000 }); }
+      function gloss(c) { return new THREE.MeshPhysicalMaterial({ color: c, roughness: 0.38, metalness: 0, clearcoat: 0.7, clearcoatRoughness: 0.25 }); }
+      function shade(o, cast, recv) { o.traverse(function (n) { if (n.isMesh) { n.castShadow = cast !== false; n.receiveShadow = recv !== false; } }); return o; }
+
+      // Island outline in (u along the long axis NW->SE, v across toward NE), in km. Width exaggerated for the diorama.
+      var UD = new THREE.Vector2(0.82, 0.57), VD = new THREE.Vector2(0.57, -0.82), K = 1.3;
+      function toXZ(u, v) { return [UD.x * u + VD.x * v, UD.y * u + VD.y * v]; }
+      function topV(u) { var t = (u + 30) / 60, e = Math.pow(Math.max(Math.sin(Math.PI * t), 0), 0.5); return K * 6.2 * e * (1 + 0.18 * Math.sin(t * 7 + 1) + 0.1 * Math.sin(t * 17)); }
+      function botV(u) { var t = (u + 30) / 60, e = Math.pow(Math.max(Math.sin(Math.PI * t), 0), 0.5); var w = 6.8 * e * (1 + 0.2 * Math.sin(t * 11) + 0.08 * Math.sin(t * 23)); w -= 3.0 * Math.exp(-Math.pow((u - 9) / 1.1, 2)); return -K * Math.max(w, 0.1); }
+      var outline = [], i;
+      for (i = -30; i <= 30; i++) outline.push([i, topV(i)]);
+      for (i = 30; i >= -30; i--) outline.push([i, botV(i)]);
+      function pts(su, sv) { return outline.map(function (p) { return toXZ(p[0] * su, p[1] * sv); }); }
+      function slab(su, sv, depth, bevel) {
+        var sh = new THREE.Shape();
+        pts(su, sv).forEach(function (q, k) { if (k === 0) sh.moveTo(q[0], -q[1]); else sh.lineTo(q[0], -q[1]); });
+        var g = new THREE.ExtrudeGeometry(sh, { depth: depth, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 5, curveSegments: 1 });
+        g.rotateX(-Math.PI / 2); return g;
+      }
+      var SURF = 0.5;
+      var rim = new THREE.Mesh(slab(1, 1, 0.7, 0.3), mat(0xb9784a, { r: 0.6 })); rim.geometry.translate(0, -1.0, 0);
+      var rimBand = new THREE.Mesh(slab(1.0, 1.0, 0.05, 0.3), mat(0xd9a06a, { r: 0.6 })); rimBand.geometry.translate(0, -0.3, 0);
+      var topMat = mat(0xaee04f, { r: 0.6 });
+      var grass = new THREE.Mesh(slab(0.965, 0.93, 0.2, 0.2), topMat); grass.geometry.translate(0, 0.1, 0);
+      world.add(shade(rim)); world.add(shade(rimBand)); world.add(shade(grass));
+
+      // soft shadow blob under the floating island
+      var shc = document.createElement('canvas'); shc.width = shc.height = 128;
+      var sg = shc.getContext('2d'), rg = sg.createRadialGradient(64, 64, 4, 64, 64, 62);
+      rg.addColorStop(0, 'rgba(60,120,150,0.38)'); rg.addColorStop(1, 'rgba(60,120,150,0)'); sg.fillStyle = rg; sg.fillRect(0, 0, 128, 128);
+      var blob = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shc), transparent: true, depthWrite: false }));
+      blob.rotation.x = -Math.PI / 2; blob.rotation.z = Math.atan2(UD.y, UD.x); blob.scale.set(86, 34, 1); blob.position.y = -5; scene.add(blob);
+
+      // decor: hills, bushes, rocks
+      function rnd(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+      var R = rnd(7), hills = [[-8, 1.0, 4.2, 1.7], [-6, -3.0, 2.8, 1.0], [14, 1.0, 3.6, 1.3], [-20, -0.5, 3.0, 1.0]];
+      hills.forEach(function (h) {
+        var m = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 16), mat(0xc3ea6a, { r: 0.6 })); var p = toXZ(h[0], h[1]);
+        m.scale.set(h[2], h[3], h[2]); m.position.set(p[0], SURF - 0.1, p[1]); world.add(shade(m));
+      });
+      function nearSite(u, v, d) { return SITES.some(function (s) { return Math.hypot(s.u - u, s.v - v) < d; }) || hills.some(function (h) { return Math.hypot(h[0] - u, h[1] - v) < h[2] + 0.8; }); }
+      function inside(u, v) { return u > -27 && u < 27 && v < topV(u) * 0.7 && v > botV(u) * 0.7; }
+      var placed = 0, tries = 0;
+      while (placed < 30 && tries < 600) {
+        tries++; var u = -27 + R() * 54, v = botV(u) + R() * (topV(u) - botV(u));
+        if (!inside(u, v) || nearSite(u, v, 4.6)) continue;
+        var p = toXZ(u, v), g = new THREE.Group();
+        if (placed % 4 === 3) {
+          var rk = new THREE.Mesh(new THREE.SphereGeometry(0.4, 14, 10), mat(0xd3dce0, { r: 0.7 })); rk.scale.set(1, 0.6, 0.8); rk.position.y = 0.1; g.add(rk);
+        } else {
+          for (var b = 0; b < 3; b++) { var bs = new THREE.Mesh(new THREE.SphereGeometry(0.34 + R() * 0.26, 14, 10), mat(b % 2 ? 0x6cc443 : 0x52b53a, { r: 0.6 })); bs.position.set((b - 1) * 0.42, 0.25 + R() * 0.1, (R() - 0.5) * 0.4); g.add(bs); }
+        }
+        g.position.set(p[0], SURF - 0.05, p[1]); world.add(shade(g)); placed++;
+      }
+
+      // rounded shapes
+      function rrShape(w, d, r) {
+        var s = new THREE.Shape(), x = -w / 2, y = -d / 2;
+        s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + d - r);
+        s.quadraticCurveTo(x + w, y + d, x + w - r, y + d); s.lineTo(x + r, y + d); s.quadraticCurveTo(x, y + d, x, y + d - r); s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+        return s;
+      }
+      function rbox(w, h, d, r, m) {
+        var b = Math.min(0.17, r * 0.5, h * 0.45);
+        var g = new THREE.ExtrudeGeometry(rrShape(w - 2 * b, d - 2 * b, Math.max(r - b, 0.02)), { depth: Math.max(h - 2 * b, 0.001), bevelEnabled: true, bevelThickness: b, bevelSize: b, bevelSegments: 4, curveSegments: 8 });
+        g.rotateX(-Math.PI / 2); g.translate(0, b, 0); return new THREE.Mesh(g, m);
+      }
+      function cyl(rt, rb, h, m, seg) { return new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg || 20), m); }
+      function ball(r, m) { return new THREE.Mesh(new THREE.SphereGeometry(r, 20, 14), m); }
+
+      /* ---------- Site models ---------- */
+      var rotors = [], puffs = [], winMats = [], AXIS = -Math.atan2(UD.y, UD.x);
+      function turbine() {
+        var g = new THREE.Group(), white = mat(0xffffff, { r: 0.4 });
+        var tw = cyl(0.1, 0.2, 2.5, white, 18); tw.position.y = 1.25; g.add(tw);
+        var nac = ball(0.3, white); nac.scale.set(1, 1, 1.5); nac.position.y = 2.55; g.add(nac);
+        var hub = ball(0.2, mat(0xffc93c, { r: 0.4 })); hub.position.set(0, 2.55, 0.46); g.add(hub);
+        var rot = new THREE.Group(); rot.position.set(0, 2.55, 0.52);
+        for (var b = 0; b < 3; b++) {
+          var arm = new THREE.Group(); arm.rotation.z = b * Math.PI * 2 / 3;
+          var bl = ball(1, white); bl.scale.set(0.17, 0.85, 0.05); bl.position.y = 0.88; arm.add(bl); rot.add(arm);
+        }
+        g.add(rot); rotors.push(rot); return g;
+      }
+      function boltMesh() {
+        var s = new THREE.Shape(); s.moveTo(0.12, 0.55); s.lineTo(-0.28, -0.05); s.lineTo(-0.04, -0.05); s.lineTo(-0.14, -0.55); s.lineTo(0.28, 0.1); s.lineTo(0.04, 0.1); s.closePath();
+        var g = new THREE.ExtrudeGeometry(s, { depth: 0.12, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.04, bevelSegments: 2 }); g.center();
+        return new THREE.Mesh(g, gloss(0xffc93c));
+      }
+      function build(s) {
+        var g = new THREE.Group(), xz = toXZ(s.u, s.v); g.position.set(xz[0], SURF, xz[1]); g.rotation.y = AXIS;
+        var size = s.kind === 'wind' ? 5.0 : 4.4;
+        s.base = rbox(size + 0.4, 0.3, size + 0.4, 1.2, mat(0xffffff)); g.add(s.base);
+        s.tile = rbox(size, 0.3, size, 1.1, gloss(0x9fb6c0)); s.tile.position.y = 0.26; g.add(s.tile);
+        var a = new THREE.Group(); a.position.y = 0.56; g.add(a);
+        s.h = 3.4;
+        if (s.kind === 'wind') {
+          [[-1.3, 0.9], [1.3, 0.9], [0, -1.0]].forEach(function (p, k) { var t = turbine(); t.position.set(p[0], 0, p[1]); t.scale.setScalar(0.88); t.rotation.y = (k - 1) * 0.12; a.add(t); });
+          s.h = 3.6;
+        } else if (s.kind === 'solar') {
+          for (var r = 0; r < 2; r++) for (var c = 0; c < 2; c++) {
+            var pg = new THREE.Group(); pg.position.set((c - 0.5) * 1.9, 0.5, (r - 0.5) * 1.7 + 0.3);
+            var fr = rbox(1.7, 0.12, 1.3, 0.1, mat(0xffffff)); var pn = rbox(1.5, 0.1, 1.1, 0.08, gloss(0x2f6bff)); pn.position.y = 0.08; pg.add(fr); pg.add(pn); pg.rotation.x = -0.45;
+            var st = cyl(0.07, 0.09, 0.55, mat(0xdfe8ec), 10); st.position.set(pg.position.x, 0.25, pg.position.z); a.add(st); a.add(pg);
+          }
+          var sunG = new THREE.Group(); sunG.position.set(0, 3.1, -0.4);
+          s.sunMat = mat(0xffd23f, { r: 0.4, e: 0x6a4a00 }); sunG.add(ball(0.6, s.sunMat));
+          var ey = mat(0x10312a, { r: 0.5 });[-0.2, 0.2].forEach(function (x) { var e = ball(0.07, ey); e.position.set(x, 0.1, 0.55); sunG.add(e); });
+          var sm = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.03, 8, 16, Math.PI), ey); sm.rotation.z = Math.PI; sm.position.set(0, -0.04, 0.56); sunG.add(sm);
+          var ch = ball(0.07, mat(0xff9aa8));[-0.36, 0.36].forEach(function (x) { var e = ch.clone(); e.position.set(x, -0.08, 0.5); sunG.add(e); });
+          a.add(sunG); s.sun = sunG; s.h = 3.9;
+        } else if (s.kind === 'battery') {
+          [-1.25, 0, 1.25].forEach(function (x) {
+            var body = rbox(1.0, 1.7, 1.0, 0.48, gloss(0x6fdc9c)); body.position.set(x, 0, 0); a.add(body);
+            var band = rbox(1.05, 0.2, 1.05, 0.5, mat(0x1c4d3a)); band.position.set(x, 1.0, 0); a.add(band);
+            var cap = rbox(0.42, 0.24, 0.42, 0.18, mat(0x1c3a30)); cap.position.set(x, 1.7, 0); a.add(cap);
+          });
+          s.bolt = boltMesh(); s.bolt.position.set(0, 3.0, 0); a.add(s.bolt); s.h = 3.7;
+        } else {
+          var bd = rbox(2.8, 1.5, 2.1, 0.5, gloss(0xfff0cf)); bd.position.set(0, 0, 0.5); a.add(bd);
+          var rf = rbox(2.95, 0.28, 2.25, 0.2, gloss(0xff7a5c)); rf.position.set(0, 1.3, 0.5); a.add(rf);
+          [-0.9, 0, 0.9].forEach(function (x) { var wm = mat(0x86bcff, { r: 0.3 }); winMats.push(wm); var w = rbox(0.5, 0.42, 0.12, 0.14, wm); w.position.set(x, 0.55, 1.58); a.add(w); });
+          [-0.65, 0.65].forEach(function (x, k) {
+            [0xffffff, 0xff7a5c, 0xffffff].forEach(function (c, j) { var seg = cyl(0.3 - j * 0.02, 0.33 - j * 0.02, 0.7, mat(c, { r: 0.45 })); seg.position.set(x, 1.5 + j * 0.7 + 0.35, -0.5); a.add(seg); });
+            var rimc = cyl(0.34, 0.3, 0.14, mat(0x10312a), 20); rimc.position.set(x, 3.65, -0.5); a.add(rimc);
+            for (var q = 0; q < 2; q++) { var pf = ball(1, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, transparent: true })); puffs.push({ m: pf, x: x, ph: (q * 0.5 + k * 0.25) % 1 }); a.add(pf); }
+          });
+          s.h = 4.8;
+        }
+        shade(g); s.g = g; s.lift = 0; s.ax = xz[0]; s.az = xz[1];
+        world.add(g);
+      }
+      SITES.forEach(build);
+      puffs.forEach(function (p) { p.m.castShadow = false; });
+
+      /* ---------- Camera orbit ---------- */
+      var cam = { az: -0.45, pol: 0.95, r: 80, tr: 80 };
+      var touched = false, deskMQ = window.matchMedia('(min-width: 900px)');
+      function desktop() { return deskMQ.matches; }
+      function fitRadius() { var asp = stage.clientWidth / stage.clientHeight; return Math.max(58, Math.min(215, 76 / (0.69 * asp))); }
+      function resize() {
+        var w = stage.clientWidth, h = stage.clientHeight;
+        renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+        if (!touched) { cam.r = cam.tr = fitRadius(); cam.pol = desktop() ? 0.95 : 0.82; }
+      }
+      window.addEventListener('resize', resize);
+
+      var ptrs = {}, pinch0 = 0;
+      stage.addEventListener('pointerdown', function (e) {
+        if (e.target.closest('.site, #card, .legend, #hint')) return;
+        stage.setPointerCapture(e.pointerId); ptrs[e.pointerId] = { x: e.clientX, y: e.clientY }; stage.classList.add('drag'); touched = true;
+        if (Object.keys(ptrs).length === 2) pinch0 = dist();
+      });
+      function dist() { var ks = Object.keys(ptrs), a = ptrs[ks[0]], b = ptrs[ks[1]]; return Math.hypot(a.x - b.x, a.y - b.y); }
+      stage.addEventListener('pointermove', function (e) {
+        var p = ptrs[e.pointerId]; if (!p) return;
+        var ks = Object.keys(ptrs);
+        if (ks.length === 1) { cam.az -= (e.clientX - p.x) * 0.005; cam.pol = Math.max(0.3, Math.min(1.4, cam.pol - (e.clientY - p.y) * 0.004)); }
+        p.x = e.clientX; p.y = e.clientY;
+        if (ks.length === 2) { var d = dist(); if (pinch0) cam.tr = Math.max(35, Math.min(230, cam.tr * pinch0 / d)); pinch0 = d; }
+      });
+      function up(e) { delete ptrs[e.pointerId]; pinch0 = 0; if (!Object.keys(ptrs).length) stage.classList.remove('drag'); }
+      stage.addEventListener('pointerup', up); stage.addEventListener('pointercancel', up);
+      stage.addEventListener('wheel', function (e) { e.preventDefault(); touched = true; cam.tr = Math.max(35, Math.min(230, cam.tr * (1 + e.deltaY * 0.001))); }, { passive: false });
+
+      /* ---------- Day / night ---------- */
+      var pref = 'auto', mode = 'day', nk = 0, nightTarget = 0;
+      try { var sv = localStorage.getItem('gridwatch-mode'); if (sv === 'day' || sv === 'night' || sv === 'auto') pref = sv; } catch (e) { }
+      function autoMode() { var h = new Date().getHours(); return (h >= 6 && h < 18) ? 'day' : 'night'; }
+      function applyMode() {
+        mode = pref === 'auto' ? autoMode() : pref;
+        document.documentElement.setAttribute('data-mode', mode);
+        nightTarget = mode === 'night' ? 1 : 0;
+        Array.prototype.forEach.call(document.querySelectorAll('.seg button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-m') === pref ? 'true' : 'false'); });
+      }
+      Array.prototype.forEach.call(document.querySelectorAll('.segHost'), function (host) {
+        host.insertAdjacentHTML('beforeend', '<div class="seg" role="group" aria-label="Day or night view"><button data-m="auto">Auto</button><button data-m="day">Day</button><button data-m="night">Night</button></div>');
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('.seg button'), function (b) {
+        b.addEventListener('click', function () { pref = b.getAttribute('data-m'); try { localStorage.setItem('gridwatch-mode', pref); } catch (e) { } applyMode(); });
+      });
+      applyMode(); nk = nightTarget;
+      setInterval(function () { if (pref === 'auto') applyMode(); }, 60000);
+
+      /* ---------- UI ---------- */
+      var labelsEl = document.getElementById('labels'), cardEl = document.getElementById('card'), ln = document.getElementById('ln');
+      var dayIdx = 0, selected = null;
+      var ICONS = {
+        wind: '<svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="1.7"/><path d="M12 8.3V3M13.5 10.9l4.9 2.8M10.5 10.9l-4.9 2.8M12 11.7V21"/></svg>',
+        solar: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>',
+        battery: '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="16" height="10" rx="3"/><path d="M21 10v4M10 9.5l-2 3h4l-2 3"/></svg>',
+        conv: '<svg viewBox="0 0 24 24"><path d="M3 21V11l6 3v-3l6 3V5h4v16z"/></svg>',
+        heat: '<svg viewBox="0 0 24 24"><path d="M10 14V5a2 2 0 014 0v9a4 4 0 11-4 0z"/></svg>',
+        unk: '<svg viewBox="0 0 24 24"><path d="M9 9a3 3 0 115 2c-1 1-2 1.5-2 3M12 18h.01"/></svg>'
+      };
+
+      SITES.forEach(function (s) {
+        var b = document.createElement('button'); b.className = 'site'; b.setAttribute('aria-pressed', 'false');
+        b.innerHTML = '<span class="dot"></span><span class="nm"></span><span class="mt"></span>';
+        b.querySelector('.nm').textContent = s.name;
+        b.addEventListener('click', function () { select(selected === s ? null : s); });
+        s.el = b; labelsEl.appendChild(b);
+      });
+
+      var daysEl = document.getElementById('days'), plotEl = document.getElementById('plot');
+      DAYS.forEach(function (d, k) {
+        var b = document.createElement('button'), L = level(d.pct);
+        b.className = L.k; b.setAttribute('aria-pressed', 'false');
+        b.innerHTML = '<span class="wd">' + d.wd + '</span><span class="dn">' + d.n + '</span><span class="dp">' + d.pct + '%</span>';
+        b.setAttribute('aria-label', d.wd + ' ' + d.n + ' October, ' + d.pct + ' percent, ' + L.name);
+        b.addEventListener('click', function () { setDay(k); });
+        daysEl.appendChild(b);
+      });
+      // lollipop chart: also the day picker on desktop
+      var ph = '<div class="grid">' + [[25, 'Moderate from 25%'], [45, 'Elevated from 45%'], [60, 'High from 60%']].map(function (t) { return '<div class="gl" style="--p:' + t[0] + '"><span>' + t[1] + '</span></div>'; }).join('') + '</div><div class="cols">';
+      DAYS.forEach(function (d, k) {
+        var L = level(d.pct);
+        ph += '<button class="col ' + L.k + '" data-k="' + k + '" aria-pressed="false" aria-label="' + d.wd + ' ' + d.n + ' October, ' + d.pct + ' percent, ' + L.name + '" style="--p:' + d.pct + '"><i class="stem"></i><i class="dot"></i><span class="tip">' + d.pct + '%</span><span class="lab">' + d.wd + '</span></button>';
+      });
+      plotEl.innerHTML = ph + '</div>';
+      Array.prototype.forEach.call(plotEl.querySelectorAll('.col'), function (b) { b.addEventListener('click', function () { setDay(+b.getAttribute('data-k')); }); });
+
+      function setDay(k) {
+        dayIdx = k; var d = DAYS[k], L = level(d.pct);
+        Array.prototype.forEach.call(daysEl.children, function (b, j) { b.setAttribute('aria-pressed', j === k ? 'true' : 'false'); });
+        Array.prototype.forEach.call(plotEl.querySelectorAll('.col'), function (b, j) { b.setAttribute('aria-pressed', j === k ? 'true' : 'false'); });
+        document.getElementById('when').textContent = d.wd + ' ' + d.n + ' Oct 2026, 19:00 to 22:00';
+        document.getElementById('pct').textContent = d.pct + '%';
+        var lv = document.getElementById('lvl'); lv.textContent = L.name; lv.className = 'pill ' + L.k;
+        document.getElementById('mascot').innerHTML = mascot(L.k);
+        var drv = [['Wind', windWord(d.wind), windTone(d.wind)], ['Heat', d.temp + '°C', demandTone(d.temp)], ['Demand', demandWord(d.temp), demandTone(d.temp)], ['Capacity', 'Unknown', 'unknown']];
+        document.getElementById('drivers').innerHTML = drv.map(function (x) { return '<li class="t-' + x[2] + '">' + x[0] + ' <b>' + x[1] + '</b></li>'; }).join('');
+        function stat(ic, val, lab, chip, tone) { return '<div class="stat card"><div class="si">' + ICONS[ic] + '</div><div class="sv">' + val + '</div><div class="sl">' + lab + '</div><span class="chip ' + tone + '">' + chip + '</span></div>'; }
+        document.getElementById('stats').innerHTML =
+          stat('wind', d.wind.toFixed(1) + '<small>m/s</small>', 'Wind at hub height', windWord(d.wind), windTone(d.wind)) +
+          stat('heat', d.temp + '<small>°C</small>', 'Evening heat', demandWord(d.temp) + ' demand', demandTone(d.temp)) +
+          stat('unk', 'Unknown', 'Generator capacity', 'Not public', '');
+        SITES.forEach(function (s) {
+          var st = status(s, d); s.st = st;
+          var c = new THREE.Color(TONE[st.k]); s.tile.material.color.copy(c); s.base.material.color.copy(c).multiplyScalar(0.68);
+          s.el.querySelector('.dot').style.background = TONE[st.k];
+          s.el.querySelector('.mt').textContent = st.mt;
+        });
+        if (selected) renderCard(selected);
+      }
+
+      function tile(b, t) { return '<div class="tile"><b>' + b + '</b><span>' + t + '</span></div>'; }
+      function renderCard(s) {
+        var d = DAYS[dayIdx], st = s.st, kindName = { wind: 'Wind park', solar: 'Solar', battery: 'Storage', conv: 'Conventional plant' }[s.kind];
+        var prog = '', tiles = '', note = '';
+        if (s.kind === 'wind') {
+          var o = windOut(d.wind);
+          prog = '<div><div class="pr"><span>Estimated output</span><span>~' + o + '%</span></div><div class="bar"><i style="width:' + o + '%"></i></div></div>';
+          tiles = tile('Wind ' + d.wind.toFixed(1) + ' m/s', 'Example, ' + d.wd + ' evening') + tile('69 MW', 'All island wind parks, 2024');
+          note = 'Output is estimated from the example wind with a generic turbine curve. It is not Aqualectra’s measured production, and the split between parks is not public.';
+        } else if (s.kind === 'solar') {
+          tiles = tile('Normal sun', 'Example, ' + d.wd + ' evening') + tile('16.6 MW', 'Registered PV on the island, 2024');
+          note = 'Shown as one marker for illustration. Solar is spread over many sites and rooftops.';
+        } else if (s.kind === 'battery') {
+          tiles = tile('Charge: not public', 'Only the utility knows') + tile('Evening peaks', 'Used per public reports');
+          note = 'Reports on the April and August 2026 events mention batteries covering the evening peak. Position is schematic.';
+        } else {
+          tiles = tile('Units: not public', 'Which are running now') + tile('151 MW', 'Island conventional fleet, 2024');
+          note = 'Whether enough units are running is the biggest unknown in this model. Reports on recent outages point to units in maintenance or repair.';
+        }
+        cardEl.innerHTML =
+          '<div class="head"><div class="ic">' + ICONS[s.kind] + '</div><div class="hd"><div class="kind">' + kindName + '</div><h2>' + s.name + '</h2></div><button class="x" aria-label="Close card">×</button></div>' +
+          '<div><span class="pill ' + (st.k === 'unknown' ? '' : st.k) + '">' + st.txt + '</span></div>' + prog +
+          '<div class="tiles">' + tiles + '</div><p class="note">' + note + '</p>';
+        cardEl.querySelector('.x').addEventListener('click', function () { select(null); });
+      }
+
+      function select(s) {
+        selected = s;
+        SITES.forEach(function (x) { x.el.setAttribute('aria-pressed', x === s ? 'true' : 'false'); });
+        if (!s) { cardEl.hidden = true; ln.hidden = true; return; }
+        renderCard(s); cardEl.hidden = false;
+      }
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { select(null); setEvents(false); } });
+
+      var evBtn = document.getElementById('evBtn'), evEl = document.getElementById('events');
+      function setEvents(on) { evEl.hidden = !on; evBtn.setAttribute('aria-expanded', on ? 'true' : 'false'); }
+      evBtn.addEventListener('click', function () { setEvents(evEl.hidden); });
+
+      /* ---------- Render loop ---------- */
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var needle = document.getElementById('needle'), v3 = new THREE.Vector3();
+      var cDay = new THREE.Color(0xffd23f), cNight = new THREE.Color(0xe3ebff), eDay = new THREE.Color(0x6a4a00), eNight = new THREE.Color(0x24365f), tmp = new THREE.Color();
+      function project(x, y, z) { v3.set(x, y, z).project(camera); return [(v3.x * 0.5 + 0.5) * stage.clientWidth, (-v3.y * 0.5 + 0.5) * stage.clientHeight]; }
+
+      function frame(t) {
+        requestAnimationFrame(frame);
+        var s = t * 0.001;
+        cam.r += (cam.tr - cam.r) * 0.12;
+        camera.position.set(cam.r * Math.sin(cam.pol) * Math.sin(cam.az), cam.r * Math.cos(cam.pol), cam.r * Math.sin(cam.pol) * Math.cos(cam.az));
+        camera.lookAt(0, 0, 0);
+        needle.style.transform = 'rotate(' + cam.az + 'rad)';
+
+        // blend day and night
+        nk += (nightTarget - nk) * 0.06; if (Math.abs(nightTarget - nk) < 0.002) nk = nightTarget;
+        hemi.color.copy(ENV.d.hs).lerp(ENV.n.hs, nk); hemi.groundColor.copy(ENV.d.hg).lerp(ENV.n.hg, nk); hemi.intensity = ENV.d.hi + (ENV.n.hi - ENV.d.hi) * nk;
+        sun.color.copy(ENV.d.sc).lerp(ENV.n.sc, nk); sun.intensity = ENV.d.si + (ENV.n.si - ENV.d.si) * nk; fill.intensity = ENV.d.fi + (ENV.n.fi - ENV.d.fi) * nk;
+        stars.material.opacity = nk * 0.9; stars.rotation.y = s * 0.004;
+        topMat.emissive.set(0x123d26).multiplyScalar(nk * 0.9);
+        winMats.forEach(function (m) { m.emissive.set(0xffc65a).multiplyScalar(nk); });
+        blob.material.opacity = 1 - nk * 0.35;
+
+        var bob = reduce ? 0 : Math.sin(s * 0.9) * 0.2;
+        world.position.y = bob;
+
+        var d = DAYS[dayIdx], spin = reduce ? 0 : d.wind * 0.011;
+        rotors.forEach(function (r, i) { r.rotation.z += spin * (0.9 + (i % 3) * 0.1); });
+        puffs.forEach(function (p) {
+          var k = reduce ? 0.4 : (s * 0.22 + p.ph) % 1;
+          p.m.position.set(p.x + k * 0.5, 4.4 + k * 2.2, -0.5); p.m.scale.setScalar(0.18 + k * 0.38); p.m.material.opacity = 0.9 * (1 - k);
+        });
+        SITES.forEach(function (site, i) {
+          var target = selected === site ? 0.45 : 0;
+          site.lift += (target - site.lift) * 0.14; site.g.position.y = SURF + site.lift + (reduce ? 0 : Math.sin(s * 1.6 + i) * 0.04);
+          if (site.st) site.tile.material.emissive.set(TONE[site.st.k]).multiplyScalar(0.5 * nk);
+          if (site.sun) {
+            site.sun.position.y = 3.1 + (reduce ? 0 : Math.sin(s * 1.4) * 0.15); site.sun.lookAt(camera.position);
+            site.sunMat.color.copy(cDay).lerp(cNight, nk); site.sunMat.emissive.copy(eDay).lerp(eNight, nk);
+          }
+          if (site.bolt && !reduce) { site.bolt.rotation.y = s * 1.2; site.bolt.position.y = 3.0 + Math.sin(s * 1.5) * 0.12; }
+          var p = project(site.ax, SURF + site.h + site.lift + bob, site.az);
+          site.el.style.transform = 'translate(' + (p[0] + site.off[0]) + 'px,' + (p[1] + site.off[1]) + 'px) translate(-50%,-100%)';
+        });
+
+        if (selected && !cardEl.hidden) {
+          if (desktop()) {
+            var w = stage.clientWidth, h = stage.clientHeight, g = 16;
+            var p2 = project(selected.ax, SURF + selected.h * 0.5 + bob, selected.az);
+            var cw = cardEl.offsetWidth, ch = cardEl.offsetHeight;
+            var x = p2[0] + 90; if (x + cw > w - g) x = p2[0] - 90 - cw;
+            x = Math.max(g, Math.min(w - cw - g, x));
+            var y = Math.max(70, Math.min(h - ch - 70, p2[1] - ch / 2));
+            cardEl.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+            var ex = Math.max(x, Math.min(x + cw, p2[0])), ey = Math.max(y, Math.min(y + ch, p2[1]));
+            ln.setAttribute('x1', p2[0]); ln.setAttribute('y1', p2[1]); ln.setAttribute('x2', ex); ln.setAttribute('y2', ey); ln.hidden = false;
+          } else { cardEl.style.transform = 'none'; ln.hidden = true; }
+        }
+        renderer.render(scene, camera);
+      }
+      resize(); setDay(0); requestAnimationFrame(frame);
+    })();
+  </script>
+
+</body>
+
+</html>
