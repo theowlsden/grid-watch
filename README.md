@@ -34,15 +34,20 @@ docs/       Spec, prototype, methodology, data gaps, results
 
 ## How to run
 
-The production front end is not ported yet. For now, the reference prototype is a single HTML file with no build step:
+The front end lives in `web/` (Next.js, static export). It needs Node.js 22 or later.
 
 ```sh
-# from the repo root, any static server works
-python3 -m http.server 8000
-# then open http://localhost:8000/docs/prototype/grid-watch-prototype.html
+cd web
+npm ci
+npm run dev        # http://localhost:3000
+npm run build      # static site in web/out/
 ```
 
-The prototype loads three.js and fonts from public CDNs, so it needs a network connection. Instructions for `web/`, `pipeline/` and `cms/` will be added here as each part lands.
+To check a production build locally, serve `web/out/` with any static server, for example `python3 -m http.server 8000 -d web/out`.
+
+The page loads `/data/forecast.json` and `/data/events.json` at runtime. In development these come from `web/public/data/`, which currently holds **example data** (shown with an "Example data" tag on screen). Site positions come from `data/sites.snapshot.json` and are placeholders on a stylised map until the OpenStreetMap step lands.
+
+The original single-file prototype is kept as the visual reference in `docs/prototype/grid-watch-prototype.html`; open it through any static server.
 
 ## Configuration and secrets
 

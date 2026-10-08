@@ -1,0 +1,1555 @@
+/* Grid Watch Curaçao styles, ported from docs/prototype/grid-watch-prototype.html.
+   Tokens follow spec 10. Two looks, Day and Night, switched by data-mode on the root.
+   Layout: over 1500 px info cards in a left column and the island on the right; up to
+   1500 px a grid of top bar, risk card, island and day strip (spec 4.1, 4.2, 12.12). */
+:root {
+  --sea: #e6f4f9;
+  --glow: #f6fcfe;
+  --edge: #d3eaf2;
+  --ink: #10312a;
+  --muted: #5f7f7c;
+  --panel: #ffffff;
+  --soft: #eef7fa;
+  --line: #d5e8ee;
+  --blue: #1b7bff;
+  --ok: #27c76f;
+  --watch: #f4c20d;
+  --warn: #ff8a2b;
+  --crit: #ff4d4f;
+  --unknown: #9fb6c0;
+  --on-tone: #10312a;
+  --sel-bg: #10312a;
+  --sel-fg: #ffffff;
+  --tag-bg: #10312a;
+  --tag-fg: #ffffff;
+  --hl: rgba(174, 224, 79, 0.38);
+  --ring: rgba(174, 224, 79, 0.4);
+  --mbg: #10312a;
+  --shadow: 0 10px 28px rgba(40, 100, 125, 0.16);
+  --font-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --gutter: 16px;
+  color-scheme: light;
+}
+
+:root[data-mode="night"] {
+  --sea: #070d14;
+  --glow: #16314a;
+  --edge: #04080d;
+  --ink: #e8f3f1;
+  --muted: #8ea9ad;
+  --panel: rgba(16, 28, 39, 0.9);
+  --soft: #1a2b3a;
+  --line: #26394a;
+  --blue: #5aa2ff;
+  --unknown: #6f8794;
+  --sel-bg: #aee04f;
+  --sel-fg: #10312a;
+  --tag-bg: #aee04f;
+  --tag-fg: #10312a;
+  --hl: rgba(174, 224, 79, 0.2);
+  --ring: rgba(174, 224, 79, 0.28);
+  --mbg: #2b5a4c;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font: 600 14px/1.45 var(--font-body);
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 45%, var(--glow) 0%, var(--sea) 62%, var(--edge) 100%) var(--sea);
+}
+
+#app {
+  position: relative;
+  height: 100%;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+img {
+  max-width: 100%;
+}
+
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+#stage {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  cursor: grab;
+}
+
+#stage.drag {
+  cursor: grabbing;
+}
+
+#c {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#leader {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#leader line {
+  stroke: var(--blue);
+  stroke-width: 2;
+  stroke-dasharray: 2 6;
+  stroke-linecap: round;
+}
+
+#labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
+h1,
+h2 {
+  margin: 0;
+}
+
+.card {
+  background: var(--panel);
+  border-radius: 24px;
+  backdrop-filter: blur(10px);
+}
+
+.site {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: auto;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 8px;
+  align-items: center;
+  padding: 6px 12px 6px 9px;
+  background: var(--panel);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  text-align: left;
+  white-space: nowrap;
+  box-shadow: var(--shadow);
+  will-change: transform;
+}
+
+.site .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  grid-row: span 2;
+  background: var(--unknown);
+}
+
+.site .nm {
+  font: 800 13px/1.15 var(--font-body);
+}
+
+.site .mt {
+  font: 700 11px/1.15 var(--font-body);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.site[aria-pressed="true"] {
+  border-color: var(--ink);
+}
+
+.tag {
+  display: inline-block;
+  font: 800 10.5px/1 var(--font-body);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--tag-fg);
+  background: var(--tag-bg);
+  border-radius: 999px;
+  padding: 5px 9px;
+}
+
+.sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  font: 800 12px/1 var(--font-body);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 7px 12px;
+  border-radius: 999px;
+  color: var(--on-tone);
+  background: var(--unknown);
+}
+
+.pill.ok {
+  background: var(--ok);
+}
+
+.pill.watch {
+  background: var(--watch);
+}
+
+.pill.warn {
+  background: var(--warn);
+}
+
+.pill.crit {
+  background: var(--crit);
+  color: #fff;
+}
+
+/* segmented day/night control */
+.seg {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--soft);
+  border-radius: 999px;
+}
+
+.seg button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font: 800 12px/1 var(--font-body);
+  color: var(--muted);
+}
+
+.seg button[aria-pressed="true"] {
+  background: var(--sel-bg);
+  color: var(--sel-fg);
+}
+
+#mseg {
+  position: absolute;
+  right: var(--gutter);
+  top: var(--gutter);
+  z-index: 2;
+  box-shadow: var(--shadow);
+  background: var(--panel);
+}
+
+#hud {
+  position: absolute;
+  left: var(--gutter);
+  top: 62px;
+  width: calc(100% - 2 * var(--gutter));
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 20px;
+}
+
+#hud .top {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+#mascot {
+  width: 46px;
+  height: 46px;
+  flex: none;
+}
+
+#mascot svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.mh1 {
+  margin-top: 6px;
+  font: 800 20px/1 var(--font-display);
+  letter-spacing: -.01em;
+}
+
+.when {
+  margin-top: 3px;
+  font: 700 12px/1.3 var(--font-body);
+  color: var(--muted);
+}
+
+.readout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pct {
+  font: 800 40px/0.9 var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+
+.drivers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.drivers li {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 4px 8px;
+  background: var(--soft);
+  border-radius: 999px;
+  font: 700 11px/1.2 var(--font-body);
+}
+
+.drivers li::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--unknown);
+}
+
+.drivers .t-ok::before {
+  background: var(--ok);
+}
+
+.drivers .t-watch::before {
+  background: var(--watch);
+}
+
+.drivers .t-warn::before {
+  background: var(--warn);
+}
+
+.drivers .t-crit::before {
+  background: var(--crit);
+}
+
+.drivers b {
+  font-weight: 800;
+}
+
+#brand,
+#stats,
+#week,
+#evCard,
+#below,
+.legend,
+#hint {
+  display: none;
+}
+
+#evBtn {
+  position: absolute;
+  left: var(--gutter);
+  top: var(--gutter);
+  padding: 11px 16px;
+  cursor: pointer;
+  background: var(--panel);
+  border: 0;
+  border-radius: 999px;
+  font: 800 13px/1 var(--font-body);
+  box-shadow: var(--shadow);
+  z-index: 2;
+}
+
+#evBtn[aria-expanded="true"] {
+  background: var(--sel-bg);
+  color: var(--sel-fg);
+}
+
+#events {
+  position: absolute;
+  left: var(--gutter);
+  top: 66px;
+  bottom: 104px;
+  width: calc(100% - 2 * var(--gutter));
+  overflow: auto;
+  padding: 18px;
+  z-index: 4;
+}
+
+.evh {
+  font: 800 20px/1.15 var(--font-display);
+  margin-bottom: 4px;
+}
+
+.evl {
+  list-style: none;
+  margin: 14px 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.evl li {
+  display: grid;
+  gap: 3px;
+  padding: 12px 14px;
+  background: var(--soft);
+  border-radius: 16px;
+}
+
+.evl time {
+  justify-self: start;
+  font: 800 11px/1 var(--font-body);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--crit);
+  color: #fff;
+}
+
+.evl li.minor time {
+  background: var(--warn);
+  color: var(--on-tone);
+}
+
+.evl strong {
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+.evl p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+#card {
+  position: fixed;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 104px;
+  max-height: 54%;
+  overflow: auto;
+  background: var(--panel);
+  border-radius: 24px;
+  padding: 16px;
+  box-shadow: 0 14px 34px rgba(0, 20, 40, 0.28);
+  z-index: 3;
+  display: grid;
+  gap: 12px;
+  backdrop-filter: blur(10px);
+}
+
+#card .head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+#card .ic {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: none;
+  background: var(--soft);
+}
+
+#card .ic svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--ink);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#card .hd {
+  flex: 1;
+  min-width: 0;
+}
+
+#card .kind {
+  font: 800 11px/1 var(--font-body);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+#card h2 {
+  margin: 3px 0 0;
+  font: 800 20px/1.05 var(--font-display);
+  text-wrap: balance;
+}
+
+#card .x {
+  cursor: pointer;
+  background: var(--soft);
+  border: 0;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  line-height: 1;
+  font-size: 18px;
+  flex: none;
+}
+
+#card .pr {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font: 800 14px/1 var(--font-body);
+}
+
+#card .pr span:last-child {
+  color: var(--blue);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+#card .bar {
+  height: 10px;
+  background: var(--soft);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+#card .bar i {
+  display: block;
+  height: 100%;
+  background: var(--blue);
+  border-radius: 999px;
+}
+
+#card .tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+#card .tile {
+  background: var(--soft);
+  border-radius: 16px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+
+#card .tile b {
+  display: block;
+  font: 800 14px/1.2 var(--font-body);
+}
+
+#card .tile span {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.25;
+}
+
+#card .note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+#compass {
+  position: absolute;
+  right: var(--gutter);
+  bottom: 104px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  pointer-events: none;
+}
+
+#compass span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: start center;
+  font: 800 11px/1 var(--font-body);
+  color: var(--ink);
+  padding-top: 4px;
+  transition: transform .1s linear;
+}
+
+#compass span::after {
+  content: "";
+  position: absolute;
+  top: 17px;
+  left: 50%;
+  width: 3px;
+  height: 14px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--crit);
+}
+
+#days {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: var(--gutter);
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  z-index: 2;
+}
+
+#days button {
+  cursor: pointer;
+  display: grid;
+  gap: 3px;
+  justify-items: center;
+  padding: 9px 2px 8px;
+  background: var(--panel);
+  border: 0;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+
+#days .wd {
+  font: 800 11px/1 var(--font-body);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+#days .dn {
+  font: 800 16px/1 var(--font-display);
+}
+
+#days .dp {
+  font: 800 10.5px/1 var(--font-body);
+  padding: 3px 5px;
+  border-radius: 999px;
+  background: var(--unknown);
+  font-variant-numeric: tabular-nums;
+  color: var(--on-tone);
+}
+
+#days .ok .dp {
+  background: var(--ok);
+}
+
+#days .watch .dp {
+  background: var(--watch);
+}
+
+#days .warn .dp {
+  background: var(--warn);
+}
+
+#days .crit .dp {
+  background: var(--crit);
+  color: #fff;
+}
+
+#days button[aria-pressed="true"] {
+  background: var(--sel-bg);
+  color: var(--sel-fg);
+}
+
+#days button[aria-pressed="true"] .wd {
+  color: inherit;
+  opacity: .75;
+}
+
+#fail {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* ---------- Desktop: cards left, island right ---------- */
+@media (min-width: 1501px) {
+  body {
+    background: radial-gradient(ellipse at 70% 36%, var(--glow) 0%, var(--sea) 60%, var(--edge) 100%) var(--sea);
+  }
+
+  #main {
+    position: absolute;
+    left: 456px;
+    right: var(--gutter);
+    top: var(--gutter);
+    bottom: calc(var(--gutter) + 296px);
+  }
+
+  #stage {
+    position: absolute;
+    inset: 0;
+  }
+
+  #below {
+    display: grid;
+    position: absolute;
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: var(--gutter);
+    height: 284px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: 12px;
+  }
+
+  #side {
+    position: absolute;
+    left: var(--gutter);
+    top: var(--gutter);
+    bottom: calc(var(--gutter) + 296px);
+    width: 424px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    padding: 4px 8px 4px 4px;
+    margin: -4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+
+  #side>* {
+    flex: none;
+  }
+
+  #brand {
+    display: grid;
+    gap: 10px;
+    padding: 18px;
+  }
+
+  #brand .brow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  #brand h1 {
+    font: 800 46px/0.95 var(--font-display);
+    letter-spacing: -.015em;
+  }
+
+  #hud {
+    position: static;
+    width: auto;
+    padding: 16px;
+    border-radius: 24px;
+    gap: 4px 16px;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+  }
+
+  #hud .top,
+  #hud .ttl {
+    display: contents;
+  }
+
+  #hud .tag,
+  #hud .mh1,
+  #hud .drivers {
+    display: none;
+  }
+
+  #mascot {
+    width: 72px;
+    height: 72px;
+    grid-row: span 2;
+  }
+
+  #hud .when {
+    margin: 0;
+    grid-column: 2;
+  }
+
+  #hud .readout {
+    grid-column: 2;
+  }
+
+  .pct {
+    font-size: 56px;
+  }
+
+  #hud .sub {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+  }
+
+  #stats {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .stat {
+    display: grid;
+    gap: 6px;
+    padding: 14px;
+    justify-items: start;
+  }
+
+  .stat .si {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--soft);
+    display: grid;
+    place-items: center;
+  }
+
+  .stat .si svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--ink);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .stat .sv {
+    font: 800 24px/1 var(--font-display);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat .sv small {
+    font: 700 12px/1 var(--font-body);
+    color: var(--muted);
+    margin-left: 2px;
+  }
+
+  .stat .sl {
+    font: 700 12px/1.2 var(--font-body);
+    color: var(--muted);
+  }
+
+  .chip {
+    font: 800 11px/1 var(--font-body);
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: var(--unknown);
+    color: var(--on-tone);
+  }
+
+  .chip.ok {
+    background: var(--ok);
+  }
+
+  .chip.watch {
+    background: var(--watch);
+  }
+
+  .chip.warn {
+    background: var(--warn);
+  }
+
+  .chip.crit {
+    background: var(--crit);
+    color: #fff;
+  }
+
+  #week {
+    display: block;
+    padding: 16px 16px 12px;
+  }
+
+  #week .wh {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  #week h2 {
+    font: 800 19px/1.1 var(--font-display);
+  }
+
+  #plot {
+    position: relative;
+    height: 196px;
+  }
+
+  #plot .grid,
+  #plot .cols {
+    position: absolute;
+    inset: 0;
+  }
+
+  #plot .gl {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(38px + var(--p) * 1.4px);
+    border-top: 1px dashed var(--line);
+  }
+
+  #plot .gl span {
+    position: absolute;
+    right: 0;
+    bottom: 3px;
+    font: 700 10px/1 var(--font-body);
+    color: var(--muted);
+  }
+
+  #plot .cols {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  #plot .col {
+    position: relative;
+    border: 0;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  #plot .stem {
+    position: absolute;
+    left: 50%;
+    bottom: 38px;
+    width: 2px;
+    margin-left: -1px;
+    height: calc(var(--p) * 1.4px);
+    background: var(--line);
+  }
+
+  #plot .dot {
+    position: absolute;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    bottom: calc(38px + var(--p) * 1.4px - 8px);
+    border-radius: 50%;
+    background: var(--unknown);
+    border: 3px solid var(--panel);
+    box-sizing: border-box;
+  }
+
+  #plot .ok .dot {
+    background: var(--ok);
+  }
+
+  #plot .watch .dot {
+    background: var(--watch);
+  }
+
+  #plot .warn .dot {
+    background: var(--warn);
+  }
+
+  #plot .crit .dot {
+    background: var(--crit);
+  }
+
+  #plot .tip {
+    display: none;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(38px + var(--p) * 1.4px + 16px);
+    background: var(--sel-bg);
+    color: var(--sel-fg);
+    font: 800 12px/1 var(--font-body);
+    padding: 6px 9px;
+    border-radius: 999px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  #plot .lab {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 4px;
+    font: 800 11px/1 var(--font-body);
+    padding: 7px 8px;
+    border-radius: 999px;
+    background: var(--soft);
+    color: var(--muted);
+  }
+
+  #plot .col[aria-pressed="true"]::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: 0;
+    bottom: 34px;
+    border-radius: 0 0 1rem 1rem;
+    background: linear-gradient(to top, var(--hl), transparent);
+  }
+
+  #plot .col[aria-pressed="true"] .tip {
+    display: block;
+  }
+
+  #plot .col[aria-pressed="true"] .dot {
+    width: 22px;
+    height: 22px;
+    margin-left: -11px;
+    bottom: calc(38px + var(--p) * 1.4px - 11px);
+    box-shadow: 0 0 0 6px var(--ring);
+  }
+
+  #plot .col[aria-pressed="true"] .lab {
+    background: var(--sel-bg);
+    color: var(--sel-fg);
+  }
+
+  #evCard {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  #evCard .evh {
+    margin: 0;
+  }
+
+  #evCard .evl {
+    display: flex;
+    gap: 10px;
+    margin: 4px 0 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+
+  #evCard .evl li {
+    flex: 0 0 224px;
+    scroll-snap-align: start;
+    align-content: start;
+  }
+
+  #evCard .evl p {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  #evCard>.sub:last-child {
+    font-size: 12px;
+  }
+
+  #topbar,
+  #tapHint,
+  #days,
+  #events {
+    display: none !important;
+  }
+
+  .legend {
+    display: flex;
+    gap: 14px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    flex-wrap: wrap;
+    font: 700 12px/1 var(--font-body);
+    color: var(--muted);
+  }
+
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: block;
+  }
+
+  #hint {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    font: 700 12px/1 var(--font-body);
+    color: var(--muted);
+    padding: 9px 14px;
+    border-radius: 999px;
+  }
+
+  #compass {
+    bottom: 4px;
+    right: 0;
+  }
+
+  #card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: auto;
+    bottom: auto;
+    width: 330px;
+    max-width: calc(100% - 2 * var(--gutter));
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+/* ---------- Up to 1500 px (phones, tablets, laptops): layout-based canvas area (spec 4.2, 12.12) ----------
+   Portrait: rows of top bar / risk card / island / day strip.
+   Landscape: top bar, then risk card left and island right, day strip below.
+   The island always has its own grid cell, so no overlay covers it. Sites are picked by
+   tapping their tile; the label buttons stay in the page for keyboard and screen readers. */
+@media (max-width: 1500px) {
+  #side {
+    display: contents;
+  }
+
+  #app {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-areas: "top" "hud" "stage" "days";
+    row-gap: 10px;
+    box-sizing: border-box;
+    padding: calc(var(--gutter) + env(safe-area-inset-top, 0px)) max(var(--gutter), env(safe-area-inset-right, 0px)) calc(var(--gutter) + env(safe-area-inset-bottom, 0px)) max(var(--gutter), env(safe-area-inset-left, 0px));
+  }
+
+  /* top bar: app name, reported events, day/night */
+  #topbar {
+    grid-area: top;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-areas: "name name" "ev mode";
+    align-items: center;
+    gap: 8px;
+    padding: 10px 8px 8px 14px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  #topbar .appname {
+    grid-area: name;
+    font: 800 20px/1.05 var(--font-display);
+    letter-spacing: -.01em;
+  }
+
+  #evBtn,
+  #mseg,
+  #hud,
+  #days {
+    position: static;
+  }
+
+  #evBtn {
+    grid-area: ev;
+    justify-self: start;
+    padding: 9px 14px;
+    background: var(--soft);
+    box-shadow: none;
+  }
+
+  #mseg {
+    grid-area: mode;
+    justify-self: end;
+    background: none;
+    box-shadow: none;
+  }
+
+  /* risk card: tag across the top, mascot beside date and level, then explanation and drivers */
+  #hud {
+    grid-area: hud;
+    width: auto;
+    min-width: 0;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "tag tag" "mascot when" "mascot readout" "sub sub" "drivers drivers";
+    align-items: center;
+    gap: 6px 12px;
+    box-sizing: border-box;
+  }
+
+  #hud .top,
+  #hud .ttl {
+    display: contents;
+  }
+
+  #hud .mh1 {
+    display: none;
+  }
+
+  #hud .tag {
+    grid-area: tag;
+    justify-self: start;
+    margin-bottom: 2px;
+  }
+
+  #mascot {
+    grid-area: mascot;
+  }
+
+  #hud .when {
+    grid-area: when;
+    margin: 0;
+    align-self: end;
+  }
+
+  #hud .readout {
+    grid-area: readout;
+    align-self: start;
+  }
+
+  #hud .sub {
+    grid-area: sub;
+  }
+
+  #hud .drivers {
+    grid-area: drivers;
+  }
+
+  #main {
+    grid-area: stage;
+    position: relative;
+    min-height: 0;
+    /* let the island use the full screen width, edge to edge */
+    margin: 0 calc(-1 * var(--gutter));
+  }
+
+  #days {
+    grid-area: days;
+  }
+
+  #compass {
+    bottom: 6px;
+  }
+
+  #tapHint {
+    position: absolute;
+    left: var(--gutter);
+    bottom: 10px;
+    margin: 0;
+    font: 700 12px/1.2 var(--font-body);
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  #app.sheet-open #tapHint,
+  #app.picked #tapHint {
+    display: none;
+  }
+
+  /* site labels: hidden, but still buttons for keyboard and screen readers; shown while focused */
+  .site {
+    position: absolute;
+    left: var(--gutter);
+    top: 8px;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    transform: none;
+    will-change: auto;
+  }
+
+  .site:focus-visible {
+    width: auto;
+    height: auto;
+    padding: 7px 12px 7px 9px;
+    border: 2px solid var(--ink);
+    overflow: visible;
+    clip-path: none;
+    z-index: 1;
+  }
+
+  .site .mt {
+    display: none;
+  }
+
+  #card {
+    position: absolute;
+    bottom: 0;
+    /* about 54 percent of the screen, but always leave part of the island in view */
+    max-height: min(54vh, calc(100% - 120px));
+  }
+
+  #events {
+    bottom: calc(var(--gutter) + 82px);
+    max-width: 440px;
+  }
+}
+
+/* top bar in one row when there is room */
+@media (min-width: 600px) and (max-width: 1500px) {
+  #topbar {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas: "name ev mode";
+    padding: 6px 6px 6px 18px;
+    border-radius: 999px;
+  }
+}
+
+/* Landscape: risk card left, island right. The site card replaces the risk card while open. */
+@media (max-width: 1500px) and (orientation: landscape) and (min-aspect-ratio: 5/4) {
+  #app {
+    grid-template-columns: minmax(0, clamp(300px, 30vw, 400px)) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas: "top top" "hud stage" "days days";
+    column-gap: 10px;
+  }
+
+  #hud {
+    overflow-y: auto;
+    align-self: start;
+    max-height: 100%;
+  }
+
+  #app.sheet-open #hud {
+    visibility: hidden;
+  }
+
+  /* the island fills the short landscape cell, so the hint goes above it */
+  #tapHint {
+    top: 8px;
+    bottom: auto;
+  }
+
+  #main {
+    margin: 0 calc(-1 * var(--gutter)) 0 0;
+  }
+
+  /* placed over the risk card column by script */
+  #card {
+    position: fixed;
+    box-sizing: border-box;
+    right: auto;
+    bottom: auto;
+    max-height: none;
+  }
+}
+
+/* short landscape screens (phones): tighter risk card and day strip so everything fits */
+@media (max-width: 1500px) and (max-height: 520px) {
+  #topbar .appname {
+    font-size: 18px;
+  }
+
+  #hud {
+    padding: 10px 12px;
+    gap: 4px 10px;
+  }
+
+  #mascot {
+    width: 38px;
+    height: 38px;
+  }
+
+  .pct {
+    font-size: 32px;
+  }
+
+  #hud .sub {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .drivers {
+    gap: 4px;
+  }
+
+  .drivers li {
+    padding: 3px 7px;
+    font-size: 10.5px;
+  }
+
+  #days button {
+    padding: 6px 2px 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #compass span {
+    transition: none;
+  }
+}
+
+/* ---------- Additions for the Next.js port ---------- */
+
+.mascot-bg {
+  fill: var(--mbg);
+}
+
+/* status colour dots: legend, site buttons */
+.lg-ok {
+  background: var(--ok) !important;
+}
+
+.lg-watch {
+  background: var(--watch) !important;
+}
+
+.lg-warn {
+  background: var(--warn) !important;
+}
+
+.lg-crit {
+  background: var(--crit) !important;
+}
+
+.lg-unknown {
+  background: var(--unknown) !important;
+}
+
+/* stress index: 0 to 100, with the scale shown so it does not read as a percentage */
+.pct .scale {
+  font: 700 13px/1 var(--font-body);
+  color: var(--muted);
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+
+.readout {
+  flex-wrap: wrap;
+}
+
+.conf {
+  font: 700 12px/1.2 var(--font-body);
+  color: var(--muted);
+}
+
+/* event source line */
+.evl .src {
+  margin-top: 4px;
+  font: 700 12px/1.3 var(--font-body);
+  color: var(--blue);
+  justify-self: start;
+}
+
+.evl .src.missing {
+  color: var(--muted);
+  font-style: italic;
+}
+
+#brand .disc,
+#brand .credit,
+#events .credit {
+  margin: 0;
+  font: 700 12px/1.35 var(--font-body);
+  color: var(--muted);
+}
+
+#brand .disc {
+  color: var(--ink);
+}
+
+/* top bar: name with the required disclaimer under it (spec 8.2) */
+#topbar .appname {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+#topbar .appname .disc {
+  font: 700 11px/1.25 var(--font-body);
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+/* the site buttons' first child is a note only shown in the 2D fallback */
+.fallback-note {
+  display: none;
+}
+
+/* ---------- No WebGL: a plain list of the same sites, statuses and cards (spec 4.4) ---------- */
+#app.no-webgl #c,
+#app.no-webgl #compass,
+#app.no-webgl #hint,
+#app.no-webgl #tapHint {
+  display: none;
+}
+
+#app.no-webgl #labels {
+  position: absolute;
+  inset: 12px var(--gutter) auto;
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  pointer-events: auto;
+}
+
+#app.no-webgl .fallback-note {
+  display: block;
+  margin: 0 0 4px;
+  color: var(--muted);
+  font: 700 13px/1.35 var(--font-body);
+}
+
+#app.no-webgl .site {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 6px 12px 6px 9px;
+  overflow: visible;
+  clip-path: none;
+  transform: none !important;
+}
+
+#app.no-webgl .site .mt {
+  display: block;
+}
+
+@media (min-width: 1501px) {
+  #app.no-webgl #card {
+    left: auto;
+    right: var(--gutter);
+    top: var(--gutter);
+  }
+}

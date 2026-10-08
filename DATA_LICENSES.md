@@ -27,8 +27,9 @@ Each event in `data/events/events.yaml` carries its own source links (publisher,
 
 | Component | Licence | Notes |
 |---|---|---|
-| three.js | MIT | Pinned and bundled from Phase 1 (the prototype loads r128 from cdnjs) |
-| Baloo 2 | SIL Open Font License 1.1 | To be self-hosted in `web/public/fonts/` with its licence file |
-| Nunito | SIL Open Font License 1.1 | To be self-hosted in `web/public/fonts/` with its licence file |
+| three.js | MIT | Pinned (0.186.1) and bundled with the site; the prototype loads r128 from cdnjs |
+| Baloo 2 | SIL Open Font License 1.1 | Self-hosted from the `@fontsource/baloo-2` package; licence in `web/public/fonts/Baloo2-OFL.txt` |
+| Nunito | SIL Open Font License 1.1 | Self-hosted from the `@fontsource/nunito` package; licence in `web/public/fonts/Nunito-OFL.txt` |
+| Next.js, React | MIT | Build framework and UI library |
 
 All runtime dependencies must be compatible with MIT distribution; CI will check this once the web and pipeline dependencies land.
