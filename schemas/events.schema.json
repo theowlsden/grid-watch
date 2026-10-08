@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://grid.noirvisuals.studio/schemas/events.schema.json",
   "title": "Grid Watch reported events",
-  "description": "Sourced event database (spec 7.1, 8.4). Source of truth is data/events/events.yaml; /data/events.json is built from it. Source fields may be TODO while an entry waits for its source; publishing requires real sources (validate --strict).",
+  "description": "Sourced event database (spec 7.1, 8.4). Source of truth is data/events/events.yaml; /data/events.json is built from it. Source fields may be TODO in events.yaml while an entry waits for its source; such entries are left out of the published events.json, and validate.py rejects any published event without real sources.",
   "type": "array",
   "items": { "$ref": "#/$defs/event" },
   "$defs": {

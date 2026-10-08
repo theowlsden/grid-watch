@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from events import build_events, dumps, load_events_yaml
+from events import build_events, dumps, has_sources, load_events_yaml
 from paths import EVENTS_JSON, EVENTS_YAML, FORECAST_JSON, SITES_SNAPSHOT
 from validate import Report, check_events, check_events_built, check_forecast, check_sites, level_from_index, main
 
@@ -35,8 +35,9 @@ def test_repository_files_pass():
     assert main([]) == 0
 
 
-def test_strict_fails_while_sources_are_todo():
-    assert main(["--strict"]) == 1
+def test_unsourced_events_are_not_published(events):
+    assert all(not has_sources(e) for e in events)  # all seed sources are still TODO
+    assert json.loads(EVENTS_JSON.read_text()) == []
 
 
 def test_events_json_matches_yaml():
@@ -138,74 +139,83 @@ def test_issued_at_must_be_utc(forecast):
 # ---------- events ----------
 
 
+SOURCE = {"publisher": "Example", "title": "Report", "url": "https://example.org/report", "published_at": "2025-08-28", "retrieved_at": "2026-10-08"}
+
+
 def test_seed_events_are_valid(events):
     report = Report()
-    check_events(events, report, strict=False)
+    check_events(events, report, published=False)
     assert report.ok, report.errors
     assert len(events) == 5
+    assert len(report.warnings) == 5  # each waits for its source
 
 
-def test_todo_sources_fail_in_strict_mode(events):
+def test_published_events_need_sources(events):
     report = Report()
-    check_events(events, report, strict=True)
+    check_events(events, report, published=True)
     assert len(report.errors) == len(events)
 
 
-def test_filled_sources_pass_strict(events):
-    e = copy.deepcopy(events[0])
-    e["sources"] = [
-        {"publisher": "Example", "title": "Report", "url": "https://example.org/report", "published_at": "2025-08-28", "retrieved_at": "2026-10-08"}
-    ]
+def test_sourced_event_is_published(events):
+    events[0]["sources"] = [dict(SOURCE)]
+    built = build_events(events)
+    assert [e["id"] for e in built] == [events[0]["id"]]
     report = Report()
-    check_events([e], report, strict=True)
+    check_events(built, report, published=True)
     assert report.ok, report.errors
+
+
+def test_partly_filled_source_is_not_published(events):
+    events[0]["sources"] = [dict(SOURCE, published_at="TODO")]
+    assert build_events(events) == []
 
 
 def test_event_needs_a_source(events):
     events[0]["sources"] = []
     report = Report()
-    check_events(events, report, strict=False)
+    check_events(events, report, published=False)
     assert not report.ok
 
 
 def test_http_source_is_rejected(events):
     events[0]["sources"][0]["url"] = "http://example.org"
     report = Report()
-    check_events(events, report, strict=False)
+    check_events(events, report, published=False)
     assert not report.ok
 
 
 def test_event_time_needs_curacao_offset(events):
     events[0]["start_local"] = "2025-08-27T02:30:00Z"
     report = Report()
-    check_events(events, report, strict=False)
+    check_events(events, report, published=False)
     assert not report.ok
 
 
 def test_duplicate_event_ids(events):
     events.append(copy.deepcopy(events[0]))
     report = Report()
-    check_events(events, report, strict=False)
+    check_events(events, report, published=False)
     assert any("duplicate" in e for e in report.errors)
 
 
 def test_end_before_start(events):
     events[1]["end_local"] = "2026-04-24"
     report = Report()
-    check_events(events, report, strict=False)
+    check_events(events, report, published=False)
     assert any("before start" in e for e in report.errors)
 
 
 def test_build_sorts_chronologically(events):
-    shuffled = list(reversed(events))
-    built = build_events(shuffled)
+    for e in events:
+        e["sources"] = [dict(SOURCE)]
+    built = build_events(list(reversed(events)))
     assert [e["id"] for e in built] == sorted(e["id"] for e in events)
     assert dumps(built).endswith("\n")
 
 
 def test_out_of_date_json_is_reported(tmp_path, events):
     stale = tmp_path / "events.json"
-    stale.write_text(dumps(events[:2]))
+    stale.write_text(dumps(events[:2]))  # e.g. unsourced events copied in by hand
     report = Report()
     check_events_built(EVENTS_YAML, stale, report)
     assert any("out of date" in e for e in report.errors)

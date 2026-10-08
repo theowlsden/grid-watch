@@ -25,7 +25,7 @@ jobs:
       - name: Unit tests
         run: python -m pytest -q pipeline/tests
 
-      # Schemas plus rules; TODO event sources are warnings here. The deploy build runs
-      # validate.py --strict, which blocks publishing until every event has a source (spec 4.6).
+      # Schemas plus rules. Events with TODO sources stay in events.yaml (warning) and are
+      # never in the published events.json (error if they are), per spec 4.6 and decision 12.15.
       - name: Validate published JSON
         run: python pipeline/validate.py

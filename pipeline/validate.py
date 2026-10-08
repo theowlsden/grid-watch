@@ -3,8 +3,10 @@
 Checks each file against its JSON Schema in schemas/ and adds rules a schema cannot express.
 Exit code 1 when there are errors. Warnings do not fail the run.
 
-    python pipeline/validate.py            # development: TODO sources are warnings
-    python pipeline/validate.py --strict   # before publishing: TODO sources are errors
+    python pipeline/validate.py
+
+Events: entries in events.yaml may still have TODO sources (a warning; they are not
+published). The published events.json must only contain fully sourced events (an error).
 """
 
 from __future__ import annotations
@@ -153,7 +155,7 @@ def _todo_fields(event: dict[str, Any]) -> list[str]:
     return [f"sources/{i}/{k}" for i, s in enumerate(event["sources"]) for k, v in s.items() if v == "TODO"]
 
 
-def check_events(data: Any, report: Report, strict: bool, where: str = "events") -> None:
+def check_events(data: Any, report: Report, published: bool, where: str = "events") -> None:
     if not check_schema(data, "events.schema.json", where, report):
         return
     seen: set[str] = set()
@@ -167,11 +169,12 @@ def check_events(data: Any, report: Report, strict: bool, where: str = "events")
         if e["end_local"] and _date(e["end_local"]) < _date(e["start_local"]):
             report.error(at, "end_local is before start_local")
         todo = _todo_fields(e)
-        if todo:
-            msg = f"source not filled in yet ({', '.join(todo)})"
-            (report.error if strict else report.warn)(at, msg + ("; required before publishing" if strict else ""))
-        if strict and not e["verified"]:
-            report.warn(at, "not verified against its sources yet")
+        if todo and published:
+            report.error(at, f"published event without a source ({', '.join(todo)})")
+        elif todo:
+            report.warn(at, f"not published until its source is filled in ({', '.join(todo)})")
+        if published and not e["verified"]:
+            report.warn(at, "published but not yet verified against its sources")
 
 
 def check_events_built(yaml_path: Path, json_path: Path, report: Report) -> None:
@@ -202,14 +205,16 @@ def run(args: argparse.Namespace) -> Report:
     if events_yaml is None:
         report.error(str(args.events_yaml), "file not found")
     else:
-        check_events(events_yaml, report, args.strict, where="events.yaml")
+        check_events(events_yaml, report, published=False, where="events.yaml")
         check_events_built(args.events_yaml, args.events, report)
+        published = read_json(args.events, report)
+        if published is not None:
+            check_events(published, report, published=True, where="events.json")
     return report
 
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--strict", action="store_true", help="treat missing (TODO) event sources as errors")
     p.add_argument("--forecast", type=Path, default=FORECAST_JSON)
     p.add_argument("--events", type=Path, default=EVENTS_JSON)
     p.add_argument("--events-yaml", type=Path, default=EVENTS_YAML)

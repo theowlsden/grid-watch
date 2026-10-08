@@ -28,9 +28,17 @@ def load_events_yaml(path: Path) -> list[dict[str, Any]]:
     return [_normalise(e) for e in data]
 
 
+def has_sources(event: dict[str, Any]) -> bool:
+    """True when the event has at least one source and no source field is still TODO."""
+    sources = event.get("sources") or []
+    return bool(sources) and all(v != "TODO" for s in sources for v in s.values())
+
+
 def build_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Events in chronological order, newest last, as served to the site."""
-    return sorted(events, key=lambda e: (str(e.get("start_local", ""))[:10], str(e.get("id", ""))))
+    """Published events: only those with filled-in sources (spec 4.6, decision 12.15),
+    in chronological order, newest last. Unsourced entries stay in events.yaml only."""
+    published = [e for e in events if has_sources(e)]
+    return sorted(published, key=lambda e: (str(e.get("start_local", ""))[:10], str(e.get("id", ""))))
 
 
 def dumps(data: Any) -> str:

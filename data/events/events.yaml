@@ -1,9 +1,9 @@
 # Reported grid events in Curaçao (spec 8.4). Source of truth for /data/events.json.
 #
 # Rules
-# - Every event needs at least one public source. Fields marked TODO are waiting for one;
-#   the site shows "Source link to be added" and publishing is blocked until they are filled
-#   (pipeline/validate.py --strict).
+# - Every event needs at least one public source. Entries with TODO source fields are kept
+#   here but NOT published: build_events.py leaves them out of events.json until every
+#   source field is filled in.
 # - No unsourced claims about the utility. Summaries describe what the source reports.
 # - Titles and source names stay in their original language.
 # - start_local / end_local: a date (YYYY-MM-DD) when no time was reported, otherwise a

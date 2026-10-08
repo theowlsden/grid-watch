@@ -1576,3 +1576,12 @@ h2 {
   margin: 0;
   font: 700 13px/1.35 var(--font-body);
 }
+
+.evl-empty {
+  margin: 12px 0;
+  padding: 12px 14px;
+  background: var(--soft);
+  border-radius: 16px;
+  font: 700 13px/1.4 var(--font-body);
+  color: var(--muted);
+}

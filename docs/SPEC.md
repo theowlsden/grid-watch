@@ -469,6 +469,7 @@ Acceptance by phase:
 12. **DECIDED, Layout breakpoint (8 Oct 2026, revised)**: the side column plus bottom row layout is used only when the viewport is over 1500 px wide and at least 1182 px tall. Otherwise portrait uses the stacked layout and landscape uses risk card left, island right, day strip below, with a shared top bar for name, events and mode. No on-screen site labels outside the wide layout; sites are picked by tapping the island. Details in 4.2.
 13. **DECIDED, Copyright holder**: "Noir Visuals" in `LICENSE` (not yet a registered company; revisit if it becomes one).
 14. **DECIDED, Readout format**: the stress index is shown as "18 / 100" with the level, a confidence label and "Not a probability" (spec 5.1); day buttons show the bare index.
+15. **DECIDED, Unsourced events are never published (8 Oct 2026)**: `data/events/events.yaml` may hold entries whose sources are still TODO, but the build leaves them out of the published `events.json` until every source field is filled in. The site can deploy at any time; each event appears once it is sourced. A password-protected preview environment may be added later.
 
 ## 12b. Licensing and public repository
 

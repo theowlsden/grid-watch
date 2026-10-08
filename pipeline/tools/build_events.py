@@ -1,5 +1,8 @@
 """Build web/public/data/events.json from data/events/events.yaml.
 
+Only events whose sources are filled in are published; entries with TODO sources stay in
+the YAML until they have one (spec 4.6, decision 12.15).
+
     python pipeline/tools/build_events.py          # write events.json
     python pipeline/tools/build_events.py --check  # exit 1 if events.json is out of date
 """
@@ -24,9 +27,11 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--out", type=Path, default=EVENTS_JSON)
     args = p.parse_args(argv)
 
-    events = build_events(load_events_yaml(args.yaml))
+    all_events = load_events_yaml(args.yaml)
     report = Report()
-    check_events(events, report, strict=False)
+    check_events(all_events, report, published=False)
+    events = build_events(all_events)
+    skipped = len(all_events) - len(events)
     for e in report.errors:
         print(f"ERROR    {e}")
     if not report.ok:
@@ -39,10 +44,10 @@ def main(argv: list[str] | None = None) -> int:
         if current != text:
             print(f"{args.out} is out of date; run python pipeline/tools/build_events.py")
             return 1
-        print(f"{args.out} is up to date ({len(events)} events)")
+        print(f"{args.out} is up to date ({len(events)} published, {skipped} waiting for sources)")
         return 0
     args.out.write_text(text, encoding="utf-8")
-    print(f"wrote {args.out} ({len(events)} events)")
+    print(f"wrote {args.out} ({len(events)} published, {skipped} waiting for sources)")
     return 0
 
 

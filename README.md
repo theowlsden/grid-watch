@@ -49,13 +49,13 @@ The page loads `/data/forecast.json` and `/data/events.json` at runtime. In deve
 
 ### Data
 
-- `data/events/events.yaml` is the sourced event database; `web/public/data/events.json` is built from it.
+- `data/events/events.yaml` is the event database; `web/public/data/events.json` is built from it and only contains events whose sources are filled in.
 - `schemas/` holds JSON Schemas for every published file; `pipeline/validate.py` checks them.
 
 ```sh
 python3 -m venv pipeline/.venv && pipeline/.venv/bin/pip install -r pipeline/requirements-dev.txt
 pipeline/.venv/bin/python pipeline/tools/build_events.py   # after editing events.yaml
-pipeline/.venv/bin/python pipeline/validate.py             # add --strict before publishing
+pipeline/.venv/bin/python pipeline/validate.py             # checks every published JSON file
 ```
 
 The original single-file prototype is kept as the visual reference in `docs/prototype/grid-watch-prototype.html`; open it through any static server.

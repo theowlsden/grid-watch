@@ -49,6 +49,7 @@
   "events.button": "Reported events",
   "events.title": "Reported grid events",
   "events.intro": "From public reports. Each entry links to its source.",
+  "events.empty": "Sources for the reported events are being collected. Each event appears here as soon as it has a public source.",
   "events.source": "Source: {publisher}",
   "events.sourceMissing": "Source link to be added",
   "events.cannotShow": "What this page cannot show: which generators are running, real electricity demand, and how full the batteries are. Only the utility has those numbers.",

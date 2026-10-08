@@ -7,15 +7,14 @@ python3 -m venv pipeline/.venv
 pipeline/.venv/bin/pip install -r pipeline/requirements-dev.txt
 
 pipeline/.venv/bin/python pipeline/validate.py            # check all published JSON
-pipeline/.venv/bin/python pipeline/validate.py --strict   # before publishing: every event needs a real source
 pipeline/.venv/bin/python pipeline/tools/build_events.py  # rebuild events.json from data/events/events.yaml
 pipeline/.venv/bin/python -m pytest -q pipeline/tests
 ```
 
 | File | Purpose |
 |---|---|
-| `validate.py` | JSON Schema checks (`schemas/`) plus rules: level matches index, consecutive dates, UTC issue time, known site slugs, unique event ids, events.json up to date, sources before publishing |
-| `events.py`, `tools/build_events.py` | `data/events/events.yaml` → `web/public/data/events.json` |
+| `validate.py` | JSON Schema checks (`schemas/`) plus rules: level matches index, consecutive dates, UTC issue time, known site slugs, unique event ids, events.json up to date, published events all sourced |
+| `events.py`, `tools/build_events.py` | `data/events/events.yaml` → `web/public/data/events.json`; only events with filled-in sources are published |
 | `paths.py` | repository paths |
 | `tests/` | unit tests (spec 11) |
 

@@ -2,8 +2,8 @@ import type { GridEvent } from "@/lib/schema";
 import { eventDate, eventRange } from "@/lib/time";
 import type { Translate } from "@/i18n";
 
-// Reported events (spec 4.6). Every event must show its source; entries still waiting for
-// one say so instead of hiding it. Titles and source names stay in their original language.
+// Reported events (spec 4.6). Only events with a public source are published, so every entry
+// links to its source. Titles and source names stay in their original language.
 function EventItem({ e, locale, t }: { e: GridEvent; locale: string; t: Translate }) {
   const when =
     e.end_local && e.end_local.slice(0, 10) !== e.start_local.slice(0, 10)
@@ -31,11 +31,16 @@ export function EventsList({ events, locale, t }: { events: GridEvent[]; locale:
     <>
       <h2 className="evh">{t("events.title")}</h2>
       <p className="sub">{t("events.intro")}</p>
-      <ol className="evl">
-        {events.map((e) => (
-          <EventItem key={e.id} e={e} locale={locale} t={t} />
-        ))}
-      </ol>
+      {events.length ? (
+        <ol className="evl">
+          {events.map((e) => (
+            <EventItem key={e.id} e={e} locale={locale} t={t} />
+          ))}
+        </ol>
+      ) : (
+        // only sourced events are published (spec 4.6); until the first one, say why the list is empty
+        <p className="evl-empty">{t("events.empty")}</p>
+      )}
       <p className="sub">{t("events.cannotShow")}</p>
     </>
   );
