@@ -9,7 +9,7 @@ Fields marked **TODO** are still to be filled in by the maintainer. Do not guess
 | Source | Used for | Licence / terms | Attribution text | URL | Retrieved | Status |
 |---|---|---|---|---|---|---|
 | OpenStreetMap contributors | Island outline (coastline), site positions (power plant and wind turbine features) | ODbL 1.0 | "Map data from OpenStreetMap", linked to the copyright page (shown on the island) | https://www.openstreetmap.org/copyright | 2026-10-09 | In use (`pipeline/tools/build_island.py`) |
-| Open-Meteo | Weather forecasts and historical forecast archive | CC BY 4.0; free API for non-commercial use | Weather data by Open-Meteo.com | https://open-meteo.com/en/licence | TODO | Planned (Phase 2) |
+| Open-Meteo | Weather forecasts (ECMWF IFS 0.25° and its ensemble) for the stress outlook | CC BY 4.0; free API for non-commercial use | Weather data by Open-Meteo.com (on the risk card and the methodology page) | https://open-meteo.com/en/licence | 2026-10-09 | In use (Phase 2) |
 | NOAA GFS (via AWS Open Data) | Second weather source; archived forecasts for backtests | CC BY 4.0 (UCAR archive), commercial use allowed | Forecast data: NOAA GFS | https://noaa-gfs-bdp-pds.s3.amazonaws.com/index.html | TODO | Planned (Phase 2/3, swappable source) |
 | ECMWF open data (IFS) | Optional second model | CC BY 4.0, commercial use allowed | Contains modified ECMWF open data (CC BY 4.0) | https://www.ecmwf.int/en/forecasts/datasets/open-data | TODO | Planned (optional) |
 | Natural Earth | Fallback island outline only if OSM is not used | Public domain | Made with Natural Earth | https://www.naturalearthdata.com/about/terms-of-use/ | n/a | Fallback, not used |
