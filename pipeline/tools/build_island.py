@@ -48,11 +48,16 @@ SITE_FEATURES: dict[str, list[str]] = {
     "terakora": ["relation/14071783"],  # "Tera Kòrá Windparken"
     "dokweg": ["way/1138435502"],  # "Dokweg Power Plant", operator Aqualectra
     "playakanoa": ["relation/3972363"],  # "Playa Kanoa wind farm"
-    # No named feature in OSM: the four turbines east of Playa Kanoa. To be confirmed.
+    # No named feature in OSM: the four turbines east of Playa Kanoa (confirmed by the maintainer).
     "koraaltabak": ["node/13424676329", "node/13424676330", "node/13424676331", "node/13424676332"],
 }
 # Sites whose OSM match is inferred rather than named stay "approximate" until confirmed.
-INFERRED = {"koraaltabak"}
+INFERRED: set[str] = set()
+# Positions set by the maintainer where the OSM centre is not the right point for the map.
+# The OSM feature stays the source reference.
+OVERRIDES: dict[str, tuple[float, float, str]] = {
+    "terakora": (12.228, -69.016, "position set by the maintainer; OpenStreetMap relation for reference"),
+}
 
 METRES_PER_UNIT = 1000.0  # one scene unit = 1 km; the island is about 60 units long
 TARGET_VERTICES = (150, 400)
@@ -151,6 +156,8 @@ def site_positions(power: dict) -> dict[str, tuple[float, float, str]]:
             pts.append((c["lat"], c["lon"]))
         lat = sum(p[0] for p in pts) / len(pts)
         lon = sum(p[1] for p in pts) / len(pts)
+        if slug in OVERRIDES:
+            lat, lon, _ = OVERRIDES[slug]
         # rounded to about 100 m: what the map needs, no finer (spec 7.4)
         out[slug] = (round(lat, 3), round(lon, 3), f"https://www.openstreetmap.org/{ids[0]}")
     return out
@@ -197,9 +204,12 @@ def build(cache: Path | None, out: Path) -> int:
             s["lat"], s["lon"] = lat, lon
             s["placement"] = "approximate" if s["slug"] in INFERRED else "exact"
             s["source_url"] = url
-            s["source_note"] = (
-                f"OpenStreetMap, retrieved {today}" + ("; inferred from unnamed turbines, to be confirmed" if s["slug"] in INFERRED else "")
-            )
+            note = f"OpenStreetMap, retrieved {today}"
+            if s["slug"] in OVERRIDES:
+                note = f"{OVERRIDES[s['slug']][2]} (retrieved {today})"
+            elif s["slug"] in INFERRED:
+                note += "; inferred from unnamed turbines, to be confirmed"
+            s["source_note"] = note
     snap["_comment"] = (
         "Export of the CMS sites and island records. Island outline and site positions from "
         "OpenStreetMap (© OpenStreetMap contributors, ODbL) via pipeline/tools/build_island.py. "

@@ -96,5 +96,5 @@
   "news.severity.info": "Info",
   "news.severity.notice": "Notice",
   "news.severity.important": "Important",
-  "map.credit": "© OpenStreetMap contributors"
+  "map.credit": "Map data from OpenStreetMap"
 }
