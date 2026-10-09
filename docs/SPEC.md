@@ -483,7 +483,7 @@ Acceptance by phase:
 |---|---|---|
 | Code (`web/`, `pipeline/`, `cms/` migrations and hooks, `bot/`, `deploy/`) | **MIT** | `LICENSE` at the repo root |
 | Docs, spec, methodology, published forecasts and event database | **CC BY 4.0** | `docs/LICENSE`, `data/LICENSE` |
-| 3D models and artwork (`assets/`, `web/public/models/`) | **CC BY 4.0** (switch to CC BY-NC 4.0 if commercial reuse should be blocked; decide before the first public commit) | `assets/LICENSE` |
+| 3D models and artwork (`assets/`, `web/public/models/`) | **CC BY 4.0** (decided 9 Oct 2026, before the first public push) | `assets/LICENSE` |
 | Island outline and anything derived from OpenStreetMap | **ODbL 1.0**, "© OpenStreetMap contributors" | listed in `DATA_LICENSES.md`, attribution in the UI footer or about card |
 | Weather data pulled from Open-Meteo | **CC BY 4.0**, credit Open-Meteo wherever data or derived values are republished | `DATA_LICENSES.md`, methodology page |
 | Fonts (Baloo 2, Nunito) | SIL Open Font License, self-hosted with their licence files | `web/public/fonts/` |

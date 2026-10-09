@@ -3,10 +3,18 @@
 
 FROM alpine:3.22@sha256:5291449c3df73caf6ed85e649dec1b9e818b39a5d8c871e97afc13e9cd5e8fa8 AS fetch
 ARG PB_VERSION=0.40.5
-ARG PB_SHA256=1dbea1b01eb3dfe64953513859d01e759c96650c4e3264fa4eecd54b769382e4
-RUN apk add --no-cache unzip \
- && wget -q -O /tmp/pb.zip "https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip" \
- && echo "${PB_SHA256}  /tmp/pb.zip" | sha256sum -c - \
+# checksums from the release's checksums.txt; the build picks the VPS architecture
+ARG PB_SHA256_AMD64=1dbea1b01eb3dfe64953513859d01e759c96650c4e3264fa4eecd54b769382e4
+ARG PB_SHA256_ARM64=570baa1c45d2fb92fc0073582b945ca0ece03cbf9837ccabf49a222f99dd02e3
+ARG TARGETARCH
+RUN case "${TARGETARCH:-amd64}" in \
+      amd64) SUM="$PB_SHA256_AMD64" ;; \
+      arm64) SUM="$PB_SHA256_ARM64" ;; \
+      *) echo "unsupported architecture: $TARGETARCH" >&2; exit 1 ;; \
+    esac \
+ && apk add --no-cache unzip \
+ && wget -q -O /tmp/pb.zip "https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_${TARGETARCH:-amd64}.zip" \
+ && echo "${SUM}  /tmp/pb.zip" | sha256sum -c - \
  && unzip -q /tmp/pb.zip pocketbase -d /usr/local/bin
 
 FROM alpine:3.22@sha256:5291449c3df73caf6ed85e649dec1b9e818b39a5d8c871e97afc13e9cd5e8fa8
