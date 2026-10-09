@@ -36,6 +36,6 @@ ENV GRIDWATCH_DATA_DIR=/var/lib/gridwatch \
 USER 10001
 VOLUME /var/lib/gridwatch
 # healthy when the last run succeeded within 36 hours (spec 7.2)
-HEALTHCHECK --interval=5m --timeout=10s --start-period=2m --retries=2 \
+HEALTHCHECK --interval=2m --timeout=10s --start-period=3m --start-interval=10s --retries=2 \
   CMD python pipeline/healthcheck.py || exit 1
 CMD ["sh", "deploy/pipeline/start.sh"]

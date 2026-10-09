@@ -39,6 +39,6 @@ COPY --from=build /repo/web/out /srv
 ENV XDG_CONFIG_HOME=/tmp XDG_DATA_HOME=/tmp
 USER 10001
 EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=3s --start-period=20s --start-interval=5s --retries=3 \
   CMD wget -qO- http://127.0.0.1:8080/healthz || exit 1
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]

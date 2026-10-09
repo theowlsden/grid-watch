@@ -9,7 +9,8 @@ export async function loadConfig(signal?: AbortSignal): Promise<RuntimeConfig> {
   try {
     const res = await fetch("/config.json", { signal, cache: "no-cache" });
     const data = (await res.json()) as Partial<RuntimeConfig>;
-    const origin = typeof data.cmsOrigin === "string" && /^https?:\/\/[^/\s]+$/.test(data.cmsOrigin) ? data.cmsOrigin : "";
+    const raw = typeof data.cmsOrigin === "string" ? data.cmsOrigin.trim().replace(/\/+$/, "") : "";
+    const origin = /^https?:\/\/[^/\s]+$/.test(raw) ? raw : "";
     return { cmsOrigin: origin };
   } catch {
     return { cmsOrigin: "" };

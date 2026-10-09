@@ -24,11 +24,14 @@ services:
     cap_drop: [ALL]
     security_opt:
       - no-new-privileges:true
+    # Coolify shows each service's health from these checks; the proxy only routes to healthy ones
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/healthz"]
       interval: 30s
       timeout: 3s
       retries: 3
+      start_period: 20s
+      start_interval: 5s
 
   cms:
     build:
@@ -51,12 +54,14 @@ services:
     cap_drop: [ALL]
     security_opt:
       - no-new-privileges:true
+    # unhealthy (not restarting) when a setting is wrong: the log says which (deploy/cms/entrypoint.sh)
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8090/api/health"]
       interval: 30s
       timeout: 3s
       retries: 3
-      start_period: 10s
+      start_period: 30s
+      start_interval: 5s
 
   pipeline:
     build:
@@ -76,12 +81,14 @@ services:
     cap_drop: [ALL]
     security_opt:
       - no-new-privileges:true
+    # healthy while the last run succeeded within 36 hours (the first run happens on start)
     healthcheck:
       test: ["CMD", "python", "pipeline/healthcheck.py"]
-      interval: 5m
+      interval: 2m
       timeout: 10s
       retries: 2
-      start_period: 2m
+      start_period: 3m
+      start_interval: 10s
 
   # bot: Telegram news bot (Phase 1b), long polling, no public route. Added in the bot step.
 

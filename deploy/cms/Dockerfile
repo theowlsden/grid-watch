@@ -31,6 +31,6 @@ USER 10002
 WORKDIR /pb
 VOLUME /pb/pb_data
 EXPOSE 8090
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --start-interval=5s --retries=3 \
   CMD wget -qO- http://127.0.0.1:8090/api/health || exit 1
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

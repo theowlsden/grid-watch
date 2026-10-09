@@ -86,6 +86,41 @@ Set by `deploy/web/Caddyfile`: a strict Content-Security-Policy generated at bui
 `Cross-Origin-Resource-Policy`, HSTS. Hashed assets are cached for a year, `/data/*` for 60 s,
 HTML is revalidated. No access log is written (it would hold visitors' IP addresses).
 
+## Troubleshooting: which container is running?
+
+**In Coolify**: open the resource. Each service (`web`, `cms`, `pipeline`) has its own status
+(running / healthy / unhealthy / restarting). The **Logs** tab has a selector for each container,
+and **Terminal** opens a shell inside one. What the states mean here:
+
+| Status | Meaning | Where to look |
+|---|---|---|
+| healthy | running and answering its health check | nothing to do |
+| unhealthy (cms) | a required setting is wrong; the CMS waits instead of crash-looping | cms log: a line starting `[grid-watch cms] CMS NOT STARTED:` says which variable to fix |
+| unhealthy (pipeline) | the last run failed or is older than 36 hours | pipeline log: `run_daily status=error` and the `ERROR` lines after it; also `/data/heartbeat.json` |
+| restarting | the process keeps exiting | the log of that container; please report it, the images should not crash-loop |
+| starting | first health checks still running (up to a minute) | wait |
+
+The proxy only routes a domain to a **healthy** container, so "configured correctly but
+unreachable" usually means the container behind that domain is not healthy yet.
+
+**On the VPS (SSH)**: Coolify names containers `<service>-<resource uuid>`; the uuid is in the
+resource URL and in the deploy log (e.g. `pgeywqmwhli2zqparhgseekk`).
+
+```sh
+docker ps -a --format 'table {{.Names}}\t{{.Status}}' | grep <resource-uuid>   # every service and its state
+docker logs --tail 80 cms-<resource-uuid>                                    # last lines of one service
+docker inspect --format '{{json .State.Health}}' cms-<resource-uuid>          # the health check results
+```
+
+**CMS messages** (`deploy/cms/entrypoint.sh`):
+
+| Message | Fix |
+|---|---|
+| `SITE_ORIGIN is empty` / `must start with https://` / `without a path` | set `SITE_ORIGIN=https://grid.noirvisuals.studio` on the cms service |
+| `PB_ENCRYPTION_KEY must be exactly 32 characters` | generate with `openssl rand -hex 16`; changing it later makes stored settings unreadable, keep a copy |
+| `warning: superuser not changed: ...` | check `PB_SUPERUSER_EMAIL` (a valid address) and `PB_SUPERUSER_PASSWORD` (10+ characters); the CMS still starts |
+| `warning: PB_ADMIN_IPS not applied` | use space-separated IPs or CIDR subnets, e.g. `203.0.113.7 198.51.100.0/24`; leave it empty to allow any IP (the password still protects sign-in) |
+
 ## Backups (spec 7.3, 7.6)
 
 - **PocketBase**: in the admin UI → Settings → Backups, enable scheduled backups (e.g. daily,
