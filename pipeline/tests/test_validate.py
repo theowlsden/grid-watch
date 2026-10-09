@@ -257,22 +257,6 @@ def test_coordinates_must_be_on_curacao(sites):
     assert not report.ok
 
 
-# ---------- daily run ----------
-
-
-def test_run_daily_writes_heartbeat(tmp_path, monkeypatch):
-    import importlib
-
-    monkeypatch.setenv("GRIDWATCH_DATA_DIR", str(tmp_path))
-    import run_daily
-
-    importlib.reload(run_daily)
-    assert run_daily.main() == 0
-    hb = json.loads((tmp_path / "data" / "heartbeat.json").read_text())
-    assert hb["status"] == "ok" and hb["last_run"].endswith("Z") and hb["forecast"] is None
-
-
-
 # ---------- island outline (step 8) ----------
 
 

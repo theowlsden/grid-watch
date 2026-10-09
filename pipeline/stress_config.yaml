@@ -1,0 +1,49 @@
+# Rule-based stress outlook, version rules-v0 (spec 5.2). Every number that affects the result
+# lives here, so each forecast can be reproduced from its stored inputs. These are transparent
+# starting assumptions, NOT fitted values; Phase 3 fits them against the sourced event database.
+# Bump `version` on any change; every issuance records the version it used.
+
+name: rules-v0
+version: 0.1.0
+label: Stress outlook
+timezone: America/Curacao
+window_local: { start: "19:00", end: "22:00" } # evening peak, hours 19, 20 and 21
+days: 7
+
+source:
+  provider: open-meteo # sources/open_meteo.py; see sources/__init__.py for the others
+  model: ecmwf_ifs025 # ECMWF IFS 0.25 deg, with a published run time
+  ensemble_model: ecmwf_ifs025 # 51 members, for the confidence label
+
+# Generic turbine power curve (spec 4.5): power grows with the cube of wind speed between cut-in
+# and rated, (v^3 - cut_in^3) / (rated^3 - cut_in^3); full output from rated to cut-out.
+power_curve: { cut_in_ms: 3.0, rated_ms: 12.0, cut_out_ms: 25.0 }
+
+# Demand proxy from the evening heat index at the demand point (Dokweg / Willemstad area).
+demand:
+  heat_index_low_c: 31.0 # proxy 0 at or below; typical evenings (about 33-34 C) read "normal"
+  heat_index_high_c: 39.0 # proxy 1 at or above
+  raised_from: 0.4 # proxy at or above: "raised"
+  high_from: 0.7 # proxy at or above: "high"
+
+# Stress index = 100 * (wind weight * wind stress + demand weight * demand proxy), where wind
+# stress = max(0, 1 - estimated output / no_stress_at_output): none while the parks run at 75 %
+# or more, full when they stand still. Wind gets the larger share: it is the biggest swing
+# factor on the island (spec 1).
+weights: { wind: 0.65, demand: 0.35 }
+wind_stress: { no_stress_at_output: 0.75 }
+
+# Level thresholds on the index (spec 5.1); keep in step with web/src/lib/levels.ts.
+levels: { moderate: 25, elevated: 45, high: 60 }
+
+# Wind site status from the island-wide evening wind at hub height (m/s), as in the prototype.
+site_status: { high_below: 5.5, elevated_below: 8.0 }
+
+# Confidence from the forecast horizon, one step lower when the ensemble disagrees.
+confidence:
+  high_until_day: 1 # day 0 (today or the first day) and day 1
+  medium_until_day: 3
+  spread_downgrade_ms: 3.0 # interquartile range of ensemble hub-height wind in the window
+
+# Data older than this is shown as out of date on the site (spec 7.2).
+stale_after_hours: 36
