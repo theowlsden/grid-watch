@@ -8,7 +8,7 @@ Fields marked **TODO** are still to be filled in by the maintainer. Do not guess
 
 | Source | Used for | Licence / terms | Attribution text | URL | Retrieved | Status |
 |---|---|---|---|---|---|---|
-| OpenStreetMap contributors | Island outline, site positions | ODbL 1.0 | © OpenStreetMap contributors | https://www.openstreetmap.org/copyright | TODO | Planned (Phase 1, `pipeline/tools/build_island.py`) |
+| OpenStreetMap contributors | Island outline (coastline), site positions (power plant and wind turbine features) | ODbL 1.0 | © OpenStreetMap contributors (shown on the island) | https://www.openstreetmap.org/copyright | 2026-10-09 | In use (`pipeline/tools/build_island.py`) |
 | Open-Meteo | Weather forecasts and historical forecast archive | CC BY 4.0; free API for non-commercial use | Weather data by Open-Meteo.com | https://open-meteo.com/en/licence | TODO | Planned (Phase 2) |
 | NOAA GFS (via AWS Open Data) | Second weather source; archived forecasts for backtests | CC BY 4.0 (UCAR archive), commercial use allowed | Forecast data: NOAA GFS | https://noaa-gfs-bdp-pds.s3.amazonaws.com/index.html | TODO | Planned (Phase 2/3, swappable source) |
 | ECMWF open data (IFS) | Optional second model | CC BY 4.0, commercial use allowed | Contains modified ECMWF open data (CC BY 4.0) | https://www.ecmwf.int/en/forecasts/datasets/open-data | TODO | Planned (optional) |
