@@ -19,6 +19,8 @@ WORKDIR /repo/web
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
 COPY data /repo/data
+# the methodology page reads the stress rules at build time
+COPY pipeline/stress_config.yaml /repo/pipeline/stress_config.yaml
 COPY web ./
 COPY --from=data /repo/web/public/data/events.json public/data/events.json
 RUN npm run build && node scripts/csp.mjs out > /repo/csp.caddy

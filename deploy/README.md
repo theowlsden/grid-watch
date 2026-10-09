@@ -35,7 +35,8 @@ pinned by digest. Nothing is published on host ports: only Coolify's proxy reach
    | `PB_ENCRYPTION_KEY` | cms | 32 random characters, e.g. `openssl rand -hex 16`; keep a copy in your password manager |
    | `PB_ADMIN_IPS` | cms | optional: your IPs/subnets, space-separated |
    | `PB_BOT_EMAIL`, `PB_BOT_PASSWORD` | cms | the Telegram bot's restricted account (news only); password at least 16 characters; set with the bot step |
-   | `OPEN_METEO_API_KEY` | pipeline | only with a paid plan (Phase 2) |
+   | `GRIDWATCH_PUBLISH` | pipeline | `0` (default): the live outlook is written as a preview only; `1`: it replaces the example data on the site |
+   | `OPEN_METEO_API_KEY` | pipeline | only with a paid plan |
 
    In Coolify, untick **"Build variable"** for every secret (passwords, keys, tokens). The
    images do not need them at build time; they are read only when the containers start.
@@ -59,6 +60,14 @@ first start the CMS seeds the sites and island from `data/sites.snapshot.json`. 
 - `pipeline`: healthy while the last daily run succeeded less than 36 hours ago. Each run writes
   `/data/heartbeat.json` (time, status, version, inputs hash) and logs one summary line.
   An external uptime monitor can watch `https://grid.noirvisuals.studio/data/heartbeat.json`.
+
+## Live outlook: preview first, then publish
+
+The pipeline runs at 06:00 and 16:00 Curaçao time (and once on start if its last forecast is
+older than 6 hours). With `GRIDWATCH_PUBLISH=0` it writes `/data/preview/forecast.json`; open
+`https://grid.noirvisuals.studio/?preview=1` to see it on the site, tagged "Preview, not
+published". When you are happy, set `GRIDWATCH_PUBLISH=1` and restart the pipeline: the next run
+replaces the example data. Every run is archived under `/data/history/`, published or not.
 
 ## How data reaches the site
 

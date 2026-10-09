@@ -64,6 +64,9 @@ services:
       dockerfile: deploy/pipeline/Dockerfile
     restart: unless-stopped
     environment:
+      # 1 publishes the live outlook to /data/forecast.json; anything else keeps it as a preview
+      # at /data/preview/forecast.json (view it with ?preview=1) and the site keeps its data
+      GRIDWATCH_PUBLISH: ${GRIDWATCH_PUBLISH:-0}
       OPEN_METEO_API_KEY: ${OPEN_METEO_API_KEY:-}
     volumes:
       - gridwatch-data:/var/lib/gridwatch

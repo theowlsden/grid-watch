@@ -1,3 +1,4 @@
-# Daily run at 06:00 Curaçao time (TZ=America/Curacao in the image).
-# Phase 2 will tune the time to the weather model's run schedule.
-0 6 * * * python pipeline/run_daily.py
+# Pipeline runs in Curaçao time (TZ=America/Curacao in the image), decision 17:
+# 06:00 uses the overnight model runs; 16:00 picks up the 12 UTC run (available around 15:30 local).
+0 6 * * * python pipeline/run_daily.py --trigger scheduled
+0 16 * * * python pipeline/run_daily.py --trigger scheduled
