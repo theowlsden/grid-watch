@@ -69,4 +69,4 @@ jobs:
       - name: Build web, cms and pipeline images
         env:
           SITE_ORIGIN: https://grid.example.org
-        run: docker compose -f deploy/docker-compose.yaml build
+        run: docker compose -f docker-compose.yaml build

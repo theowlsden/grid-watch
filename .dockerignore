@@ -1,4 +1,4 @@
-# Build context is the repo root (deploy/docker-compose.yaml); keep it small and secret-free.
+# Build context is the repo root (docker-compose.yaml); keep it small and secret-free.
 .git
 **/node_modules
 **/.next

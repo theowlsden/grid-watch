@@ -1,12 +1,14 @@
 # Grid Watch on Coolify (spec 7.6). In Coolify: "Docker Compose" resource from this Git
-# repository, compose file deploy/docker-compose.yaml. Domains are set per service in the
+# repository, base directory /, compose file /docker-compose.yaml. It lives at the repo root
+# because Docker Compose resolves build contexts against the project directory, which Coolify
+# sets to the repo root. Domains are set per service in the
 # Coolify UI (web on port 8080, cms on port 8090); Coolify's proxy provides TLS.
 # Secrets and settings come from Coolify environment variables; see deploy/README.md.
 
 services:
   web:
     build:
-      context: ..
+      context: .
       dockerfile: deploy/web/Dockerfile
     restart: unless-stopped
     expose:
@@ -30,7 +32,7 @@ services:
 
   cms:
     build:
-      context: ..
+      context: .
       dockerfile: deploy/cms/Dockerfile
     restart: unless-stopped
     expose:
@@ -58,7 +60,7 @@ services:
 
   pipeline:
     build:
-      context: ..
+      context: .
       dockerfile: deploy/pipeline/Dockerfile
     restart: unless-stopped
     environment:

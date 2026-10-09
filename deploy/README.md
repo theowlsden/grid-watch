@@ -1,7 +1,8 @@
 # Deployment (Coolify on the Hostinger VPS)
 
-Spec 7.6. Three services from one compose file, `deploy/docker-compose.yaml`, built from this
-repository (build context: the repo root). The Telegram bot is added in its own step.
+Spec 7.6. Three services from one compose file, `docker-compose.yaml` at the repository root
+(build context: the repo root). It sits at the root because Coolify runs compose with the repo
+root as project directory, and compose resolves build paths against that directory. The Telegram bot is added in its own step.
 
 | Service | Image | Listens | Domain | Data |
 |---|---|---|---|---|
@@ -18,7 +19,7 @@ pinned by digest. Nothing is published on host ports: only Coolify's proxy reach
 1. **DNS**: `A` records for `grid.noirvisuals.studio` and `cms.grid.noirvisuals.studio` pointing
    to the VPS IP. Coolify issues the TLS certificates.
 2. **Coolify**: New resource → *Docker Compose* from this Git repository, branch `main`,
-   base directory `/`, compose file `/deploy/docker-compose.yaml`. Turn on automatic deploys
+   base directory `/`, compose file `/docker-compose.yaml`. Turn on automatic deploys
    on push.
 3. **Domains** (per service in Coolify, `domain:port` means the container port):
    - web: `https://grid.noirvisuals.studio:8080`
@@ -35,6 +36,9 @@ pinned by digest. Nothing is published on host ports: only Coolify's proxy reach
    | `PB_ADMIN_IPS` | cms | optional: your IPs/subnets, space-separated |
    | `PB_BOT_EMAIL`, `PB_BOT_PASSWORD` | cms | the Telegram bot's restricted account (news only); password at least 16 characters; set with the bot step |
    | `OPEN_METEO_API_KEY` | pipeline | only with a paid plan (Phase 2) |
+
+   In Coolify, untick **"Build variable"** for every secret (passwords, keys, tokens). The
+   images do not need them at build time; they are read only when the containers start.
 
    Why the superuser variables matter: until a superuser exists, PocketBase prints a one-time
    setup link in its log. Creating the account from the environment closes that window. After
