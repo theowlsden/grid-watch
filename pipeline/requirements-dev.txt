@@ -1,2 +1,3 @@
 -r requirements.txt
 pytest==9.1.1
+pip-licenses==5.5.5
