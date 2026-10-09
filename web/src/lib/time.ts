@@ -58,7 +58,8 @@ export function eventRange(start: string, end: string, locale: string, join: (a:
   return join(a.day, `${b.day} ${b.month} ${b.year}`);
 }
 
-// "7 Oct 08:00" for the issue time.
+// "7 Oct 08:00" for the issue time, in Curaçao time.
 export function issuedShort(iso: string, locale: string): string {
-  return fmt(new Date(iso), locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false });
+  const p = parts(new Date(iso), locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false });
+  return `${p.day} ${p.month} ${p.hour}:${p.minute}`;
 }

@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { Forecast, GridEvent } from "@/lib/schema";
-import { loadCmsIsland, loadCmsSites, loadEvents, loadForecast, snapshotIsland, snapshotSites, validOutline } from "@/lib/data";
+import { isStale, loadCmsIsland, loadCmsSites, loadEvents, loadForecast, snapshotIsland, snapshotSites, validOutline } from "@/lib/data";
 import { northAngle, project, projectWithOffset, type IslandGeo } from "@/lib/projection";
 import { stylisedXZ, type SceneIsland } from "@/scene/IslandScene";
 import { loadConfig } from "@/lib/config";
@@ -19,6 +19,7 @@ import { StatTiles } from "./StatTiles";
 import { WeekChart } from "./WeekChart";
 import { DayStrip } from "./DayStrip";
 import { News } from "./News";
+import Link from "next/link";
 
 const SNAPSHOT_SITES = snapshotSites();
 const SNAPSHOT_ISLAND = snapshotIsland();
@@ -38,6 +39,7 @@ export function Dashboard() {
   const [forecast, setForecast] = useState<Forecast | null>(null);
   const [events, setEvents] = useState<GridEvent[]>([]);
   const [failed, setFailed] = useState(false);
+  const [preview, setPreview] = useState(false);
   const [dayIdx, setDayIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [picked, setPicked] = useState(false);
@@ -55,8 +57,13 @@ export function Dashboard() {
 
   useEffect(() => {
     const ac = new AbortController();
-    loadForecast(ac.signal)
-      .then(setForecast)
+    // ?preview=1 shows the pipeline's unpublished outlook, clearly tagged
+    const wantPreview = new URLSearchParams(window.location.search).get("preview") === "1";
+    loadForecast(ac.signal, wantPreview)
+      .then((f) => {
+        setForecast(f);
+        setPreview(wantPreview);
+      })
       .catch((e) => {
         if (!ac.signal.aborted) {
           console.error(e);
@@ -82,12 +89,11 @@ export function Dashboard() {
     return () => ac.abort();
   }, []);
 
-  // Day / night: Auto re-evaluates every 60 s (spec 4.3).
+  // The clock ticks every minute: Auto day/night (spec 4.3) and the out-of-date check (spec 7.2).
   useEffect(() => {
-    if (pref !== "auto") return;
     const id = setInterval(() => setNow(Date.now()), 60_000);
     return () => clearInterval(id);
-  }, [pref]);
+  }, []);
   useEffect(() => {
     if (hydrated) document.documentElement.setAttribute("data-mode", mode);
   }, [mode, hydrated]);
@@ -110,6 +116,7 @@ export function Dashboard() {
   }, []);
 
   const day = forecast?.days[Math.min(dayIdx, forecast.days.length - 1)] ?? null;
+  const stale = forecast ? isStale(forecast, now) : false;
   useEffect(() => {
     if (day) warnUnknownSlugs(day, sites);
   }, [day, sites]);
@@ -140,7 +147,7 @@ export function Dashboard() {
       slug: s.slug,
       name: (lang !== "en" && s.name_pap) || s.name_en,
       meta,
-      tone: v?.tone ?? "unknown",
+      tone: stale ? "unknown" : (v?.tone ?? "unknown"),
       scene: {
         slug: s.slug,
         kind: s.kind,
@@ -157,7 +164,7 @@ export function Dashboard() {
     ) : null;
 
   const example = forecast?.data_mode === "example";
-  const appClass = [selected && "sheet-open", picked && "picked", !webgl && "no-webgl", visibleNews.length && "has-news"].filter(Boolean).join(" ");
+  const appClass = [stale && "stale", selected && "sheet-open", picked && "picked", !webgl && "no-webgl", visibleNews.length && "has-news"].filter(Boolean).join(" ");
   // the scene is built once per site list; a different list from the CMS rebuilds it
   const sceneKey =
     `${island.version}|` + stageSites.map((s) => `${s.slug}:${s.scene.kind}:${s.scene.xz.map((v) => v.toFixed(3)).join("/")}:${s.scene.parkCount}:${s.scene.rotationDeg ?? 0}`).join("|");
@@ -193,12 +200,17 @@ export function Dashboard() {
           </div>
           <h1>{t("app.name")}</h1>
           <p className="sub">{t("app.tagline")}</p>
-          <p className="disc">{t("app.disclaimer")}</p>
+          <p className="disc">
+            {t("app.disclaimer")}{" "}
+            <Link className="methodlink" href="/methodology">
+              {t("method.link")}
+            </Link>
+          </p>
           <p className="credit">{t("app.credit")}</p>
         </section>
         {forecast && day ? (
           <>
-            <RiskCard forecast={forecast} day={day} locale={locale} t={t} />
+            <RiskCard forecast={forecast} day={day} stale={stale} preview={preview} locale={locale} t={t} />
             <News items={visibleNews} lang={lang} locale={locale} onDismiss={dismiss} t={t} />
             <StatTiles day={day} t={t} />
           </>

@@ -31,6 +31,7 @@ test("example data always carries the example tag", async ({ page }) => {
 test("live data has no example tag and no probability wording", async ({ page }) => {
   const live = forecastCopy();
   live.data_mode = "live";
+  live.issued_at = new Date().toISOString().replace(/\.\d+Z$/, "Z"); // fresh, so not out of date
   live.sources = [{ name: "Open-Meteo", url: "https://open-meteo.com/", retrieved_at: "2026-10-07T11:00:00Z" }];
   await page.route("**/data/forecast.json", (r) => r.fulfill({ json: live }));
   await open(page);
@@ -39,7 +40,39 @@ test("live data has no example tag and no probability wording", async ({ page })
   await expect(page.locator("body")).not.toContainText(/chance of|probability of/i);
 });
 
-test.fixme("stale data shows 'Data out of date' and greys the statuses (Phase 2, spec 7.2)", async () => {});
+function liveForecast(hoursAgo: number) {
+  const f = forecastCopy();
+  f.data_mode = "live";
+  f.issued_at = new Date(Date.now() - hoursAgo * 3600_000).toISOString().replace(/\.\d+Z$/, "Z");
+  f.sources = [{ name: "Weather data by Open-Meteo.com (ECMWF IFS 0.25°)", url: "https://open-meteo.com/", retrieved_at: f.issued_at }];
+  return f;
+}
+
+test("live data shows when it was updated and credits the weather source", async ({ page }) => {
+  await page.route("**/data/forecast.json", (r) => r.fulfill({ json: liveForecast(2) }));
+  await open(page);
+  await expect(page.locator("#hud .updated")).toContainText("Updated");
+  const credit = page.locator("#hud .updated").getByRole("link", { name: /Open-Meteo/ });
+  await expect(credit).toHaveAttribute("href", "https://open-meteo.com/");
+  await expect(credit).toHaveAttribute("rel", "noopener noreferrer");
+  await expect(page.locator("#app")).not.toHaveClass(/stale/);
+});
+
+test("data older than 36 hours is out of date and the statuses turn grey (spec 7.2)", async ({ page }) => {
+  await page.route("**/data/forecast.json", (r) => r.fulfill({ json: liveForecast(40) }));
+  await open(page);
+  await expect(page.locator("#app")).toHaveClass(/stale/);
+  await expect(page.locator("#hud .tag.stale")).toHaveText("Data out of date");
+  await expect(page.locator("#hud .pill")).toHaveText("Not public");
+  await expect(page.locator("#hud")).toContainText("no newer one has arrived");
+  for (const s of sites) await expect(page.locator(".site", { hasText: s.name_en }).locator(".dot")).toHaveClass(/lg-unknown/);
+});
+
+test("?preview=1 shows the unpublished outlook, clearly tagged", async ({ page }) => {
+  await page.route("**/data/preview/forecast.json", (r) => r.fulfill({ json: liveForecast(1) }));
+  await page.goto("/?preview=1");
+  await expect(page.locator("#hud .tag.preview")).toHaveText("Preview, not published");
+});
 
 test("forecast that fails to load shows a message, page stays usable", async ({ page }) => {
   await page.route("**/data/forecast.json", (r) => r.fulfill({ status: 500 }));

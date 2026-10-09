@@ -1833,3 +1833,124 @@ h2 {
     bottom: 26px;
   }
 }
+
+/* ---------- Live data: issue time, credits, preview and out-of-date state (spec 7.2) ---------- */
+#hud .updated {
+  grid-area: updated;
+  margin: 2px 0 0;
+  font: 700 11.5px/1.35 var(--font-body);
+  color: var(--muted);
+}
+
+#hud .updated a {
+  color: var(--blue-text);
+}
+
+.tag.preview {
+  background: var(--blue-text);
+  color: #fff;
+}
+
+.tag.stale {
+  background: var(--sel-bg);
+  color: var(--sel-fg);
+}
+
+/* out of date: every status turns grey; the numbers stay readable but are dimmed */
+#app.stale #days .dp,
+#app.stale #plot .dot,
+#app.stale .drivers li::before {
+  background: var(--unknown) !important;
+  color: var(--on-tone);
+}
+
+#app.stale #hud .pct {
+  opacity: 0.55;
+}
+
+@media (max-width: 1500px), (max-height: 1181px) {
+  #hud {
+    grid-template-areas: "tag tag" "mascot when" "mascot readout" "sub sub" "drivers drivers" "updated updated";
+  }
+}
+
+@media (min-width: 1501px) and (min-height: 1182px) {
+  #hud .updated {
+    grid-area: auto;
+    grid-column: 1 / -1;
+  }
+
+  /* the brand card carries the example tag; preview and out-of-date tags belong on the risk card,
+     on their own first row above the mascot */
+  #hud .tag.preview,
+  #hud .tag.stale {
+    display: inline-block;
+    grid-row: 1;
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  #hud:has(.tag.preview, .tag.stale) #mascot {
+    grid-row: 2 / span 2;
+  }
+
+  #hud:has(.tag.preview, .tag.stale) .when {
+    grid-row: 2;
+  }
+
+  #hud:has(.tag.preview, .tag.stale) .readout {
+    grid-row: 3;
+  }
+}
+
+/* ---------- Methodology page (spec 8.2) ---------- */
+.doc-page {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.doc {
+  box-sizing: border-box;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: calc(24px + env(safe-area-inset-top, 0px)) var(--gutter) 48px;
+  font: 600 15px/1.6 var(--font-body);
+}
+
+.doc h1 {
+  font: 800 34px/1.1 var(--font-display);
+  margin: 8px 0 12px;
+}
+
+.doc h2 {
+  font: 800 20px/1.2 var(--font-display);
+  margin: 28px 0 6px;
+}
+
+.doc .lead {
+  font-size: 16px;
+}
+
+.doc ul {
+  padding-left: 20px;
+}
+
+.doc li {
+  margin: 6px 0;
+}
+
+.doc a {
+  color: var(--blue-text);
+}
+
+.doc .credit {
+  margin-top: 32px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* link from the risk card and brand card */
+.methodlink {
+  color: var(--blue-text);
+  white-space: nowrap;
+}

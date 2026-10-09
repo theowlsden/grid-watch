@@ -37,12 +37,19 @@ createServer((req, res) => {
     return;
   }
   const path = normalize(decodeURIComponent(new URL(req.url, "http://x").pathname)).replace(/^(\.\.[/\\])+/, "");
-  let file = join(root, path);
-  try {
-    if (statSync(file).isDirectory()) file = join(file, "index.html");
-    statSync(file);
-  } catch {
-    // like production (deploy/web/Caddyfile): the site's own 404 page
+  // like Caddy's try_files {path} {path}.html {path}/index.html: a directory only counts when the
+  // path ends in "/"
+  const base = join(root, path);
+  const isFile = (f) => {
+    try {
+      return statSync(f).isFile();
+    } catch {
+      return false;
+    }
+  };
+  const file = [base, `${base}.html`, path.endsWith("/") ? join(base, "index.html") : ""].find((f) => f && isFile(f)) ?? (path === "/" ? join(root, "index.html") : "");
+  if (!file) {
+    // the site's own 404 page
     res.writeHead(404, { ...SECURITY, "content-type": TYPES[".html"] });
     createReadStream(join(root, "404.html")).pipe(res);
     return;

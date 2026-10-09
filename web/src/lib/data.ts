@@ -2,6 +2,13 @@ import { isEventList, isForecast, type Forecast, type GridEvent, type Island, ty
 import { fetchJson } from "./config";
 import snapshot from "../../../data/sites.snapshot.json";
 
+/** Data older than this is shown as out of date (spec 7.2); same as stale_after_hours in the pipeline config. */
+export const STALE_AFTER_HOURS = 36;
+
+export function isStale(f: Forecast, now: number): boolean {
+  return f.data_mode === "live" && now - Date.parse(f.issued_at) > STALE_AFTER_HOURS * 3600_000;
+}
+
 // Forecast and events are fetched at runtime from /data, so a new pipeline run never
 // needs a rebuild (spec 7.6). Short cache: the static server sets the headers.
 async function getJson(url: string, signal?: AbortSignal): Promise<unknown> {
@@ -10,8 +17,9 @@ async function getJson(url: string, signal?: AbortSignal): Promise<unknown> {
   return res.json();
 }
 
-export async function loadForecast(signal?: AbortSignal): Promise<Forecast> {
-  const data = await getJson("/data/forecast.json", signal);
+/** The published forecast, or with `preview` the pipeline's unpublished one (?preview=1). */
+export async function loadForecast(signal?: AbortSignal, preview = false): Promise<Forecast> {
+  const data = await getJson(preview ? "/data/preview/forecast.json" : "/data/forecast.json", signal);
   if (!isForecast(data)) throw new Error("forecast.json does not match the data contract");
   return data;
 }
