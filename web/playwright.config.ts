@@ -1,0 +1,35 @@
+import { defineConfig, devices } from "@playwright/test";
+
+// End-to-end tests against the static export (spec 11). Run `npm run build` first;
+// `npm run test:e2e` builds and tests in one go.
+const PORT = 4173;
+
+export default defineConfig({
+  testDir: "tests/e2e",
+  timeout: 60_000,
+  expect: { timeout: 15_000 },
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 1 : 0,
+  workers: process.env.CI ? 2 : undefined,
+  reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
+  use: {
+    baseURL: `http://localhost:${PORT}`,
+    timezoneId: "America/Curacao",
+    locale: "en-GB",
+    // stable frames: no bobbing, spinning or smoke (also what reduced-motion visitors get)
+    reducedMotion: "reduce",
+    trace: "retain-on-failure",
+    launchOptions: {
+      // WebGL through SwiftShader on machines without a GPU (CI)
+      args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
+    },
+  },
+  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  webServer: {
+    command: `node tests/serve.mjs`,
+    env: { PORT: String(PORT) },
+    url: `http://localhost:${PORT}`,
+    reuseExistingServer: !process.env.CI,
+  },
+});

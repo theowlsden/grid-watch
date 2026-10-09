@@ -72,8 +72,27 @@ function botV(u: number): number {
   return -K * Math.max(w, 0.1);
 }
 
+// Read-only view of the scene for automated tests (spec 11). Only exposed when the browser is
+// driven by automation (navigator.webdriver), never for normal visitors.
+export interface SceneTestHook {
+  frames: () => number;
+  objectNames: () => string[];
+  /** Viewport position of a site's tile, for tap tests. */
+  sitePoint: (slug: string) => [number, number] | null;
+  /** Viewport bounding box of the island's top surface. */
+  islandBox: () => { x0: number; y0: number; x1: number; y1: number };
+}
+
+declare global {
+  interface Window {
+    __gridWatch?: SceneTestHook;
+  }
+}
+
 export class IslandScene {
   onPick: (slug: string | null) => void = () => {};
+  private frameCount = 0;
+  private outlineXZ: [number, number][] = [];
 
   private renderer: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
@@ -148,6 +167,32 @@ export class IslandScene {
     this.ro.observe(els.stage);
     this.resize();
     this.raf = requestAnimationFrame(this.frame);
+    if (navigator.webdriver) window.__gridWatch = this.testHook();
+  }
+
+  private testHook(): SceneTestHook {
+    const toViewport = ([x, y]: [number, number]): [number, number] => {
+      const r = this.els.stage.getBoundingClientRect();
+      return [r.left + x, r.top + y];
+    };
+    return {
+      frames: () => this.frameCount,
+      objectNames: () => {
+        const names: string[] = [];
+        this.scene.traverse((o) => o.name && names.push(o.name));
+        return names;
+      },
+      sitePoint: (slug) => {
+        const s = this.sites.find((x) => x.slug === slug);
+        return s ? toViewport(this.project(s.ax, s.group.position.y + this.world.position.y + 0.6, s.az)) : null;
+      },
+      islandBox: () => {
+        const pts = this.outlineXZ.map(([x, z]) => toViewport(this.project(x, SURF + this.world.position.y, z)));
+        const xs = pts.map((p) => p[0]);
+        const ys = pts.map((p) => p[1]);
+        return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) };
+      },
+    };
   }
 
   // ---------- public API ----------
@@ -179,6 +224,7 @@ export class IslandScene {
   }
 
   dispose(): void {
+    if (window.__gridWatch && navigator.webdriver) delete window.__gridWatch;
     cancelAnimationFrame(this.raf);
     this.ro.disconnect();
     this.cleanup.forEach((f) => f());
@@ -201,6 +247,9 @@ export class IslandScene {
   }
 
   private buildLights(): void {
+    this.hemi.name = "ambient_light";
+    this.sun.name = "key_light";
+    this.fill.name = "fill_light";
     this.scene.add(this.hemi);
     const sun = this.sun;
     sun.position.set(34, 60, 26);
@@ -231,6 +280,7 @@ export class IslandScene {
       g,
       new THREE.PointsMaterial({ color: 0xd6e6ff, size: 2.2, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false }),
     );
+    this.stars.name = "stars";
     this.scene.add(this.stars);
   }
 
@@ -255,6 +305,10 @@ export class IslandScene {
     band.geometry.translate(0, -0.3, 0);
     const grass = new THREE.Mesh(slab(0.965, 0.93, 0.2, 0.2), this.topMat);
     grass.geometry.translate(0, 0.1, 0);
+    rim.name = "island_rim";
+    band.name = "island_band";
+    grass.name = "island";
+    this.outlineXZ = outline.map(([u, v]) => toXZ(u * 0.965, v * 0.93));
     this.world.add(shade(rim), shade(band), shade(grass));
 
     // soft shadow blob under the floating island
@@ -271,6 +325,7 @@ export class IslandScene {
     this.blob.rotation.z = Math.atan2(UD.y, UD.x);
     this.blob.scale.set(86, 34, 1);
     this.blob.position.y = -5;
+    this.blob.name = "island_shadow";
     this.scene.add(this.blob);
   }
 
@@ -323,6 +378,7 @@ export class IslandScene {
   private buildSite(s: SceneSite): void {
     const [x, z] = toXZ(s.uv[0], s.uv[1]);
     const g = new THREE.Group();
+    g.name = `site_${s.slug}`; // naming contract for models (spec 7.5)
     g.position.set(x, SURF, z);
     g.rotation.y = AXIS;
     const twoParks = s.kind === "wind" && s.parkCount > 1;
@@ -344,6 +400,7 @@ export class IslandScene {
       for (const cx of clusters) {
         [[-1.3, 0.9], [1.3, 0.9], [0, -1.0]].forEach(([px, pz], k) => {
           const t = turbine();
+          t.group.name = "turbine";
           t.group.position.set(cx + px * spread, 0, pz);
           t.group.scale.setScalar(twoParks ? 0.8 : 0.88);
           t.group.rotation.y = (k - 1) * 0.12;
@@ -353,6 +410,7 @@ export class IslandScene {
       }
       h = 3.6;
     } else if (s.kind === "thermal") {
+      a.name = "power_plant";
       const body = rbox(2.8, 1.5, 2.1, 0.5, gloss(0xfff0cf));
       body.position.set(0, 0, 0.5);
       const roof = rbox(2.95, 0.28, 2.25, 0.2, gloss(0xff7a5c));
@@ -376,6 +434,7 @@ export class IslandScene {
         a.add(rimc);
         for (let q = 0; q < 2; q++) {
           const pf = ball(1, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, transparent: true })) as THREE.Mesh<THREE.SphereGeometry, THREE.MeshStandardMaterial>;
+          pf.name = "smoke";
           this.puffs.push({ m: pf, x: cx, ph: (q * 0.5 + k * 0.25) % 1 });
           a.add(pf);
         }
@@ -384,6 +443,7 @@ export class IslandScene {
     } else {
       // generic marker for sites without a model (spec 7.4): a clay pillar on the status tile
       const pillar = rbox(1.2, 2.2, 1.2, 0.5, gloss(0xfff0cf));
+      pillar.name = "marker";
       a.add(pillar);
     }
 
@@ -587,6 +647,7 @@ export class IslandScene {
 
     this.placeCard(bob);
     this.renderer.render(this.scene, camera);
+    this.frameCount++;
   };
 
   private placeCard(bob: number): void {

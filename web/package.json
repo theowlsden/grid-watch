@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "next build && playwright test",
+    "test:e2e:only": "playwright test",
+    "licenses": "license-checker-rseidelsohn --production --excludePrivatePackages --excludePackagesStartingWith @img/sharp-libvips --onlyAllow \"MIT;ISC;BSD-2-Clause;BSD-3-Clause;0BSD;Apache-2.0;OFL-1.1;CC-BY-4.0;CC0-1.0;BlueOak-1.0.0\""
   },
   "dependencies": {
     "@fontsource/baloo-2": "5.3.0",
@@ -17,12 +20,15 @@
     "three": "0.186.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.64.0",
     "@types/node": "22.20.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@types/three": "0.186.0",
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.0",
+    "license-checker-rseidelsohn": "5.0.1",
     "typescript": "5.9.3"
   },
   "license": "MIT",
