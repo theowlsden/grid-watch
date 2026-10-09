@@ -1588,3 +1588,19 @@ h2 {
   font: 700 13px/1.4 var(--font-body);
   color: var(--muted);
 }
+
+.notfound {
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  height: 100%;
+  text-align: center;
+}
+
+.notfound h1 {
+  font: 800 32px/1.1 var(--font-display);
+}
+
+.notfound a {
+  color: var(--blue-text);
+}
