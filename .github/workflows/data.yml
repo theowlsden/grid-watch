@@ -32,3 +32,30 @@ jobs:
       # never in the published events.json (error if they are), per spec 4.6 and decision 12.15.
       - name: Validate published JSON
         run: python pipeline/validate.py
+
+  cms:
+    # Access rules and hooks against the same PocketBase version as deploy/cms/Dockerfile
+    runs-on: ubuntu-latest
+    env:
+      PB_VERSION: 0.40.5
+      PB_SHA256: 1dbea1b01eb3dfe64953513859d01e759c96650c4e3264fa4eecd54b769382e4
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/requirements-dev.txt
+
+      - name: Install
+        run: pip install -r pipeline/requirements-dev.txt
+
+      - name: Install PocketBase (pinned, checksum verified)
+        run: |
+          curl -sSfL -o pb.zip "https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip"
+          echo "${PB_SHA256}  pb.zip" | sha256sum -c -
+          unzip -q pb.zip pocketbase -d "$RUNNER_TEMP"
+
+      - name: CMS rules and hooks
+        run: POCKETBASE_BIN="$RUNNER_TEMP/pocketbase" python -m pytest -q cms/tests

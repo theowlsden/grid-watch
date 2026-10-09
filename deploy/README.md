@@ -33,12 +33,20 @@ pinned by digest. Nothing is published on host ports: only Coolify's proxy reach
    | `PB_SUPERUSER_EMAIL`, `PB_SUPERUSER_PASSWORD` | cms | strong, unique; set **before the first deploy** |
    | `PB_ENCRYPTION_KEY` | cms | 32 random characters, e.g. `openssl rand -hex 16`; keep a copy in your password manager |
    | `PB_ADMIN_IPS` | cms | optional: your IPs/subnets, space-separated |
+   | `PB_BOT_EMAIL`, `PB_BOT_PASSWORD` | cms | the Telegram bot's restricted account (news only); password at least 16 characters; set with the bot step |
    | `OPEN_METEO_API_KEY` | pipeline | only with a paid plan (Phase 2) |
 
    Why the superuser variables matter: until a superuser exists, PocketBase prints a one-time
    setup link in its log. Creating the account from the environment closes that window. After
    the first successful start you may remove `PB_SUPERUSER_PASSWORD`; the account stays.
 5. Deploy. All three services must turn **healthy** in Coolify.
+
+## CMS content
+
+The site reads its CMS address at runtime from `/config.json`, which Caddy fills from
+`CMS_ORIGIN`. News and sites are fetched in the browser with a 4 s timeout; if the CMS is down
+the page shows no news (or the last copy it saw) and uses the sites built into the image. On its
+first start the CMS seeds the sites and island from `data/sites.snapshot.json`. See `cms/README.md`.
 
 ## Health checks and observability
 
