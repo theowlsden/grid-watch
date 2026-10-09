@@ -173,7 +173,9 @@ Weather alone cannot explain every event (the April 2026 outage was mostly maint
 | Source | Use | Notes |
 |---|---|---|
 | MDC (Meteorological Department of Curaçao) | Local observations and forecasts, ideal partner | Contact early; start with global data |
-| Open-Meteo (forecast, historical forecast archive, ensemble) | **Decided: Phase 2 weather provider** | Free API is for non-commercial use with attribution (CC BY 4.0). If Grid Watch ends up under the consultancy brand or carries sponsorship, use a paid plan or self-host. Call it from the pipeline only (once per day, cached), never from the browser. Store the model name and run time with every pull so forecasts can be replayed |
+| Open-Meteo (forecast, historical forecast archive, ensemble) | **Decided: Phase 2 weather provider, behind a swappable source module (decision 18)** | Free API is for non-commercial use with attribution (CC BY 4.0). If Grid Watch ends up under the consultancy brand or carries sponsorship, use a paid plan or self-host. Call it from the pipeline only (once per day, cached), never from the browser. Store the model name and run time with every pull so forecasts can be replayed |
+| NOAA GFS (AWS Open Data, every run since 2021) | Second weather source; archived forecasts for Phase 3 backtests | CC BY 4.0, commercial use allowed; GRIB2, 80 m and 100 m wind. Planned |
+| ECMWF open data (IFS 0.25°) | Optional second model | CC BY 4.0, commercial use allowed with credit; `100u`/`100v` available; only recent runs online. Planned |
 | ERA5 | Historical relationships, power curve calibration | Reanalysis, not forecasts |
 | NASA POWER | Reproducible historical weather and solar | Backup/cross-check |
 | Global Wind Atlas | Static wind resource layer for the island | Not a forecast source |
@@ -474,6 +476,7 @@ Acceptance by phase:
 15. **DECIDED, Unsourced events are never published (8 Oct 2026)**: `data/events/events.yaml` may hold entries whose sources are still TODO, but the build leaves them out of the published `events.json` until every source field is filled in. The site can deploy at any time; each event appears once it is sourced. A password-protected preview environment may be added later.
 16. **DECIDED, PocketBase version (8 Oct 2026)**: pinned exactly to 0.40.5 (the latest release at the time) with a checksum in `deploy/cms/Dockerfile`. PocketBase is pre-1.0 and its authors advise caution in production; accepted for this small news/sites CMS, with committed migrations, off-VPS backups and upgrades only as a deliberate change after reading the release notes.
 17. **DECIDED, Pipeline schedule (8 Oct 2026)**: one run a day at 06:00 Curaçao time until Phase 2. From Phase 2: two scheduled runs a day (06:00 and an afternoon run timed to the weather models' updates), plus a manual run triggered from the Telegram bot by an allowlisted user. Every run, scheduled or manual, is stored as its own immutable issuance with the trigger recorded (`scheduled` or `manual`), manual runs are rate-limited, and the scorecard (5.4) states how manual issuances are counted.
+18. **DECIDED, Weather sources are swappable (9 Oct 2026)**: the pipeline reads weather through a small source interface (one module per provider, chosen in configuration), so changing provider never touches the stress rules. Phase 2 starts with the free Open-Meteo API while the site is non-commercial (no ads, no subscriptions); before launch, ask Open-Meteo in writing whether the "by Noir Visuals" credit keeps it non-commercial. NOAA GFS is the second module and the source of archived forecasts for Phase 3 backtests; it is also the fallback if Open-Meteo's terms stop fitting. Every stored issuance records the source and model run.
 
 ## 12b. Licensing and public repository
 

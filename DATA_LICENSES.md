@@ -10,6 +10,8 @@ Fields marked **TODO** are still to be filled in by the maintainer. Do not guess
 |---|---|---|---|---|---|---|
 | OpenStreetMap contributors | Island outline, site positions | ODbL 1.0 | © OpenStreetMap contributors | https://www.openstreetmap.org/copyright | TODO | Planned (Phase 1, `pipeline/tools/build_island.py`) |
 | Open-Meteo | Weather forecasts and historical forecast archive | CC BY 4.0; free API for non-commercial use | Weather data by Open-Meteo.com | https://open-meteo.com/en/licence | TODO | Planned (Phase 2) |
+| NOAA GFS (via AWS Open Data) | Second weather source; archived forecasts for backtests | CC BY 4.0 (UCAR archive), commercial use allowed | Forecast data: NOAA GFS | https://noaa-gfs-bdp-pds.s3.amazonaws.com/index.html | TODO | Planned (Phase 2/3, swappable source) |
+| ECMWF open data (IFS) | Optional second model | CC BY 4.0, commercial use allowed | Contains modified ECMWF open data (CC BY 4.0) | https://www.ecmwf.int/en/forecasts/datasets/open-data | TODO | Planned (optional) |
 | Natural Earth | Fallback island outline only if OSM is not used | Public domain | Made with Natural Earth | https://www.naturalearthdata.com/about/terms-of-use/ | n/a | Fallback, not used |
 | RAC (Regulatory Authority of Curaçao) energy reports | Fleet figures shown in the UI: wind 69 MW, conventional 151 MW, registered PV 16.6 MW (all 2024) | TODO | TODO | TODO | TODO | In use in the prototype |
 | Aqualectra annual reports | Sales and production anchors | TODO | TODO | TODO | TODO | Planned (Phase 3) |
