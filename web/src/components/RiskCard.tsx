@@ -1,3 +1,4 @@
+import type { DateNames } from "@/lib/time";
 import type { Forecast, ForecastDay } from "@/lib/schema";
 import { demandTone, toneOfLevel, windTone, windWord, type Tone } from "@/lib/levels";
 import { dateMedium, issuedShort } from "@/lib/time";
@@ -10,12 +11,12 @@ interface Props {
   day: ForecastDay;
   stale: boolean;
   preview: boolean;
-  locale: string;
+  dates: DateNames;
   t: Translate;
 }
 
 // The main readout (#hud). Shows a 0 to 100 stress index and level, never a probability (spec 5.1).
-export function RiskCard({ forecast, day, stale, preview, locale, t }: Props) {
+export function RiskCard({ forecast, day, stale, preview, dates, t }: Props) {
   const tone = stale ? "unknown" : toneOfLevel(day.level);
   const d = day.drivers;
   const drivers: [string, string, Tone][] = [
@@ -33,7 +34,7 @@ export function RiskCard({ forecast, day, stale, preview, locale, t }: Props) {
           {preview && <span className="tag preview">{t("tag.preview")}</span>}
           {stale && <span className="tag stale">{t("risk.stale")}</span>}
           <div className="when" id="hud-when">
-            {t("risk.window", { date: dateMedium(day.date, locale), start: forecast.window_local.start, end: forecast.window_local.end })}
+            {t("risk.window", { date: dateMedium(day.date, dates), start: forecast.window_local.start, end: forecast.window_local.end })}
           </div>
         </div>
       </div>
@@ -46,7 +47,7 @@ export function RiskCard({ forecast, day, stale, preview, locale, t }: Props) {
         <span className="conf">{t("confidence.label", { level: t(`confidence.${day.confidence}`) })}</span>
       </div>
       <p className="sub">
-        {stale ? t("risk.staleExplain", { time: issuedShort(forecast.issued_at, locale) }) : t("risk.explain")}{" "}
+        {stale ? t("risk.staleExplain", { time: issuedShort(forecast.issued_at, dates) }) : t("risk.explain")}{" "}
         <Link className="methodlink" href="/methodology">
           {t("method.link")}
         </Link>
@@ -60,7 +61,7 @@ export function RiskCard({ forecast, day, stale, preview, locale, t }: Props) {
       </ul>
       {forecast.data_mode === "live" && (
         <p className="updated">
-          {t("risk.updated", { time: issuedShort(forecast.issued_at, locale) })}
+          {t("risk.updated", { time: issuedShort(forecast.issued_at, dates) })}
           {forecast.sources.map((s) => (
             <span key={s.url}>
               {" · "}

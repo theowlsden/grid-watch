@@ -1,13 +1,14 @@
+import type { DateNames } from "@/lib/time";
 import type { ForecastDay } from "@/lib/schema";
 import { dayOfMonth, monthLong, weekdayLong } from "@/lib/time";
 import type { Translate } from "@/i18n";
 
 // "Saturday 10 October, stress index 67, High" (spec 4.8)
-export function dayAriaLabel(d: ForecastDay, locale: string, t: Translate): string {
+export function dayAriaLabel(d: ForecastDay, dates: DateNames, t: Translate): string {
   return t("day.aria", {
-    weekday: weekdayLong(d.date, locale),
+    weekday: weekdayLong(d.date, dates),
     day: dayOfMonth(d.date),
-    month: monthLong(d.date, locale),
+    month: monthLong(d.date, dates),
     index: d.index,
     level: t(`level.${d.level}`),
   });

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { translator } from "@/i18n";
+import { LANGS, translator, type Lang } from "@/i18n";
 import { readStressConfig } from "@/lib/model";
 
 export const metadata: Metadata = {
@@ -11,13 +11,25 @@ export const metadata: Metadata = {
 const REPO = "https://github.com/theowlsden/grid-watch";
 
 // Methodology and limits (spec 8.2). Numbers come from pipeline/stress_config.yaml at build time.
+// The static page holds every language; CSS shows the one matching <html lang>, which
+// mode-init.js sets from the visitor's choice before first paint.
 export default function Methodology() {
-  const t = translator("en");
   const c = readStressConfig();
-  const pct = (v: number) => Math.round(v * 100);
   return (
     <div className="doc-page">
-      <main className="doc">
+      {LANGS.map((lang) => (
+        <Body key={lang} lang={lang} c={c} />
+      ))}
+    </div>
+  );
+}
+
+function Body({ lang, c }: { lang: Lang; c: ReturnType<typeof readStressConfig> }) {
+  const t = translator(lang);
+  const pct = (v: number) => Math.round(v * 100);
+  return (
+    <>
+      <main className="doc" lang={lang} data-doc-lang={lang}>
         <p>
           <Link href="/">← {t("method.back")}</Link>
         </p>
@@ -86,6 +98,6 @@ export default function Methodology() {
 
         <p className="credit">{t("app.credit")}</p>
       </main>
-    </div>
+    </>
   );
 }

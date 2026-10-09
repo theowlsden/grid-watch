@@ -9,7 +9,9 @@ import { loadNews, readDismissed, storeDismissed, type NewsItem } from "@/lib/ne
 import type { Island, Site } from "@/lib/schema";
 import { getModePref, resolveMode, setModePref, subscribeModePref, type ModePref } from "@/lib/mode";
 import { siteView, warnUnknownSlugs } from "@/lib/view";
-import { LOCALE, translator, type Lang } from "@/i18n";
+import { coverage, dateNames, translator } from "@/i18n";
+import { getLang, setLang, subscribeLang } from "@/lib/lang";
+import { LangSwitch } from "./LangSwitch";
 import { EventsList } from "./EventsList";
 import { IslandStage, type StageSite } from "./IslandStage";
 import { ModeSwitch } from "./ModeSwitch";
@@ -32,9 +34,10 @@ function islandGeo(island: Island): IslandGeo | null {
 const noop = () => () => {};
 
 export function Dashboard() {
-  const lang: Lang = "en"; // EN / PAP toggle comes with the language step
+  // EN / PAP (spec 4.7); English while hydrating, then the stored choice
+  const lang = useSyncExternalStore(subscribeLang, getLang, () => "en" as const);
   const t = useMemo(() => translator(lang), [lang]);
-  const locale = LOCALE[lang];
+  const dates = useMemo(() => dateNames(lang), [lang]);
 
   const [forecast, setForecast] = useState<Forecast | null>(null);
   const [events, setEvents] = useState<GridEvent[]>([]);
@@ -113,6 +116,10 @@ export function Dashboard() {
   useEffect(() => {
     if (hydrated) document.documentElement.setAttribute("data-mode", mode);
   }, [mode, hydrated]);
+  useEffect(() => {
+    if (hydrated) document.documentElement.setAttribute("lang", lang);
+  }, [lang, hydrated]);
+  const papPending = lang === "pap" && coverage("pap") < 0.95;
   const changePref = (p: ModePref) => setModePref(p);
 
   const select = useCallback((slug: string | null) => {
@@ -176,7 +183,7 @@ export function Dashboard() {
   const site = sites.find((s) => s.slug === selected);
   const card =
     site && forecast && day ? (
-      <SiteCard site={site} name={stageSites.find((x) => x.slug === site.slug)!.name} forecast={forecast} day={day} locale={locale} t={t} onClose={() => select(null)} />
+      <SiteCard site={site} name={stageSites.find((x) => x.slug === site.slug)!.name} forecast={forecast} day={day} dates={dates} t={t} onClose={() => select(null)} />
     ) : null;
 
   const example = forecast?.data_mode === "example";
@@ -202,9 +209,9 @@ export function Dashboard() {
       />
 
       <div id="below">
-        {forecast && <WeekChart days={forecast.days} selected={dayIdx} onSelect={setDayIdx} locale={locale} t={t} />}
+        {forecast && <WeekChart days={forecast.days} selected={dayIdx} onSelect={setDayIdx} dates={dates} t={t} />}
         <section id="evCard" className="card">
-          <EventsList events={events} locale={locale} t={t} />
+          <EventsList events={events} dates={dates} t={t} />
         </section>
       </div>
 
@@ -213,7 +220,9 @@ export function Dashboard() {
           <div className="brow">
             {example && <span className="tag">{t("tag.example")}</span>}
             <ModeSwitch pref={pref} onChange={changePref} t={t} />
+            <LangSwitch lang={lang} onChange={setLang} t={t} />
           </div>
+          {papPending && <p className="langnote">{t("lang.papPending")}</p>}
           <h1>{t("app.name")}</h1>
           <p className="sub">{t("app.tagline")}</p>
           <p className="disc">
@@ -226,8 +235,8 @@ export function Dashboard() {
         </section>
         {forecast && day ? (
           <>
-            <RiskCard forecast={forecast} day={day} stale={stale} preview={preview} locale={locale} t={t} />
-            <News items={visibleNews} lang={lang} locale={locale} onDismiss={dismiss} t={t} />
+            <RiskCard forecast={forecast} day={day} stale={stale} preview={preview} dates={dates} t={t} />
+            <News items={visibleNews} lang={lang} dates={dates} onDismiss={dismiss} t={t} />
             <StatTiles day={day} t={t} />
           </>
         ) : (
@@ -245,16 +254,20 @@ export function Dashboard() {
         <button id="evBtn" ref={evBtnRef} type="button" aria-expanded={eventsOpen} aria-controls="events" onClick={() => setEventsOpen((o) => !o)}>
           {t("events.button")}
         </button>
+        <div id="lseg">
+          <LangSwitch lang={lang} onChange={setLang} t={t} />
+        </div>
         <div id="mseg">
           <ModeSwitch pref={pref} onChange={changePref} t={t} />
         </div>
+        {papPending && <p className="langnote">{t("lang.papPending")}</p>}
       </header>
       <aside id="events" ref={eventsRef} className="card" hidden={!eventsOpen} aria-label={t("events.title")}>
-        <EventsList events={events} locale={locale} t={t} onClose={closeEvents} />
+        <EventsList events={events} dates={dates} t={t} onClose={closeEvents} />
         <p className="credit">{t("app.credit")}</p>
       </aside>
 
-      {forecast && <DayStrip days={forecast.days} selected={dayIdx} onSelect={setDayIdx} locale={locale} t={t} />}
+      {forecast && <DayStrip days={forecast.days} selected={dayIdx} onSelect={setDayIdx} dates={dates} t={t} />}
     </div>
   );
 }

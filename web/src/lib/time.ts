@@ -1,65 +1,92 @@
-// All dates and times shown on the page use the America/Curacao zone (UTC-4, no daylight saving).
+// All dates and times on the page are Curaçao time (America/Curacao: UTC-4, no daylight saving).
+// Weekday and month names come from the message files (date.* keys), not from the browser's Intl
+// data, which has no Papiamentu; so every language can show its own names.
 export const TZ = "America/Curacao";
+const OFFSET_MS = -4 * 3600_000;
 
-// A forecast date (YYYY-MM-DD) is a local calendar date: anchor it at local noon so
-// formatting in America/Curacao can never shift it to another day.
-function localDate(ymd: string): Date {
-  return new Date(`${ymd}T12:00:00-04:00`);
+export interface DateNames {
+  daysShort: string[]; // Sunday first
+  daysLong: string[];
+  monthsShort: string[]; // January first
+  monthsLong: string[];
 }
 
-function fmt(d: Date, locale: string, opts: Intl.DateTimeFormatOptions): string {
-  return new Intl.DateTimeFormat(locale, { timeZone: TZ, ...opts }).format(d);
+interface Local {
+  y: number;
+  m: number; // 0-11
+  d: number;
+  wd: number; // 0 = Sunday
+  hh: number;
+  mm: number;
 }
 
-export function weekdayShort(ymd: string, locale: string): string {
-  return fmt(localDate(ymd), locale, { weekday: "short" });
+/** Calendar parts of a YYYY-MM-DD local date. */
+function fromYmd(ymd: string): Local {
+  const [y, m, d] = ymd.slice(0, 10).split("-").map(Number);
+  return { y, m: m - 1, d, wd: new Date(Date.UTC(y, m - 1, d)).getUTCDay(), hh: 0, mm: 0 };
 }
 
-export function weekdayLong(ymd: string, locale: string): string {
-  return fmt(localDate(ymd), locale, { weekday: "long" });
+/** Calendar parts of an instant, in Curaçao time. */
+function fromInstant(iso: string): Local {
+  const t = new Date(Date.parse(iso) + OFFSET_MS);
+  return { y: t.getUTCFullYear(), m: t.getUTCMonth(), d: t.getUTCDate(), wd: t.getUTCDay(), hh: t.getUTCHours(), mm: t.getUTCMinutes() };
+}
+
+/** Event times are a local date or a local date-time with the -04:00 offset (schema). */
+function fromEvent(value: string): Local {
+  return value.length === 10 ? fromYmd(value) : fromInstant(value);
+}
+
+const pad = (n: number) => String(n).padStart(2, "0");
+
+export function weekdayShort(ymd: string, n: DateNames): string {
+  return n.daysShort[fromYmd(ymd).wd];
+}
+
+export function weekdayLong(ymd: string, n: DateNames): string {
+  return n.daysLong[fromYmd(ymd).wd];
 }
 
 export function dayOfMonth(ymd: string): number {
-  return Number(ymd.slice(8, 10));
+  return fromYmd(ymd).d;
 }
 
-export function monthLong(ymd: string, locale: string): string {
-  return fmt(localDate(ymd), locale, { month: "long" });
+export function monthLong(ymd: string, n: DateNames): string {
+  return n.monthsLong[fromYmd(ymd).m];
 }
 
-function parts(d: Date, locale: string, opts: Intl.DateTimeFormatOptions): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const p of new Intl.DateTimeFormat(locale, { timeZone: TZ, ...opts }).formatToParts(d)) out[p.type] = p.value;
-  return out;
+// "Wed 7 Oct 2026"
+export function dateMedium(ymd: string, n: DateNames): string {
+  const p = fromYmd(ymd);
+  return `${n.daysShort[p.wd]} ${p.d} ${n.monthsShort[p.m]} ${p.y}`;
 }
 
-// "Wed 7 Oct 2026" (built from parts: some locales add a comma after the weekday)
-export function dateMedium(ymd: string, locale: string): string {
-  const p = parts(localDate(ymd), locale, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
-  return `${p.weekday} ${p.day} ${p.month} ${p.year}`;
-}
-
-function eventDay(value: string): Date {
-  return value.length === 10 ? localDate(value) : new Date(value);
-}
-
-// Event dates: either a date or a date-time with offset; "27 Aug 2025".
-export function eventDate(value: string, locale: string): string {
-  const p = parts(eventDay(value), locale, { day: "numeric", month: "short", year: "numeric" });
-  return `${p.day} ${p.month} ${p.year}`;
+// "27 Aug 2025"
+export function eventDate(value: string, n: DateNames): string {
+  const p = fromEvent(value);
+  return `${p.d} ${n.monthsShort[p.m]} ${p.y}`;
 }
 
 // Event ranges share what they can: "25 to 26 Apr 2026", "30 Aug to 2 Sep 2026".
-export function eventRange(start: string, end: string, locale: string, join: (a: string, b: string) => string): string {
-  const a = parts(eventDay(start), locale, { day: "numeric", month: "short", year: "numeric" });
-  const b = parts(eventDay(end), locale, { day: "numeric", month: "short", year: "numeric" });
-  if (a.year !== b.year) return join(`${a.day} ${a.month} ${a.year}`, `${b.day} ${b.month} ${b.year}`);
-  if (a.month !== b.month) return join(`${a.day} ${a.month}`, `${b.day} ${b.month} ${b.year}`);
-  return join(a.day, `${b.day} ${b.month} ${b.year}`);
+export function eventRange(start: string, end: string, n: DateNames, join: (a: string, b: string) => string): string {
+  const a = fromEvent(start);
+  const b = fromEvent(end);
+  const full = (p: Local) => `${p.d} ${n.monthsShort[p.m]} ${p.y}`;
+  if (a.y !== b.y) return join(full(a), full(b));
+  if (a.m !== b.m) return join(`${a.d} ${n.monthsShort[a.m]}`, full(b));
+  return join(String(a.d), full(b));
 }
 
-// "7 Oct 08:00" for the issue time, in Curaçao time.
-export function issuedShort(iso: string, locale: string): string {
-  const p = parts(new Date(iso), locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false });
-  return `${p.day} ${p.month} ${p.hour}:${p.minute}`;
+// "7 Oct 08:00" for the issue time.
+export function issuedShort(iso: string, n: DateNames): string {
+  const p = fromInstant(iso);
+  return `${p.d} ${n.monthsShort[p.m]} ${pad(p.hh)}:${pad(p.mm)}`;
+}
+
+// "9 Oct" for news items (PocketBase dates look like "2026-10-08 12:00:00.000Z").
+export function dayMonth(value: string, n: DateNames): string {
+  const t = Date.parse(value.replace(" ", "T"));
+  if (Number.isNaN(t)) return "";
+  const p = fromInstant(new Date(t).toISOString());
+  return `${p.d} ${n.monthsShort[p.m]}`;
 }

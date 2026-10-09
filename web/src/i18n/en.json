@@ -129,5 +129,15 @@
   "method.contact.h": "Corrections",
   "method.contact.p": "Spotted a mistake, or represent the utility or MDC and want something corrected or removed? Open an issue on GitHub (a public source is needed for data corrections). Valid corrections are made promptly.",
   "method.contact.link": "Report a correction",
-  "events.close": "Close reported events"
+  "events.close": "Close reported events",
+  "date.daysShort": "Sun,Mon,Tue,Wed,Thu,Fri,Sat",
+  "date.daysLong": "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday",
+  "date.monthsShort": "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec",
+  "date.monthsLong": "January,February,March,April,May,June,July,August,September,October,November,December",
+  "lang.group": "Language",
+  "lang.short.en": "EN",
+  "lang.short.pap": "PAP",
+  "lang.name.en": "English",
+  "lang.name.pap": "Papiamentu",
+  "lang.papPending": "Papiamentu is being reviewed; untranslated text is shown in English for now."
 }

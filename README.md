@@ -58,6 +58,8 @@ pipeline/.venv/bin/python pipeline/tools/build_events.py   # after editing event
 pipeline/.venv/bin/python pipeline/validate.py             # checks every published JSON file
 ```
 
+Papiamentu translation: see [docs/translating.md](docs/translating.md).
+
 The original single-file prototype is kept as the visual reference in `docs/prototype/grid-watch-prototype.html`; open it through any static server.
 
 ## Configuration and secrets

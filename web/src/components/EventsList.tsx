@@ -1,14 +1,15 @@
+import type { DateNames } from "@/lib/time";
 import type { GridEvent } from "@/lib/schema";
 import { eventDate, eventRange } from "@/lib/time";
 import type { Translate } from "@/i18n";
 
 // Reported events (spec 4.6). Only events with a public source are published, so every entry
 // links to its source. Titles and source names stay in their original language.
-function EventItem({ e, locale, t }: { e: GridEvent; locale: string; t: Translate }) {
+function EventItem({ e, dates, t }: { e: GridEvent; dates: DateNames; t: Translate }) {
   const when =
     e.end_local && e.end_local.slice(0, 10) !== e.start_local.slice(0, 10)
-      ? eventRange(e.start_local, e.end_local, locale, (start, end) => t("events.range", { start, end }))
-      : eventDate(e.start_local, locale);
+      ? eventRange(e.start_local, e.end_local, dates, (start, end) => t("events.range", { start, end }))
+      : eventDate(e.start_local, dates);
   const src = e.sources.find((s) => /^https:\/\//.test(s.url));
   return (
     <li className={e.severity === "minor" ? "minor" : undefined}>
@@ -26,7 +27,7 @@ function EventItem({ e, locale, t }: { e: GridEvent; locale: string; t: Translat
   );
 }
 
-export function EventsList({ events, locale, t, onClose }: { events: GridEvent[]; locale: string; t: Translate; onClose?: () => void }) {
+export function EventsList({ events, dates, t, onClose }: { events: GridEvent[]; dates: DateNames; t: Translate; onClose?: () => void }) {
   return (
     <>
       <div className="evhead">
@@ -41,7 +42,7 @@ export function EventsList({ events, locale, t, onClose }: { events: GridEvent[]
       {events.length ? (
         <ol className="evl">
           {events.map((e) => (
-            <EventItem key={e.id} e={e} locale={locale} t={t} />
+            <EventItem key={e.id} e={e} dates={dates} t={t} />
           ))}
         </ol>
       ) : (

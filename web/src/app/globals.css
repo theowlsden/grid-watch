@@ -1186,8 +1186,8 @@ h2 {
   #topbar {
     grid-area: top;
     display: grid;
-    grid-template-columns: auto auto;
-    grid-template-areas: "name name" "ev mode";
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "name lang" "ev mode" "note note";
     align-items: center;
     gap: 8px;
     padding: 10px 8px 8px 14px;
@@ -1221,6 +1221,16 @@ h2 {
     justify-self: end;
     background: none;
     box-shadow: none;
+  }
+
+  #lseg {
+    grid-area: lang;
+    justify-self: end;
+    align-self: start;
+  }
+
+  #topbar .langnote {
+    grid-area: note;
   }
 
   /* risk card: tag across the top, mascot beside date and level, then explanation and drivers */
@@ -1350,8 +1360,8 @@ h2 {
 /* top bar in one row when there is room */
 @media (min-width: 600px) and (max-width: 1500px), (min-width: 600px) and (max-height: 1181px) {
   #topbar {
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    grid-template-areas: "name ev mode";
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    grid-template-areas: "name ev lang mode" "note note note note";
     padding: 6px 6px 6px 18px;
     border-radius: 999px;
   }
@@ -1977,4 +1987,32 @@ h2 {
 
 #events {
   z-index: 5;
+}
+
+/* EN / PAP switch and the note while Papiamentu is being reviewed */
+.seg.lang button {
+  padding: 7px 10px;
+}
+
+.langnote {
+  margin: 0;
+  font: 700 11.5px/1.35 var(--font-body);
+  color: var(--muted);
+}
+
+#brand .brow {
+  row-gap: 8px;
+}
+
+/* methodology: one copy per language, the visitor's language is shown */
+.doc[data-doc-lang="pap"] {
+  display: none;
+}
+
+html[lang="pap"] .doc[data-doc-lang="en"] {
+  display: none;
+}
+
+html[lang="pap"] .doc[data-doc-lang="pap"] {
+  display: block;
 }

@@ -17,7 +17,7 @@ test("the risk card links to the methodology page", async ({ page }) => {
 
 test("the page shows the configured rules and no probability claims", async ({ page }) => {
   await page.goto("/methodology");
-  const main = page.locator("main.doc");
+  const main = page.locator("main.doc").filter({ visible: true });
   await expect(main).toContainText(`${cfg.name} version ${cfg.version}`);
   await expect(main).toContainText(`Elevated from ${cfg.levels.elevated}`);
   await expect(main).toContainText(`${cfg.weights.wind} × wind stress`);

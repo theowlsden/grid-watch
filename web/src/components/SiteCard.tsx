@@ -1,3 +1,4 @@
+import type { DateNames } from "@/lib/time";
 import type { Forecast, ForecastDay, Site } from "@/lib/schema";
 import { FLEET } from "@/lib/fleet";
 import { siteView, windWordOf } from "@/lib/view";
@@ -10,7 +11,7 @@ interface Props {
   name: string;
   forecast: Forecast;
   day: ForecastDay;
-  locale: string;
+  dates: DateNames;
   t: Translate;
   onClose: () => void;
 }
@@ -25,7 +26,7 @@ function Tile({ b, s }: { b: string; s: string }) {
 }
 
 // Site info card (spec 4.5): estimates say "estimated" and how; utility-only facts say "not public".
-export function SiteCard({ site, name, forecast, day, locale, t, onClose }: Props) {
+export function SiteCard({ site, name, forecast, day, dates, t, onClose }: Props) {
   const v = siteView(site, day);
   const wind = site.kind === "wind";
   const parks = site.parks ?? [];
@@ -68,7 +69,7 @@ export function SiteCard({ site, name, forecast, day, locale, t, onClose }: Prop
           <>
             <Tile
               b={t("site.wind.tile", { value: day.drivers.wind_ms_100m.toFixed(1) })}
-              s={t(forecast.data_mode === "example" ? "site.wind.tileSub.example" : "site.wind.tileSub.live", { weekday: weekdayShort(day.date, locale) })}
+              s={t(forecast.data_mode === "example" ? "site.wind.tileSub.example" : "site.wind.tileSub.live", { weekday: weekdayShort(day.date, dates) })}
             />
             <Tile b={t("site.wind.fleet", { mw: FLEET.wind_mw })} s={t("site.wind.fleetSub", { year: FLEET.year })} />
           </>

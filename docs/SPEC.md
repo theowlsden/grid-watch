@@ -121,6 +121,8 @@ Structure: icon and kind, name, status pill, optional progress row (wind: estima
 
 **Decided: English by default, with a visible EN / PAP toggle (Papiamentu).** Dutch is out of scope for launch; keep the i18n structure so `nl.json` can be added later without code changes. Use message keys from the start (no hard-coded strings in components). The choice is stored in `localStorage` (`gridwatch-lang`) and the first visit defaults to English. The toggle sits next to the Auto/Day/Night control. Papiamentu copy must be reviewed by a native speaker before launch, and untranslated keys fall back to English rather than showing a key name. Risk level names (Low, Moderate, Elevated, High) and all disclaimers need Papiamentu versions. Event titles and source names stay in their original language. Dates and times use the `America/Curacao` zone (UTC-4, no daylight saving).
 
+**As built (step 9)**: EN / PAP switch in the top bar and the brand card; `<html lang>` set before first paint; weekday and month names are message keys (`date.*`), because browsers have no Papiamentu date data; the methodology page holds both languages and shows the chosen one; while fewer than 95 % of keys are translated, PAP mode shows a short "being reviewed" note. `pap.json` is empty until Chaco's review: no Papiamentu copy was invented. Guide: `docs/translating.md`, `npm run i18n:status`.
+
 ### 4.8 Accessibility
 
 - Contrast AA in both modes. Status is never colour-only: always paired with a word or icon.
