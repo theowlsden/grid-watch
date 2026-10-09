@@ -472,6 +472,7 @@ Acceptance by phase:
 14. **DECIDED, Readout format**: the stress index is shown as "18 / 100" with the level, a confidence label and "Not a probability" (spec 5.1); day buttons show the bare index.
 15. **DECIDED, Unsourced events are never published (8 Oct 2026)**: `data/events/events.yaml` may hold entries whose sources are still TODO, but the build leaves them out of the published `events.json` until every source field is filled in. The site can deploy at any time; each event appears once it is sourced. A password-protected preview environment may be added later.
 16. **DECIDED, PocketBase version (8 Oct 2026)**: pinned exactly to 0.40.5 (the latest release at the time) with a checksum in `deploy/cms/Dockerfile`. PocketBase is pre-1.0 and its authors advise caution in production; accepted for this small news/sites CMS, with committed migrations, off-VPS backups and upgrades only as a deliberate change after reading the release notes.
+17. **DECIDED, Pipeline schedule (8 Oct 2026)**: one run a day at 06:00 Curaçao time until Phase 2. From Phase 2: two scheduled runs a day (06:00 and an afternoon run timed to the weather models' updates), plus a manual run triggered from the Telegram bot by an allowlisted user. Every run, scheduled or manual, is stored as its own immutable issuance with the trigger recorded (`scheduled` or `manual`), manual runs are rate-limited, and the scorecard (5.4) states how manual issuances are counted.
 
 ## 12b. Licensing and public repository
 
