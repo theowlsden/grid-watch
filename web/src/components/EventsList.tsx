@@ -26,10 +26,17 @@ function EventItem({ e, locale, t }: { e: GridEvent; locale: string; t: Translat
   );
 }
 
-export function EventsList({ events, locale, t }: { events: GridEvent[]; locale: string; t: Translate }) {
+export function EventsList({ events, locale, t, onClose }: { events: GridEvent[]; locale: string; t: Translate; onClose?: () => void }) {
   return (
     <>
-      <h2 className="evh">{t("events.title")}</h2>
+      <div className="evhead">
+        <h2 className="evh">{t("events.title")}</h2>
+        {onClose && (
+          <button type="button" className="x" aria-label={t("events.close")} onClick={onClose}>
+            ×
+          </button>
+        )}
+      </div>
       <p className="sub">{t("events.intro")}</p>
       {events.length ? (
         <ol className="evl">

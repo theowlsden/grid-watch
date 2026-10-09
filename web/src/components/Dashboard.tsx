@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { Forecast, GridEvent } from "@/lib/schema";
 import { isStale, loadCmsIsland, loadCmsSites, loadEvents, loadForecast, snapshotIsland, snapshotSites, validOutline } from "@/lib/data";
 import { northAngle, project, projectWithOffset, type IslandGeo } from "@/lib/projection";
@@ -44,6 +44,22 @@ export function Dashboard() {
   const [selected, setSelected] = useState<string | null>(null);
   const [picked, setPicked] = useState(false);
   const [eventsOpen, setEventsOpen] = useState(false);
+  const eventsRef = useRef<HTMLElement>(null);
+  const topbarRef = useRef<HTMLElement>(null);
+  const evBtnRef = useRef<HTMLButtonElement>(null);
+  // The events panel opens just below the top bar (its height depends on the layout), and the
+  // close button takes focus; closing returns focus to the button that opened it.
+  useLayoutEffect(() => {
+    const panel = eventsRef.current;
+    const bar = topbarRef.current;
+    if (!eventsOpen || !panel || !bar) return;
+    panel.style.top = `${bar.offsetTop + bar.offsetHeight + 10}px`;
+    panel.querySelector<HTMLButtonElement>(".x")?.focus();
+  }, [eventsOpen]);
+  const closeEvents = () => {
+    setEventsOpen(false);
+    evBtnRef.current?.focus();
+  };
   const [webgl, setWebgl] = useState(true);
   const [sites, setSites] = useState<Site[]>(SNAPSHOT_SITES);
   const [island, setIsland] = useState<Island>(SNAPSHOT_ISLAND);
@@ -221,20 +237,20 @@ export function Dashboard() {
         )}
       </div>
 
-      <header id="topbar" className="card">
+      <header id="topbar" className="card" ref={topbarRef}>
         <div className="appname">
           <span className="nm">{t("app.name")}</span>
           <span className="disc">{t("app.disclaimer")}</span>
         </div>
-        <button id="evBtn" type="button" aria-expanded={eventsOpen} aria-controls="events" onClick={() => setEventsOpen((o) => !o)}>
+        <button id="evBtn" ref={evBtnRef} type="button" aria-expanded={eventsOpen} aria-controls="events" onClick={() => setEventsOpen((o) => !o)}>
           {t("events.button")}
         </button>
         <div id="mseg">
           <ModeSwitch pref={pref} onChange={changePref} t={t} />
         </div>
       </header>
-      <aside id="events" className="card" hidden={!eventsOpen} aria-label={t("events.title")}>
-        <EventsList events={events} locale={locale} t={t} />
+      <aside id="events" ref={eventsRef} className="card" hidden={!eventsOpen} aria-label={t("events.title")}>
+        <EventsList events={events} locale={locale} t={t} onClose={closeEvents} />
         <p className="credit">{t("app.credit")}</p>
       </aside>
 

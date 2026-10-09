@@ -1954,3 +1954,27 @@ h2 {
   color: var(--blue-text);
   white-space: nowrap;
 }
+
+/* events panel header with its close button */
+.evhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.evhead .x {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--soft);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+#events {
+  z-index: 5;
+}

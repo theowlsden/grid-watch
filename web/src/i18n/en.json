@@ -128,5 +128,6 @@
   "method.news.p": "News items on the site are written by the project. They never change the outlook, and reports about outages or the utility always name their source.",
   "method.contact.h": "Corrections",
   "method.contact.p": "Spotted a mistake, or represent the utility or MDC and want something corrected or removed? Open an issue on GitHub (a public source is needed for data corrections). Valid corrections are made promptly.",
-  "method.contact.link": "Report a correction"
+  "method.contact.link": "Report a correction",
+  "events.close": "Close reported events"
 }

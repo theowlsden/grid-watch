@@ -139,3 +139,28 @@ test.describe("404 page", () => {
     });
   });
 });
+
+
+for (const size of [{ width: 360, height: 740 }, { width: 390, height: 844 }, { width: 844, height: 390 }]) {
+  test(`events panel ${size.width}x${size.height}: opens below the top bar and closes`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await open(page, { webgl: false });
+    await page.locator("#evBtn").click();
+    const panel = page.locator("#events");
+    await expect(panel).toBeVisible();
+    const close = panel.getByRole("button", { name: "Close reported events" });
+    await expect(close).toBeFocused();
+    // the panel never covers the button that opened it
+    const bar = (await page.locator("#topbar").boundingBox())!;
+    const box = (await panel.boundingBox())!;
+    expect(box.y).toBeGreaterThanOrEqual(bar.y + bar.height);
+    await close.click();
+    await expect(panel).toBeHidden();
+    await expect(page.locator("#evBtn")).toBeFocused();
+    // the button toggles too
+    await page.locator("#evBtn").click();
+    await expect(panel).toBeVisible();
+    await page.locator("#evBtn").click();
+    await expect(panel).toBeHidden();
+  });
+}
