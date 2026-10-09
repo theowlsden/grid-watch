@@ -1,0 +1,82 @@
+# Grid Watch on Coolify (spec 7.6). In Coolify: "Docker Compose" resource from this Git
+# repository, compose file deploy/docker-compose.yaml. Domains are set per service in the
+# Coolify UI (web on port 8080, cms on port 8090); Coolify's proxy provides TLS.
+# Secrets and settings come from Coolify environment variables; see deploy/README.md.
+
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/web/Dockerfile
+    restart: unless-stopped
+    expose:
+      - "8080"
+    environment:
+      # added to the CSP connect-src so the page may fetch news from the CMS
+      CMS_ORIGIN: ${CMS_ORIGIN:-}
+    volumes:
+      - gridwatch-data:/var/lib/gridwatch:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  cms:
+    build:
+      context: ..
+      dockerfile: deploy/cms/Dockerfile
+    restart: unless-stopped
+    expose:
+      - "8090"
+    environment:
+      SITE_ORIGIN: ${SITE_ORIGIN:?set SITE_ORIGIN, e.g. https://grid.noirvisuals.studio}
+      PB_ENCRYPTION_KEY: ${PB_ENCRYPTION_KEY:-}
+      PB_SUPERUSER_EMAIL: ${PB_SUPERUSER_EMAIL:-}
+      PB_SUPERUSER_PASSWORD: ${PB_SUPERUSER_PASSWORD:-}
+      PB_ADMIN_IPS: ${PB_ADMIN_IPS:-}
+    volumes:
+      - pb-data:/pb/pb_data
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8090/api/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  pipeline:
+    build:
+      context: ..
+      dockerfile: deploy/pipeline/Dockerfile
+    restart: unless-stopped
+    environment:
+      OPEN_METEO_API_KEY: ${OPEN_METEO_API_KEY:-}
+    volumes:
+      - gridwatch-data:/var/lib/gridwatch
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "pipeline/healthcheck.py"]
+      interval: 5m
+      timeout: 10s
+      retries: 2
+      start_period: 2m
+
+  # bot: Telegram news bot (Phase 1b), long polling, no public route. Added in the bot step.
+
+volumes:
+  gridwatch-data:
+  pb-data:

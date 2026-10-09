@@ -1,0 +1,3 @@
+# Daily run at 06:00 Curaçao time (TZ=America/Curacao in the image).
+# Phase 2 will tune the time to the weather model's run schedule.
+0 6 * * * python pipeline/run_daily.py

@@ -56,3 +56,17 @@ jobs:
             web/playwright-report/
             web/test-results/
           retention-days: 14
+
+  images:
+    # Build the deploy images (no push) so a broken Dockerfile is caught before Coolify sees it.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build web, cms and pipeline images
+        env:
+          SITE_ORIGIN: https://grid.example.org
+        run: docker compose -f deploy/docker-compose.yaml build
