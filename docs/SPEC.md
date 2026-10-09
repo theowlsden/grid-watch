@@ -368,7 +368,7 @@ Linking rules:
   - `cms`: PocketBase on its own subdomain, `pb_data` on a persistent volume, version pinned.
   - `pipeline`: daily job (Coolify scheduled task or a cron container). Writes `forecast.json`, `history` and the append-only forecast archive to a shared persistent volume that `web` serves under `/data`, so a forecast update never needs a rebuild or redeploy.
   - `bot`: Telegram bot (Phase 1b), long polling, no public route.
-- **Domains**: site at `grid.noirvisuals.studio`; CMS at `cms.grid.noirvisuals.studio` (or `gridcms.noirvisuals.studio`; final choice at deploy). DNS `A` records for both subdomains point to the VPS IP, and Coolify issues the certificates. Add a `www`-style redirect only if useful. Set CORS on the CMS to the site origin only.
+- **Domains (decided)**: site at `grid.noirvisuals.studio`; CMS at `cms.grid.noirvisuals.studio`. DNS `A` records for both subdomains point to the VPS IP, and Coolify issues the certificates. Add a `www`-style redirect only if useful. Set CORS on the CMS to the site origin only.
 - **Secrets**: PocketBase credentials, the bot token and the Open-Meteo key (if a paid plan is used) live in Coolify environment variables, never in the repo.
 - **Observability**: Coolify health checks for `web` and `cms`; the pipeline writes a heartbeat file; if the data is older than 36 hours the site shows "Data out of date" (7.2). Optionally an uptime monitor pings the site and `forecast.json` freshness.
 - **Backups**: see 7.3 (PocketBase backups to off-VPS storage) and back up the forecast archive volume the same way. Immutable archive files are never edited in place.
@@ -471,6 +471,7 @@ Acceptance by phase:
 13. **DECIDED, Copyright holder**: "Noir Visuals" in `LICENSE` (not yet a registered company; revisit if it becomes one).
 14. **DECIDED, Readout format**: the stress index is shown as "18 / 100" with the level, a confidence label and "Not a probability" (spec 5.1); day buttons show the bare index.
 15. **DECIDED, Unsourced events are never published (8 Oct 2026)**: `data/events/events.yaml` may hold entries whose sources are still TODO, but the build leaves them out of the published `events.json` until every source field is filled in. The site can deploy at any time; each event appears once it is sourced. A password-protected preview environment may be added later.
+16. **DECIDED, PocketBase version (8 Oct 2026)**: pinned exactly to 0.40.5 (the latest release at the time) with a checksum in `deploy/cms/Dockerfile`. PocketBase is pre-1.0 and its authors advise caution in production; accepted for this small news/sites CMS, with committed migrations, off-VPS backups and upgrades only as a deliberate change after reading the release notes.
 
 ## 12b. Licensing and public repository
 
