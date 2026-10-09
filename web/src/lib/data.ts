@@ -1,4 +1,4 @@
-import { isEventList, isForecast, type Forecast, type GridEvent, type Site, type SiteKind, type SitesSnapshot } from "./schema";
+import { isEventList, isForecast, type Forecast, type GridEvent, type Island, type Site, type SiteKind, type SitesSnapshot } from "./schema";
 import { fetchJson } from "./config";
 import snapshot from "../../../data/sites.snapshot.json";
 
@@ -35,6 +35,10 @@ export function snapshotSites(): Site[] {
   return enabledSorted((snapshot as unknown as SitesSnapshot).sites);
 }
 
+export function snapshotIsland(): Island {
+  return (snapshot as unknown as SitesSnapshot).island;
+}
+
 const KINDS: SiteKind[] = ["wind", "thermal", "other"];
 const num = (v: unknown) => (typeof v === "number" && v !== 0 ? v : null);
 const text = (v: unknown) => (typeof v === "string" && v ? v : null);
@@ -61,6 +65,8 @@ function parseSite(r: Record<string, unknown>): Site | null {
     description_en: text(r.description_en),
     description_pap: text(r.description_pap),
     source_note: text(r.source_note),
+    modelOffset: pair(r.modelOffset),
+    modelRotation: typeof r.modelRotation === "number" ? r.modelRotation : null,
     placeholder_uv: pair(r.placeholder_uv),
   };
 }
@@ -73,9 +79,40 @@ export async function loadCmsSites(cmsOrigin: string, signal?: AbortSignal): Pro
     if (!Array.isArray(data.items) || !data.items.length) return null;
     const sites = data.items.map((r) => parseSite(r as Record<string, unknown>));
     if (sites.some((s) => !s)) return null;
-    // until real coordinates are projected (OSM step), a site needs its stylised position
-    if (sites.some((s) => !s!.placeholder_uv)) return null;
+    // every site needs a place: real coordinates, or the stylised position as a fallback
+    if (sites.some((s) => (s!.lat === null || s!.lon === null) && !s!.placeholder_uv)) return null;
     return enabledSorted(sites as Site[]);
+  } catch {
+    return null;
+  }
+}
+
+/** A usable outline: one closed ring of at least 4 [lon, lat] points on Curaçao. */
+export function validOutline(o: unknown): o is Island["outline"] {
+  const ring = (o as { type?: string; coordinates?: unknown[][] })?.coordinates?.[0];
+  if ((o as { type?: string })?.type !== "Polygon" || !Array.isArray(ring) || ring.length < 4 || ring.length > 1001) return false;
+  return ring.every(
+    (p) => Array.isArray(p) && p.length === 2 && typeof p[0] === "number" && typeof p[1] === "number" && p[0] > -69.3 && p[0] < -68.6 && p[1] > 11.9 && p[1] < 12.5,
+  );
+}
+
+/** The active island record from the CMS when it is reachable and valid, otherwise null. */
+export async function loadCmsIsland(cmsOrigin: string, signal?: AbortSignal): Promise<Island | null> {
+  if (!cmsOrigin) return null;
+  try {
+    const data = (await fetchJson(`${cmsOrigin}/api/collections/island/records?perPage=1&sort=-updated`, 4000, signal)) as { items?: Record<string, unknown>[] };
+    const r = data.items?.[0];
+    if (!r || typeof r.version !== "string") return null;
+    const outline = validOutline(r.outline) ? (r.outline as Island["outline"]) : null;
+    return {
+      version: r.version,
+      outline,
+      anchorLat: num(r.anchorLat),
+      anchorLon: num(r.anchorLon),
+      metresPerUnit: num(r.metresPerUnit),
+      rotation: typeof r.rotation === "number" ? r.rotation : 0,
+      source: (r.source as Island["source"]) ?? null,
+    };
   } catch {
     return null;
   }

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { IslandScene, type SceneSite } from "@/scene/IslandScene";
+import { IslandScene, type SceneIsland, type SceneSite } from "@/scene/IslandScene";
+import { loadSceneModel } from "@/scene/gltf";
 import type { Tone } from "@/lib/levels";
 import type { Translate } from "@/i18n";
 
@@ -14,6 +15,9 @@ export interface StageSite {
 
 interface Props {
   sites: StageSite[];
+  island: SceneIsland;
+  /** Attribution for OSM-derived geometry (ODbL, spec 8.3); null for the stylised island. */
+  mapCredit: { text: string; url: string } | null;
   windMs: number;
   selected: string | null;
   onSelect: (slug: string | null) => void;
@@ -26,7 +30,7 @@ interface Props {
 // The island area (#main): canvas, site buttons, the site card and the compass.
 // Site buttons are real <button>s (spec 4.4): floating labels in the wide layout, visually hidden
 // otherwise (sites are tapped on the island), and a plain list when WebGL is unavailable.
-export function IslandStage({ sites, windMs, selected, onSelect, night, card, onWebgl, t }: Props) {
+export function IslandStage({ sites, island, mapCredit, windMs, selected, onSelect, night, card, onWebgl, t }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const leaderRef = useRef<SVGLineElement>(null);
@@ -55,6 +59,7 @@ export function IslandStage({ sites, windMs, selected, onSelect, night, card, on
         labels: labels.current,
       },
       sites.map((s) => s.scene),
+      island,
       document.documentElement.dataset.mode === "night",
     );
     onWebgl(!!scene);
@@ -66,7 +71,13 @@ export function IslandStage({ sites, windMs, selected, onSelect, night, card, on
     };
     sceneRef.current = scene;
     setReady(true);
+    // handmade models, if the manifest names one, replace code models after first paint (spec 7.5)
+    let cancelled = false;
+    loadSceneModel().then((root) => {
+      if (root && !cancelled) scene.attachModel(root);
+    });
     return () => {
+      cancelled = true;
       scene.dispose();
       sceneRef.current = null;
     };
@@ -121,6 +132,13 @@ export function IslandStage({ sites, windMs, selected, onSelect, night, card, on
         <article id="card" ref={cardRef} hidden={!selected || !card} aria-labelledby="card-title">
           {card}
         </article>
+        {mapCredit && (
+          <p id="mapCredit">
+            <a href={mapCredit.url} target="_blank" rel="noopener noreferrer">
+              {mapCredit.text}
+            </a>
+          </p>
+        )}
         <div id="compass" aria-hidden="true">
           <span id="needle" ref={needleRef}>
             N

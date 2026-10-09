@@ -74,12 +74,31 @@ export interface Site {
   description_en: string | null;
   description_pap: string | null;
   source_note: string | null;
-  // Stylised scene position used until real coordinates are projected (spec 7.4).
+  // Nudge for the 3D model in metres east/north and its turn in degrees; the real
+  // coordinate stays where it is (spec 7.4).
+  modelOffset?: [number, number] | null;
+  modelRotation?: number | null;
+  // Stylised scene position, used only when there is no island outline (spec 7.4).
   placeholder_uv: [number, number] | null;
 }
 
+export interface GeoPolygon {
+  type: "Polygon";
+  coordinates: [number, number][][]; // one closed exterior ring of [lon, lat]
+}
+
+export interface Island {
+  version: string;
+  outline: GeoPolygon | null;
+  anchorLat: number | null;
+  anchorLon: number | null;
+  metresPerUnit: number | null;
+  rotation: number;
+  source?: { name: string; licence: string; url?: string; retrieved_at: string } | null;
+}
+
 export interface SitesSnapshot {
-  island: { version: string; outline: unknown | null };
+  island: Island;
   sites: Site[];
 }
 

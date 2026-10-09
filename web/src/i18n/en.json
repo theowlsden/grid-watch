@@ -95,5 +95,6 @@
   "news.link": "More information",
   "news.severity.info": "Info",
   "news.severity.notice": "Notice",
-  "news.severity.important": "Important"
+  "news.severity.important": "Important",
+  "map.credit": "© OpenStreetMap contributors"
 }

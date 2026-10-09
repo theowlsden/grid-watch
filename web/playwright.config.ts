@@ -7,7 +7,7 @@ const PORT = 4173;
 const external = process.env.E2E_BASE_URL;
 
 export default defineConfig({
-  testDir: "tests/e2e",
+  testDir: "tests",
   timeout: 60_000,
   expect: { timeout: 15_000 },
   fullyParallel: true,
@@ -27,7 +27,11 @@ export default defineConfig({
       args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
     },
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    { name: "chromium", testDir: "tests/e2e", use: { ...devices["Desktop Chrome"] } },
+    // plain TypeScript unit tests (no browser needed), e.g. the projection (spec 7.4)
+    { name: "unit", testDir: "tests/unit" },
+  ],
   webServer: external
     ? undefined
     : {

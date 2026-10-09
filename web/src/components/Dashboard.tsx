@@ -1,10 +1,12 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { Forecast, GridEvent } from "@/lib/schema";
-import { loadCmsSites, loadEvents, loadForecast, snapshotSites } from "@/lib/data";
+import { loadCmsIsland, loadCmsSites, loadEvents, loadForecast, snapshotIsland, snapshotSites, validOutline } from "@/lib/data";
+import { northAngle, project, projectWithOffset, type IslandGeo } from "@/lib/projection";
+import { stylisedXZ, type SceneIsland } from "@/scene/IslandScene";
 import { loadConfig } from "@/lib/config";
 import { loadNews, readDismissed, storeDismissed, type NewsItem } from "@/lib/news";
-import type { Site } from "@/lib/schema";
+import type { Island, Site } from "@/lib/schema";
 import { getModePref, resolveMode, setModePref, subscribeModePref, type ModePref } from "@/lib/mode";
 import { siteView, warnUnknownSlugs } from "@/lib/view";
 import { LOCALE, translator, type Lang } from "@/i18n";
@@ -19,6 +21,13 @@ import { DayStrip } from "./DayStrip";
 import { News } from "./News";
 
 const SNAPSHOT_SITES = snapshotSites();
+const SNAPSHOT_ISLAND = snapshotIsland();
+
+/** Projection parameters when the island has a real outline, otherwise null (stylised island). */
+function islandGeo(island: Island): IslandGeo | null {
+  if (!validOutline(island.outline) || island.anchorLat === null || island.anchorLon === null || !island.metresPerUnit) return null;
+  return { anchorLat: island.anchorLat, anchorLon: island.anchorLon, metresPerUnit: island.metresPerUnit, rotation: island.rotation ?? 0 };
+}
 const noop = () => () => {};
 
 export function Dashboard() {
@@ -35,6 +44,7 @@ export function Dashboard() {
   const [eventsOpen, setEventsOpen] = useState(false);
   const [webgl, setWebgl] = useState(true);
   const [sites, setSites] = useState<Site[]>(SNAPSHOT_SITES);
+  const [island, setIsland] = useState<Island>(SNAPSHOT_ISLAND);
   const [news, setNews] = useState<NewsItem[]>([]);
   const [dismissed, setDismissed] = useState<string[]>([]);
   const pref = useSyncExternalStore(subscribeModePref, getModePref, () => "auto" as ModePref);
@@ -64,6 +74,9 @@ export function Dashboard() {
       });
       loadCmsSites(cmsOrigin, ac.signal).then((s) => {
         if (s && !ac.signal.aborted) setSites(s);
+      });
+      loadCmsIsland(cmsOrigin, ac.signal).then((i) => {
+        if (i && !ac.signal.aborted) setIsland(i);
       });
     });
     return () => ac.abort();
@@ -107,7 +120,20 @@ export function Dashboard() {
   };
   const visibleNews = news.filter((n) => !dismissed.includes(n.id));
 
-  const stageSites: StageSite[] = sites.map((s) => {
+  // One projection for the outline and the sites (spec 7.4). Without an outline the scene uses
+  // the stylised island and each site's placeholder position.
+  const geo = islandGeo(island);
+  const sceneIsland: SceneIsland = useMemo(
+    () => ({
+      coast: geo ? island.outline!.coordinates[0].slice(0, -1).map(([lon, lat]) => project(lat, lon, geo)) : null,
+      north: geo ? northAngle(geo) : 0,
+    }),
+    // geo is derived from island
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [island],
+  );
+  const placed = sites.filter((s) => (geo ? s.lat !== null && s.lon !== null : !!s.placeholder_uv));
+  const stageSites: StageSite[] = placed.map((s) => {
     const v = day ? siteView(s, day) : null;
     const meta = !v ? "" : s.kind === "wind" ? (v.hasData ? t("site.meta.wind", { pct: v.estOutputPct ?? 0 }) : t("site.noData")) : t("site.meta.thermal");
     return {
@@ -115,7 +141,13 @@ export function Dashboard() {
       name: (lang !== "en" && s.name_pap) || s.name_en,
       meta,
       tone: v?.tone ?? "unknown",
-      scene: { slug: s.slug, kind: s.kind, uv: s.placeholder_uv ?? [0, 0], parkCount: Math.max(1, s.parks?.length ?? 1) },
+      scene: {
+        slug: s.slug,
+        kind: s.kind,
+        xz: geo ? projectWithOffset(s.lat!, s.lon!, geo, s.modelOffset ?? null) : stylisedXZ(...s.placeholder_uv!),
+        parkCount: Math.max(1, s.parks?.length ?? 1),
+        rotationDeg: s.modelRotation ?? null,
+      },
     };
   });
   const site = sites.find((s) => s.slug === selected);
@@ -127,13 +159,16 @@ export function Dashboard() {
   const example = forecast?.data_mode === "example";
   const appClass = [selected && "sheet-open", picked && "picked", !webgl && "no-webgl", visibleNews.length && "has-news"].filter(Boolean).join(" ");
   // the scene is built once per site list; a different list from the CMS rebuilds it
-  const sceneKey = stageSites.map((s) => `${s.slug}:${s.scene.kind}:${s.scene.uv.join("/")}:${s.scene.parkCount}`).join("|");
+  const sceneKey =
+    `${island.version}|` + stageSites.map((s) => `${s.slug}:${s.scene.kind}:${s.scene.xz.map((v) => v.toFixed(3)).join("/")}:${s.scene.parkCount}:${s.scene.rotationDeg ?? 0}`).join("|");
 
   return (
     <div id="app" className={appClass}>
       <IslandStage
         key={sceneKey}
         sites={stageSites}
+        island={sceneIsland}
+        mapCredit={geo ? { text: t("map.credit"), url: island.source?.url ?? "https://www.openstreetmap.org/copyright" } : null}
         windMs={day?.drivers.wind_ms_100m ?? 0}
         selected={selected}
         onSelect={select}

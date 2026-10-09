@@ -64,3 +64,12 @@ test("wide layout needs at least 1182 px of height", async ({ page }) => {
   await expect(page.locator("#brand")).toBeVisible();
   await expect(page.locator("#topbar")).toBeHidden();
 });
+
+test("map data is credited to OpenStreetMap (spec 8.3)", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await open(page);
+  const credit = page.getByRole("link", { name: "© OpenStreetMap contributors" });
+  await expect(credit).toBeVisible();
+  await expect(credit).toHaveAttribute("href", "https://www.openstreetmap.org/copyright");
+  await expect(credit).toHaveAttribute("rel", "noopener noreferrer");
+});

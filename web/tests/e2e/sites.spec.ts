@@ -69,6 +69,8 @@ test("card contents follow the rules in spec 4.5", async ({ page }) => {
   await expect(card).toContainText("Estimated output, island total");
   await expect(card).toContainText("estimated");
   await expect(card).toContainText("2024");
+  // the open card may cover other labels; close it first, as a visitor would
+  await page.keyboard.press("Escape");
   await page.locator(".site", { hasText: "Dokweg" }).click();
   await expect(card).toContainText("Units: not public");
   await expect(card).not.toContainText("Estimated output");

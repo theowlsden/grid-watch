@@ -11,8 +11,15 @@ import { ball, cyl, gloss, mat, rbox, seeded, shade, turbine } from "./models";
 export interface SceneSite {
   slug: string;
   kind: SiteKind;
-  uv: [number, number]; // stylised position (u along the island NW to SE, v across), placeholder until projection lands
+  xz: [number, number]; // scene position: projected lat/lon (lib/projection.ts) or stylisedXZ()
   parkCount: number; // one turbine cluster per park
+  rotationDeg?: number | null; // extra turn of the model (spec 7.4 modelRotation)
+}
+
+/** The island to build: the projected coastline in scene units, or null for the stylised island. */
+export interface SceneIsland {
+  coast: [number, number][] | null;
+  north: number; // radians, see lib/projection.ts northAngle()
 }
 
 export interface SceneElements {
@@ -29,6 +36,7 @@ export interface SceneElements {
 
 interface BuiltSite extends SceneSite {
   group: THREE.Group;
+  model: THREE.Group; // the code-built model on top of the tile; replaced by a handmade one
   tile: THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhysicalMaterial>;
   base: THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>;
   h: number; // label height above the surface
@@ -52,10 +60,16 @@ const K = 1.3;
 const AXIS = -Math.atan2(UD.y, UD.x);
 
 // Desktop label nudges for the seed sites, so the floating labels overlap less.
-const LABEL_OFFSET: Record<string, [number, number]> = { dokweg: [64, 24], koraaltabak: [-64, 22] };
+// Tuned for the default view of the real island: the three eastern sites are only 3 to 6 km apart.
+const LABEL_OFFSET: Record<string, [number, number]> = { dokweg: [-150, 48], playakanoa: [-70, -6], koraaltabak: [86, 6] };
 
 function toXZ(u: number, v: number): [number, number] {
   return [UD.x * u + VD.x * v, UD.y * u + VD.y * v];
+}
+
+/** Scene position of a stylised placeholder (u along the island, v across), used without an outline. */
+export function stylisedXZ(u: number, v: number): [number, number] {
+  return toXZ(u, v);
 }
 
 // Stylised outline (km, width exaggerated for the diorama). Replaced by the OSM outline later (spec 7.4).
@@ -87,6 +101,89 @@ declare global {
   interface Window {
     __gridWatch?: SceneTestHook;
   }
+}
+
+// The ground the scene is built on: coastline, long axis and size, plus an inside test.
+interface Land {
+  coast: [number, number][]; // rim outline, scene units
+  top: [number, number][]; // grass outline (for the test hook)
+  axis: number; // rotation.y that lines tiles up with the island
+  length: number; // along the axis, scene units
+  width: number;
+  centre: [number, number];
+  real: boolean;
+  inside: (x: number, z: number, margin: number) => boolean;
+}
+
+function stylisedLand(): Land {
+  const coastUV: [number, number][] = [];
+  for (let i = -30; i <= 30; i++) coastUV.push([i, topV(i)]);
+  for (let i = 30; i >= -30; i--) coastUV.push([i, botV(i)]);
+  return {
+    coast: coastUV.map(([u, v]) => toXZ(u, v)),
+    top: coastUV.map(([u, v]) => toXZ(u * 0.965, v * 0.93)),
+    axis: AXIS,
+    length: 60,
+    width: 16,
+    centre: [0, 0],
+    real: false,
+    inside: (x, z) => {
+      // back to (u, v): UD and VD are (almost) orthonormal
+      const u = UD.x * x + UD.y * z;
+      const v = VD.x * x + VD.y * z;
+      return u > -27 && u < 27 && v < topV(u) * 0.7 && v > botV(u) * 0.7;
+    },
+  };
+}
+
+function pointInRing(x: number, z: number, ring: [number, number][]): boolean {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, zi] = ring[i];
+    const [xj, zj] = ring[j];
+    if (zi > z !== zj > z && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+function distToRing(x: number, z: number, ring: [number, number][]): number {
+  let best = Infinity;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [ax, az] = ring[j];
+    const [bx, bz] = ring[i];
+    const dx = bx - ax;
+    const dz = bz - az;
+    const t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz || 1)));
+    best = Math.min(best, Math.hypot(x - (ax + t * dx), z - (az + t * dz)));
+  }
+  return best;
+}
+
+function realLand(coast: [number, number][]): Land {
+  // principal axis of the outline points gives the island's long direction
+  const n = coast.length;
+  const cx = coast.reduce((a, p) => a + p[0], 0) / n;
+  const cz = coast.reduce((a, p) => a + p[1], 0) / n;
+  let sxx = 0, szz = 0, sxz = 0;
+  for (const [x, z] of coast) {
+    sxx += (x - cx) ** 2;
+    szz += (z - cz) ** 2;
+    sxz += (x - cx) * (z - cz);
+  }
+  const theta = 0.5 * Math.atan2(2 * sxz, sxx - szz); // angle of the long axis in the x-z plane
+  const ax = [Math.cos(theta), Math.sin(theta)];
+  const along = coast.map(([x, z]) => (x - cx) * ax[0] + (z - cz) * ax[1]);
+  const across = coast.map(([x, z]) => -(x - cx) * ax[1] + (z - cz) * ax[0]);
+  return {
+    coast,
+    top: coast,
+    axis: -theta,
+    length: Math.max(...along) - Math.min(...along),
+    width: Math.max(...across) - Math.min(...across),
+    centre: [cx, cz],
+    real: true,
+    inside: (x, z, margin) => pointInRing(x, z, coast) && distToRing(x, z, coast) > margin,
+  };
 }
 
 export class IslandScene {
@@ -132,17 +229,20 @@ export class IslandScene {
   };
 
   /** Returns null when WebGL is unavailable; the page then shows the 2D site list. */
-  static create(els: SceneElements, sites: SceneSite[], night: boolean): IslandScene | null {
+  static create(els: SceneElements, sites: SceneSite[], island: SceneIsland, night: boolean): IslandScene | null {
     try {
       const probe = els.canvas.getContext("webgl2") ?? els.canvas.getContext("webgl");
       if (!probe) return null;
-      return new IslandScene(els, sites, night);
+      return new IslandScene(els, sites, island, night);
     } catch {
       return null;
     }
   }
 
-  private constructor(private els: SceneElements, sites: SceneSite[], night: boolean) {
+  private land: Land;
+  private north: number;
+
+  private constructor(private els: SceneElements, sites: SceneSite[], island: SceneIsland, night: boolean) {
     const r = new THREE.WebGLRenderer({ canvas: els.canvas, antialias: true, alpha: true });
     this.renderer = r;
     r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -151,6 +251,8 @@ export class IslandScene {
     r.shadowMap.enabled = true;
     r.shadowMap.type = THREE.PCFShadowMap;
 
+    this.land = island.coast && island.coast.length > 3 ? realLand(island.coast) : stylisedLand();
+    this.north = island.north;
     this.readTones();
     this.buildLights();
     this.buildStars();
@@ -223,6 +325,58 @@ export class IslandScene {
     this.setStatuses(Object.fromEntries(this.sites.map((s) => [s.slug, s.tone])), this.wind);
   }
 
+  /** Joins handmade model nodes to sites by name (spec 7.4, 7.5). */
+  attachModel(root: THREE.Object3D): void {
+    const presets: Record<string, THREE.Material> = {
+      clay_green: mat(0xaee04f, { r: 0.6 }),
+      clay_white: mat(0xffffff, { r: 0.45 }),
+      glass: mat(0x86bcff, { r: 0.3 }),
+    };
+    root.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh) return;
+      const name = (Array.isArray(m.material) ? m.material[0] : m.material)?.name ?? "";
+      if (name === "emissive_window") {
+        const w = mat(0x86bcff, { r: 0.3 });
+        this.winMats.push(w);
+        m.material = w;
+      } else if (presets[name]) m.material = presets[name];
+      m.castShadow = m.receiveShadow = true;
+    });
+
+    const used = new Set<string>();
+    for (const site of this.sites) {
+      const node = root.getObjectByName(`site_${site.slug}`);
+      if (!node) continue; // no model for this site: keep the code-built one
+      used.add(node.name);
+      node.removeFromParent();
+      node.name = `model_site_${site.slug}`;
+      node.position.set(0, 0.56, 0);
+      node.rotation.set(0, 0, 0);
+      site.group.remove(site.model);
+      site.group.add(node);
+      node.traverse((o) => {
+        if (o.name === `${site.slug}_blades`) this.rotors.push(o as THREE.Group);
+      });
+    }
+    // site nodes without a record stay hidden (spec 7.4)
+    root.traverse((o) => {
+      if (o.name.startsWith("site_") && !used.has(o.name)) {
+        o.visible = false;
+        if (process.env.NODE_ENV !== "production") console.warn(`[grid-watch] model node "${o.name}" has no site record; hidden`);
+      }
+    });
+    const island = root.getObjectByName("island");
+    if (island) {
+      // a handmade base replaces the extruded one; it shares the same anchor and scale
+      this.world.children.filter((c) => /^island(_rim|_band)?$/.test(c.name)).forEach((c) => (c.visible = false));
+      island.removeFromParent();
+      island.name = "model_island";
+      this.world.add(island);
+    }
+    root.children.filter((c) => c.name.startsWith("prop_")).forEach((p) => this.world.add(p));
+  }
+
   dispose(): void {
     if (window.__gridWatch && navigator.webdriver) delete window.__gridWatch;
     cancelAnimationFrame(this.raf);
@@ -285,30 +439,35 @@ export class IslandScene {
   }
 
   private buildIsland(): void {
-    const outline: [number, number][] = [];
-    for (let i = -30; i <= 30; i++) outline.push([i, topV(i)]);
-    for (let i = 30; i >= -30; i--) outline.push([i, botV(i)]);
-    const slab = (su: number, sv: number, depth: number, bevel: number) => {
+    const land = this.land;
+    const slab = (pts: [number, number][], depth: number, bevel: number, inset = 0) => {
       const sh = new THREE.Shape();
-      outline.forEach(([u, v], k) => {
-        const [x, z] = toXZ(u * su, v * sv);
-        if (k === 0) sh.moveTo(x, -z);
-        else sh.lineTo(x, -z);
+      pts.forEach(([x, z], k) => (k === 0 ? sh.moveTo(x, -z) : sh.lineTo(x, -z)));
+      const g = new THREE.ExtrudeGeometry(sh, {
+        depth,
+        bevelEnabled: true,
+        bevelThickness: bevel,
+        bevelSize: bevel,
+        bevelOffset: -inset,
+        bevelSegments: 5,
+        curveSegments: 1,
       });
-      const g = new THREE.ExtrudeGeometry(sh, { depth, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 5, curveSegments: 1 });
       g.rotateX(-Math.PI / 2);
       return g;
     };
-    const rim = new THREE.Mesh(slab(1, 1, 0.7, 0.3), mat(0xb9784a, { r: 0.6 }));
+    const rim = new THREE.Mesh(slab(land.coast, 0.7, 0.3), mat(0xb9784a, { r: 0.6 }));
     rim.geometry.translate(0, -1.0, 0);
-    const band = new THREE.Mesh(slab(1, 1, 0.05, 0.3), mat(0xd9a06a, { r: 0.6 }));
+    const band = new THREE.Mesh(slab(land.coast, 0.05, 0.3), mat(0xd9a06a, { r: 0.6 }));
     band.geometry.translate(0, -0.3, 0);
-    const grass = new THREE.Mesh(slab(0.965, 0.93, 0.2, 0.2), this.topMat);
+    // the grass top sits a little inside the rim: the stylised outline is scaled, the real one inset
+    const grass = land.real
+      ? new THREE.Mesh(slab(land.coast, 0.2, 0.2, 0.25), this.topMat)
+      : new THREE.Mesh(slab(land.top, 0.2, 0.2), this.topMat);
     grass.geometry.translate(0, 0.1, 0);
     rim.name = "island_rim";
     band.name = "island_band";
     grass.name = "island";
-    this.outlineXZ = outline.map(([u, v]) => toXZ(u * 0.965, v * 0.93));
+    this.outlineXZ = land.top;
     this.world.add(shade(rim), shade(band), shade(grass));
 
     // soft shadow blob under the floating island
@@ -322,40 +481,52 @@ export class IslandScene {
     g2.fillRect(0, 0, 128, 128);
     this.blob = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
     this.blob.rotation.x = -Math.PI / 2;
-    this.blob.rotation.z = Math.atan2(UD.y, UD.x);
-    this.blob.scale.set(86, 34, 1);
-    this.blob.position.y = -5;
+    this.blob.rotation.z = -land.axis;
+    this.blob.scale.set(land.length * 1.43, land.width * 2.1, 1);
+    this.blob.position.set(land.centre[0], -5, land.centre[1]);
     this.blob.name = "island_shadow";
     this.scene.add(this.blob);
   }
 
   private buildDecor(): void {
     const R = seeded(7);
-    const hills: [number, number, number, number][] = [
+    const land = this.land;
+    const nearSite = (x: number, z: number, d: number) =>
+      this.sites.some((s) => Math.hypot(s.ax - x, s.az - z) < d * this.siteScale + (s.parkCount > 1 ? 1.4 * this.siteScale : 0));
+
+    // hills: fixed spots on the stylised island, seeded spots inside the real coastline
+    let hills: [number, number, number, number][] = [
       [-8, 1.0, 4.2, 1.7],
       [-6, -3.0, 2.8, 1.0],
       [14, 1.0, 3.6, 1.3],
       [-20, -0.5, 3.0, 1.0],
-    ];
-    // keep hills off the site tiles
-    const freeHills = hills.filter((h) => !this.sites.some((s) => Math.hypot(s.uv[0] - h[0], s.uv[1] - h[1]) < h[2] + 2.4));
-    for (const h of freeHills) {
+    ].map(([u, v, r, h]) => [...toXZ(u, v), r, h] as [number, number, number, number]);
+    if (land.real) {
+      hills = [];
+      const sizes: [number, number][] = [[3.2, 1.4], [2.6, 1.0], [2.4, 1.1], [2.0, 0.8], [2.2, 0.9]];
+      for (let tries = 0; hills.length < sizes.length && tries < 400; tries++) {
+        const [r, h] = sizes[hills.length];
+        const x = land.centre[0] + (R() - 0.5) * land.length;
+        const z = land.centre[1] + (R() - 0.5) * land.length;
+        if (land.inside(x, z, r + 0.6) && !nearSite(x, z, r + 3.2) && !hills.some((o) => Math.hypot(o[0] - x, o[1] - z) < o[2] + r + 1)) hills.push([x, z, r, h]);
+      }
+    }
+    const freeHills = hills.filter(([x, z, r]) => !nearSite(x, z, r + 2.4));
+    for (const [x, z, r, h] of freeHills) {
       const m = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 16), mat(0xc3ea6a, { r: 0.6 }));
-      const [x, z] = toXZ(h[0], h[1]);
-      m.scale.set(h[2], h[3], h[2]);
+      m.scale.set(r, h, r);
       m.position.set(x, SURF - 0.1, z);
       this.world.add(shade(m));
     }
-    const near = (u: number, v: number, d: number) =>
-      this.sites.some((s) => Math.hypot(s.uv[0] - u, s.uv[1] - v) < d + (s.parkCount > 1 ? 1.4 : 0)) ||
-      freeHills.some((h) => Math.hypot(h[0] - u, h[1] - v) < h[2] + 0.8);
-    const inside = (u: number, v: number) => u > -27 && u < 27 && v < topV(u) * 0.7 && v > botV(u) * 0.7;
+
+    // bushes and rocks
+    const nearHill = (x: number, z: number) => freeHills.some(([hx, hz, r]) => Math.hypot(hx - x, hz - z) < r + 0.8);
+    const target = land.real ? 40 : 30;
     let placed = 0;
-    for (let tries = 0; placed < 30 && tries < 600; tries++) {
-      const u = -27 + R() * 54;
-      const v = botV(u) + R() * (topV(u) - botV(u));
-      if (!inside(u, v) || near(u, v, 4.6)) continue;
-      const [x, z] = toXZ(u, v);
+    for (let tries = 0; placed < target && tries < 2000; tries++) {
+      const x = land.centre[0] + (R() - 0.5) * land.length;
+      const z = land.centre[1] + (R() - 0.5) * land.length;
+      if (!land.inside(x, z, 0.9) || nearSite(x, z, 4.6) || nearHill(x, z)) continue;
       const g = new THREE.Group();
       if (placed % 4 === 3) {
         const rock = new THREE.Mesh(new THREE.SphereGeometry(0.4, 14, 10), mat(0xd3dce0, { r: 0.7 }));
@@ -375,12 +546,37 @@ export class IslandScene {
     }
   }
 
+  // Sites on the real map are smaller: the island is only a few kilometres wide in places.
+  private get siteScale(): number {
+    return this.land.real ? 0.75 : 1;
+  }
+
+  /** Moves a tile inland (toward the island's long axis) until it fits on land; the site's
+   *  real coordinate is unchanged. Wind parks sit on the coast, and a tile is kilometres wide. */
+  private onLand([x, z]: [number, number], radius: number): [number, number] {
+    const land = this.land;
+    if (!land.real || land.inside(x, z, radius)) return [x, z];
+    const [cx, cz] = land.centre;
+    const ax = [Math.cos(-land.axis), Math.sin(-land.axis)];
+    const along = (x - cx) * ax[0] + (z - cz) * ax[1];
+    const toward = [cx + along * ax[0] - x, cz + along * ax[1] - z];
+    const len = Math.hypot(toward[0], toward[1]) || 1;
+    for (let d = 0.25; d <= 3.5; d += 0.25) {
+      const nx = x + (toward[0] / len) * d;
+      const nz = z + (toward[1] / len) * d;
+      if (land.inside(nx, nz, radius)) return [nx, nz];
+    }
+    return [x + (toward[0] / len) * 3.5, z + (toward[1] / len) * 3.5];
+  }
+
   private buildSite(s: SceneSite): void {
-    const [x, z] = toXZ(s.uv[0], s.uv[1]);
+    const halfTile = (s.kind === "wind" ? (s.parkCount > 1 ? 3.9 : 2.7) : 2.4) * this.siteScale;
+    const [x, z] = this.onLand(s.xz, halfTile * 0.8);
     const g = new THREE.Group();
     g.name = `site_${s.slug}`; // naming contract for models (spec 7.5)
     g.position.set(x, SURF, z);
-    g.rotation.y = AXIS;
+    g.rotation.y = this.land.axis + ((s.rotationDeg ?? 0) * Math.PI) / 180;
+    g.scale.setScalar(this.siteScale);
     const twoParks = s.kind === "wind" && s.parkCount > 1;
     const w = twoParks ? 7.4 : s.kind === "wind" ? 5.0 : 4.4;
     const d = s.kind === "wind" ? 5.0 : 4.4;
@@ -389,6 +585,7 @@ export class IslandScene {
     tile.position.y = 0.26;
     g.add(base, tile);
     const a = new THREE.Group();
+    a.name = "code_model";
     a.position.y = 0.56;
     g.add(a);
     let h = 3.4;
@@ -449,7 +646,7 @@ export class IslandScene {
 
     shade(g);
     this.world.add(g);
-    this.sites.push({ ...s, group: g, tile, base, h, ax: x, az: z, lift: 0, hot: false, tone: "unknown", off: LABEL_OFFSET[s.slug] ?? [0, -8] });
+    this.sites.push({ ...s, group: g, model: a, tile, base, h: h * this.siteScale, ax: x, az: z, lift: 0, hot: false, tone: "unknown", off: LABEL_OFFSET[s.slug] ?? [0, -8] });
   }
 
   // ---------- camera and input ----------
@@ -467,7 +664,9 @@ export class IslandScene {
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     if (!this.touched) {
-      this.cam.r = this.cam.tr = Math.max(58, Math.min(215, 76 / (0.69 * (w / h))));
+      // fit the island's length into the view (tuned on the 60-unit stylised island)
+      const k = this.land.length / 60;
+      this.cam.r = this.cam.tr = Math.max(58 * k, Math.min(215 * k, (76 * k) / (0.69 * (w / h))));
       this.cam.pol = this.wide() ? 0.95 : 0.82;
     }
   };
@@ -482,7 +681,7 @@ export class IslandScene {
       return Math.hypot(a.x - b.x, a.y - b.y);
     };
     const down = (e: PointerEvent) => {
-      if ((e.target as Element).closest(".site, #labels, #card, .legend, #hint")) return;
+      if ((e.target as Element).closest(".site, #labels, #card, .legend, #hint, #mapCredit")) return;
       stage.setPointerCapture(e.pointerId);
       ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
       stage.classList.add("drag");
@@ -598,9 +797,11 @@ export class IslandScene {
 
     cam.r += (cam.tr - cam.r) * 0.12;
     const rr = cam.r * this.sheetView(reduce);
-    camera.position.set(rr * Math.sin(cam.pol) * Math.sin(cam.az), rr * Math.cos(cam.pol), rr * Math.sin(cam.pol) * Math.cos(cam.az));
-    camera.lookAt(0, 0, 0);
-    els.needle.style.transform = `rotate(${cam.az}rad)`;
+    const [ox, oz] = this.land.centre;
+    camera.position.set(ox + rr * Math.sin(cam.pol) * Math.sin(cam.az), rr * Math.cos(cam.pol), oz + rr * Math.sin(cam.pol) * Math.cos(cam.az));
+    camera.lookAt(ox, 0, oz);
+    // the needle points to true north (spec 4.4): camera turn plus the map's own rotation
+    els.needle.style.transform = `rotate(${cam.az + this.north}rad)`;
 
     // blend day and night (about 1 s)
     this.nk += (this.nightTarget - this.nk) * (reduce ? 1 : 0.06);

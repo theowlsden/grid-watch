@@ -1794,3 +1794,42 @@ h2 {
     margin-left: 0;
   }
 }
+
+/* map attribution for OSM-derived geometry (ODbL, spec 8.3), beside the compass */
+#mapCredit {
+  position: absolute;
+  right: calc(var(--gutter) + 50px);
+  bottom: 18px;
+  margin: 0;
+  font: 700 10.5px/1.2 var(--font-body);
+}
+
+#mapCredit a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+#mapCredit a:hover,
+#mapCredit a:focus-visible {
+  text-decoration: underline;
+}
+
+@media (min-width: 1501px) and (min-height: 1182px) {
+  #mapCredit {
+    right: 52px;
+    bottom: 16px;
+  }
+}
+
+@media (max-width: 1500px), (max-height: 1181px) {
+  /* bottom-left in compact layouts; the tap hint moves up a line to make room */
+  #mapCredit {
+    left: var(--gutter);
+    right: auto;
+    bottom: 8px;
+  }
+
+  #tapHint {
+    bottom: 26px;
+  }
+}
