@@ -19,7 +19,7 @@ RUN case "${TARGETARCH:-amd64}" in \
 FROM python:3.12-slim@sha256:05cda9777409a9c3ffddd94a4c476b79f0769a0b4857f0c7ed9226b6800b0d6f
 COPY --from=fetch /supercronic /usr/local/bin/supercronic
 RUN groupadd -g 10001 gridwatch && useradd -u 10001 -g gridwatch -M -s /usr/sbin/nologin gridwatch \
- && mkdir -p /var/lib/gridwatch/data && chown -R 10001:10001 /var/lib/gridwatch
+ && mkdir -p /var/lib/gridwatch/data /var/lib/gridwatch-control && chown -R 10001:10001 /var/lib/gridwatch /var/lib/gridwatch-control
 
 WORKDIR /app
 COPY pipeline/requirements.txt pipeline/
@@ -30,6 +30,7 @@ COPY data data
 COPY deploy/pipeline/crontab deploy/pipeline/start.sh deploy/pipeline/
 
 ENV GRIDWATCH_DATA_DIR=/var/lib/gridwatch \
+    GRIDWATCH_CONTROL_DIR=/var/lib/gridwatch-control \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     TZ=America/Curacao

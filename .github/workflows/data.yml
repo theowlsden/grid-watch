@@ -26,7 +26,7 @@ jobs:
         run: pip-licenses --partial-match --allow-only="MIT License;MIT;BSD License;BSD-3-Clause;BSD-2-Clause;Apache Software License;Apache-2.0;ISC License (ISCL);PSF-2.0;Python Software Foundation License"
 
       - name: Unit tests
-        run: python -m pytest -q pipeline/tests
+        run: python -m pytest -q pipeline/tests bot/tests
 
       # Schemas plus rules. Events with TODO sources stay in events.yaml (warning) and are
       # never in the published events.json (error if they are), per spec 4.6 and decision 12.15.
@@ -57,5 +57,5 @@ jobs:
           echo "${PB_SHA256}  pb.zip" | sha256sum -c -
           unzip -q pb.zip pocketbase -d "$RUNNER_TEMP"
 
-      - name: CMS rules and hooks
-        run: POCKETBASE_BIN="$RUNNER_TEMP/pocketbase" python -m pytest -q cms/tests
+      - name: CMS rules and hooks, and the bot against a real CMS
+        run: POCKETBASE_BIN="$RUNNER_TEMP/pocketbase" python -m pytest -q cms/tests bot/tests

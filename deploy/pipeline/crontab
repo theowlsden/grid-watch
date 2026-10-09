@@ -2,3 +2,5 @@
 # 06:00 uses the overnight model runs; 16:00 picks up the 12 UTC run (available around 15:30 local).
 0 6 * * * python pipeline/run_daily.py --trigger scheduled
 0 16 * * * python pipeline/run_daily.py --trigger scheduled
+# manual runs requested from the Telegram bot (/run), picked up within a minute
+* * * * * python pipeline/run_requests.py

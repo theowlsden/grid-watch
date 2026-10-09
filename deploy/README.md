@@ -1,6 +1,6 @@
 # Deployment (Coolify on the Hostinger VPS)
 
-Spec 7.6. Three services from one compose file, `docker-compose.yaml` at the repository root
+Spec 7.6. Four services from one compose file, `docker-compose.yaml` at the repository root
 (build context: the repo root). It sits at the root because Coolify runs compose with the repo
 root as project directory, and compose resolves build paths against that directory. The Telegram bot is added in its own step.
 
@@ -8,7 +8,8 @@ root as project directory, and compose resolves build paths against that directo
 |---|---|---|---|---|
 | `web` | Caddy serving the static export, security headers | 8080 | `grid.noirvisuals.studio` | reads `gridwatch-data` (read-only) |
 | `cms` | PocketBase 0.40.5 (pinned, checksum verified) | 8090 | `cms.grid.noirvisuals.studio` | `pb-data` |
-| `pipeline` | Python 3.12 + supercronic, daily run | none | none | writes `gridwatch-data` |
+| `pipeline` | Python 3.12 + supercronic, two runs a day | none | none | writes `gridwatch-data`, reads run requests from `gridwatch-control` |
+| `bot` | Telegram news bot, Python standard library | none | none (long polling) | writes run requests to `gridwatch-control` |
 
 All containers run as unprivileged users with every Linux capability dropped and
 `no-new-privileges`; `web` and `pipeline` have read-only root filesystems. Base images are
@@ -24,7 +25,7 @@ pinned by digest. Nothing is published on host ports: only Coolify's proxy reach
 3. **Domains** (per service in Coolify, `domain:port` means the container port):
    - web: `https://grid.noirvisuals.studio:8080`
    - cms: `https://cms.grid.noirvisuals.studio:8090`
-   - pipeline: no domain.
+   - pipeline and bot: no domain.
 4. **Environment variables** (Coolify → Environment; never in the repo, see `.env.example`):
 
    | Variable | Service | Value |
@@ -35,6 +36,8 @@ pinned by digest. Nothing is published on host ports: only Coolify's proxy reach
    | `PB_ENCRYPTION_KEY` | cms | 32 random characters, e.g. `openssl rand -hex 16`; keep a copy in your password manager |
    | `PB_ADMIN_IPS` | cms | optional: your IPs/subnets, space-separated |
    | `PB_BOT_EMAIL`, `PB_BOT_PASSWORD` | cms | the Telegram bot's restricted account (news only); password at least 16 characters; set with the bot step |
+   | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_ALLOWED_USER_IDS` | bot | token from @BotFather; your numeric Telegram user id(s), comma-separated; see `bot/README.md` |
+   | `PB_BOT_EMAIL`, `PB_BOT_PASSWORD` | cms **and** bot | the same values on both |
    | `GRIDWATCH_PUBLISH` | pipeline | `0` (default): the live outlook is written as a preview only; `1`: it replaces the example data on the site |
    | `OPEN_METEO_API_KEY` | pipeline | only with a paid plan |
 
