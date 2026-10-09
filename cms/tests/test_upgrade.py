@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from conftest import ROOT, SUPERUSER, Api, _free_port
+from pb_helpers import ROOT, SUPERUSER, Api, _free_port
 
 MIGRATIONS = sorted((ROOT / "cms/pb_migrations").glob("*.js"))
 
