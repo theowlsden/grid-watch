@@ -16,6 +16,8 @@ RUN apk add --no-cache ca-certificates tzdata \
 COPY --from=fetch /usr/local/bin/pocketbase /usr/local/bin/pocketbase
 COPY cms/pb_migrations /pb/pb_migrations
 COPY cms/pb_hooks /pb/pb_hooks
+# seed for the first start: sites and island start identical to the static fallback
+COPY data/sites.snapshot.json /pb/seed/sites.snapshot.json
 COPY deploy/cms/entrypoint.sh /usr/local/bin/entrypoint.sh
 USER 10002
 WORKDIR /pb
