@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-import { islandBox, LANDSCAPE, noHorizontalScroll, open, overlaps, PORTRAIT, rect, setMode, WIDE } from "./helpers";
+import { expect, test, islandBox, LANDSCAPE, noHorizontalScroll, open, overlaps, PORTRAIT, rect, setMode, WIDE } from "./helpers";
 
 // Spec 4.1, 4.2, 11: every layout in day and night, no sideways scroll, and outside the wide
 // layout no overlay may cover the island. Screenshots are attached to the report for review.

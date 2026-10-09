@@ -1,11 +1,20 @@
 // Minimal static server for the exported site (out/), used by the Playwright tests.
-// No dependencies; production uses its own static server with security headers (spec 7.6).
+// No dependencies. Sends the same CSP and security headers as deploy/web/Caddyfile, so every
+// end-to-end test also proves the page works under the production policy.
 import { createReadStream, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize } from "node:path";
+import { buildPolicy } from "../scripts/csp.mjs";
 
 const root = new URL("../out/", import.meta.url).pathname;
 const port = Number(process.env.PORT ?? 4173);
+const SECURITY = {
+  "content-security-policy": buildPolicy(root),
+  "x-content-type-options": "nosniff",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cross-origin-opener-policy": "same-origin",
+  "x-frame-options": "DENY",
+};
 const TYPES = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -29,6 +38,6 @@ createServer((req, res) => {
     res.writeHead(404, { "content-type": "text/plain" }).end("not found");
     return;
   }
-  res.writeHead(200, { "content-type": TYPES[extname(file)] ?? "application/octet-stream", "cache-control": "no-store" });
+  res.writeHead(200, { ...SECURITY, "content-type": TYPES[extname(file)] ?? "application/octet-stream", "cache-control": "no-store" });
   createReadStream(file).pipe(res);
 }).listen(port, () => console.log(`serving ${root} on http://localhost:${port}`));

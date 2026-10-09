@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-import { forecastCopy, open, sites } from "./helpers";
+import { expect, test, forecastCopy, open, sites } from "./helpers";
 
 // Spec 4.4, 4.6, 7.2, 11: fallbacks and data states.
 

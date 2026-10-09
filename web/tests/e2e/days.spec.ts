@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-import { forecast, LEVEL_NAME, open, sites, TONE, WIDE } from "./helpers";
+import { expect, test, forecast, LEVEL_NAME, open, sites, TONE, WIDE } from "./helpers";
 
 // Spec 4.1, 11: picking a day updates the risk card, the day picker and every site status.
 

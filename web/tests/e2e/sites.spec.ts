@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-import { islandBox, open, rect, sites, WIDE } from "./helpers";
+import { expect, test, islandBox, open, rect, sites, WIDE } from "./helpers";
 
 // Spec 4.4, 4.5, 11: every site opens its card, Esc closes it; tapping the island picks sites.
 

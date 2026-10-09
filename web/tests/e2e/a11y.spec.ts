@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
-import { open, setMode, WIDE } from "./helpers";
+import type { Page } from "@playwright/test";
+import { expect, test, open, setMode, WIDE } from "./helpers";
 
 // Spec 4.8, 11: axe scan (WCAG 2.x A and AA) on the main states, day and night.
 

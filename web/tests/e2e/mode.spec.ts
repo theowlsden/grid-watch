@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-import { open } from "./helpers";
+import { expect, test, open } from "./helpers";
 
 // Spec 4.3, 11: Auto follows the clock (day 06:00 to 18:00), explicit choices persist.
 

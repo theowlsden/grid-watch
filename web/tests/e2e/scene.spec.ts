@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-import { open, setMode, sites } from "./helpers";
+import { expect, test, open, setMode, sites } from "./helpers";
 
 // Spec 4.3, 7.5, 11: the scene holds the seed sites by naming contract, and no sun, solar
 // or battery objects in either mode.

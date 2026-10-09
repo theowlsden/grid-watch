@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { expect, type Page } from "@playwright/test";
+import { test as base, expect, type Page } from "@playwright/test";
 import type { Forecast, SitesSnapshot } from "../../src/lib/schema";
 
 const ROOT = join(__dirname, "..", "..", "..");
@@ -27,6 +27,22 @@ export const WIDE = [{ width: 1920, height: 1200 }];
 export async function setMode(page: Page, mode: "auto" | "day" | "night") {
   await page.addInitScript((m) => localStorage.setItem("gridwatch-mode", m), mode);
 }
+
+/** Every test fails on a Content-Security-Policy violation (the server sends the production policy). */
+export const test = base.extend({
+  page: async ({ page }, provide) => {
+    const violations: string[] = [];
+    await page.exposeFunction("__cspViolation", (v: string) => violations.push(v));
+    await page.addInitScript(() => {
+      document.addEventListener("securitypolicyviolation", (e) =>
+        (window as unknown as { __cspViolation: (v: string) => void }).__cspViolation(`${e.violatedDirective} ${e.blockedURI}`),
+      );
+    });
+    await provide(page);
+    expect(violations, "Content-Security-Policy violations").toEqual([]);
+  },
+});
+export { expect };
 
 /** Open the dashboard and wait until the forecast is shown and the island has rendered. */
 export async function open(page: Page, { webgl = true } = {}) {

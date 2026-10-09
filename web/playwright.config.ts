@@ -3,6 +3,8 @@ import { defineConfig, devices } from "@playwright/test";
 // End-to-end tests against the static export (spec 11). Run `npm run build` first;
 // `npm run test:e2e` builds and tests in one go.
 const PORT = 4173;
+// E2E_BASE_URL runs the suite against an already running site (e.g. the web container).
+const external = process.env.E2E_BASE_URL;
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -14,7 +16,7 @@ export default defineConfig({
   workers: process.env.CI ? 2 : undefined,
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   use: {
-    baseURL: `http://localhost:${PORT}`,
+    baseURL: external ?? `http://localhost:${PORT}`,
     timezoneId: "America/Curacao",
     locale: "en-GB",
     // stable frames: no bobbing, spinning or smoke (also what reduced-motion visitors get)
@@ -26,10 +28,12 @@ export default defineConfig({
     },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  webServer: {
-    command: `node tests/serve.mjs`,
-    env: { PORT: String(PORT) },
-    url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: external
+    ? undefined
+    : {
+        command: `node tests/serve.mjs`,
+        env: { PORT: String(PORT) },
+        url: `http://localhost:${PORT}`,
+        reuseExistingServer: !process.env.CI,
+      },
 });
