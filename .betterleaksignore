@@ -1,4 +1,4 @@
 # Findings that are not secrets. Each line is one exact historical finding (commit:file:rule:line).
 # The placeholder passwords ("change-me") in the first .env.example; the file now leaves them empty.
-511994bd97cd6c3c94771ef4cffe37f30fca9edb:.env.example:generic-password:10
-511994bd97cd6c3c94771ef4cffe37f30fca9edb:.env.example:generic-password:14
+f718b1edc58b341b4b9e29d27357a7dc26ef1587:.env.example:generic-password:10
+f718b1edc58b341b4b9e29d27357a7dc26ef1587:.env.example:generic-password:14
