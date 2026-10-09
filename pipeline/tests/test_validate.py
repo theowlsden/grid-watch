@@ -244,6 +244,7 @@ def test_bad_slug_is_rejected(sites):
 
 def test_exact_placement_needs_coordinates(sites):
     sites["sites"][0]["placement"] = "exact"
+    sites["sites"][0]["lat"] = sites["sites"][0]["lon"] = None
     report = Report()
     check_sites(sites, report)
     assert any("exact" in e for e in report.errors)
@@ -269,3 +270,39 @@ def test_run_daily_writes_heartbeat(tmp_path, monkeypatch):
     assert run_daily.main() == 0
     hb = json.loads((tmp_path / "data" / "heartbeat.json").read_text())
     assert hb["status"] == "ok" and hb["last_run"].endswith("Z") and hb["forecast"] is None
+
+
+
+# ---------- island outline (step 8) ----------
+
+
+def test_island_outline_from_osm(sites):
+    isl = sites["island"]
+    ring = isl["outline"]["coordinates"][0]
+    assert ring[0] == ring[-1] and 150 <= len(ring) - 1 <= 400
+    assert isl["source"]["licence"] == "ODbL-1.0"
+    from validate import point_in_ring
+
+    for s in sites["sites"]:
+        assert point_in_ring(s["lon"], s["lat"], ring), f"{s['slug']} lies outside the outline"
+
+
+def test_west_to_east_order(sites):
+    # decision 12.5: Tera Kora, Dokweg, Playa Kanoa, Koraal Tabak from west to east
+    by_lon = [s["slug"] for s in sorted(sites["sites"], key=lambda s: s["lon"])]
+    assert by_lon == ["terakora", "dokweg", "playakanoa", "koraaltabak"]
+
+
+def test_site_outside_the_outline_is_flagged(sites):
+    sites["sites"][0]["lat"], sites["sites"][0]["lon"] = 12.40, -68.70  # at sea, north-east
+    report = Report()
+    check_sites(sites, report)
+    assert report.ok and any("outside the island" in w for w in report.warnings)
+
+
+def test_open_outline_is_rejected(sites):
+    ring = sites["island"]["outline"]["coordinates"][0]
+    ring.pop()
+    report = Report()
+    check_sites(sites, report)
+    assert any("closed" in e for e in report.errors)

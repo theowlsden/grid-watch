@@ -119,7 +119,27 @@ def check_sites(data: Any, report: Report, where: str = "sites") -> set[str]:
             report.error(at, "enabled site needs lat/lon or a placeholder position")
         if s["enabled"] and not has_coords:
             report.warn(at, "no coordinates yet (placeholder position on the stylised map)")
+    outline = data["island"]["outline"]
+    if outline:
+        ring = outline["coordinates"][0]
+        if ring[0] != ring[-1]:
+            report.error(f"{where}: island", "outline ring must be closed (first point = last point)")
+        n = len(ring) - 1
+        if not 150 <= n <= 400:
+            report.warn(f"{where}: island", f"outline has {n} vertices (spec 7.4 suggests 150 to 400)")
+        for s in data["sites"]:
+            if s["enabled"] and s["lat"] is not None and s["lon"] is not None and not point_in_ring(s["lon"], s["lat"], ring):
+                report.warn(f"{where}: sites ({s['slug']})", "position lies outside the island outline")
     return {s["slug"] for s in data["sites"] if s["enabled"]}
+
+
+def point_in_ring(x: float, y: float, ring: list[list[float]]) -> bool:
+    """Even-odd ray casting; ring is a closed list of [lon, lat]."""
+    inside = False
+    for (x1, y1), (x2, y2) in zip(ring, ring[1:]):
+        if (y1 > y) != (y2 > y) and x < (x2 - x1) * (y - y1) / (y2 - y1) + x1:
+            inside = not inside
+    return inside
 
 
 # ---------- forecast ----------

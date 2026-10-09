@@ -1,0 +1,2 @@
+# Data-building tools (pipeline/tools/build_island.py); not needed in the pipeline container.
+shapely==2.2.0

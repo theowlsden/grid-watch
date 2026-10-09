@@ -29,9 +29,9 @@ SITE_FIELDS = [
     "description_en", "description_pap", "pap_reviewed", "source_url", "source_note", "modelOffset",
     "modelRotation", "placeholder_uv",
 ]
-ISLAND_FIELDS = ["version", "outline", "anchorLat", "anchorLon", "metresPerUnit", "rotation"]
+ISLAND_FIELDS = ["version", "outline", "anchorLat", "anchorLon", "metresPerUnit", "rotation", "source"]
 # PocketBase returns "" or 0 for empty optional fields; the snapshot uses null.
-NULLABLE = {"name_pap", "description_en", "description_pap", "source_url", "source_note", "parks", "modelOffset", "placeholder_uv", "outline"}
+NULLABLE = {"name_pap", "description_en", "description_pap", "source_url", "source_note", "parks", "modelOffset", "placeholder_uv", "outline", "source"}
 NUMBER_OR_NULL = {"lat", "lon", "modelRotation", "anchorLat", "anchorLon", "metresPerUnit"}
 
 
