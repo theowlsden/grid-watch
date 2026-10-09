@@ -41,6 +41,9 @@ services:
       PB_SUPERUSER_EMAIL: ${PB_SUPERUSER_EMAIL:-}
       PB_SUPERUSER_PASSWORD: ${PB_SUPERUSER_PASSWORD:-}
       PB_ADMIN_IPS: ${PB_ADMIN_IPS:-}
+      # restricted account for the Telegram bot (news only), kept in sync on every start
+      PB_BOT_EMAIL: ${PB_BOT_EMAIL:-}
+      PB_BOT_PASSWORD: ${PB_BOT_PASSWORD:-}
     volumes:
       - pb-data:/pb/pb_data
     cap_drop: [ALL]

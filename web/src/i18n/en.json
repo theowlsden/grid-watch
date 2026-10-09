@@ -89,5 +89,11 @@
   "site.thermal.fleetSub": "Island conventional fleet, {year}",
   "site.thermal.note": "Whether enough units are running is the biggest unknown in this model. Reports on recent outages point to units in maintenance or repair.",
   "notFound.title": "Page not found",
-  "notFound.back": "Back to Grid Watch Curaçao"
+  "notFound.back": "Back to Grid Watch Curaçao",
+  "news.title": "News",
+  "news.dismiss": "Dismiss: {title}",
+  "news.link": "More information",
+  "news.severity.info": "Info",
+  "news.severity.notice": "Notice",
+  "news.severity.important": "Important"
 }

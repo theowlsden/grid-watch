@@ -32,7 +32,8 @@ export default defineConfig({
     ? undefined
     : {
         command: `node tests/serve.mjs`,
-        env: { PORT: String(PORT) },
+        // a CMS origin that never resolves; tests serve it with page.route()
+        env: { PORT: String(PORT), CMS_ORIGIN: "https://cms.grid.test" },
         url: `http://localhost:${PORT}`,
         reuseExistingServer: !process.env.CI,
       },

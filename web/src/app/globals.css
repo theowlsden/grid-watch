@@ -1641,3 +1641,156 @@ h2 {
 .notfound a {
   color: var(--blue-text);
 }
+
+/* ---------- News from the CMS (spec 7.3) ----------
+   Severity tags use neutral colours, never the status tones, so news cannot read as a level. */
+#news {
+  padding: 14px 16px;
+  display: grid;
+  gap: 8px;
+}
+
+#news .newsh {
+  font: 800 16px/1.1 var(--font-display);
+}
+
+#news ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+#news li {
+  min-width: 0;
+}
+
+#news .nhead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+#news .ntag {
+  flex: none;
+  font: 800 10.5px/1 var(--font-body);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--ink);
+}
+
+#news .sev-notice .ntag {
+  box-shadow: inset 0 0 0 2px var(--blue-text);
+}
+
+#news .sev-important .ntag {
+  background: var(--sel-bg);
+  color: var(--sel-fg);
+}
+
+#news .ntitle {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  font: 800 13.5px/1.25 var(--font-body);
+}
+
+#news .nx {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--soft);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+#news .nbody {
+  display: none;
+  padding: 2px 0 0;
+}
+
+#news li.open .nbody {
+  display: block;
+}
+
+#news .nbody p {
+  margin: 4px 0 0;
+  font: 600 13px/1.4 var(--font-body);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+#news .nbody .nmeta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+#news .nbody a {
+  color: var(--blue-text);
+}
+
+/* compact layouts: a chip above the day strip with the first item; the row only exists when
+   there is news, so the island keeps its space otherwise */
+@media (max-width: 1500px), (max-height: 1181px) {
+  #news {
+    grid-area: news;
+    padding: 6px 8px 6px 10px;
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+
+  #news .newsh {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  #news li:not(:first-child) {
+    display: none;
+  }
+
+  #news .ntitle {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #news li.open .ntitle {
+    white-space: normal;
+  }
+
+  #app.has-news {
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+    grid-template-areas: "top" "hud" "stage" "news" "days";
+  }
+}
+
+@media (max-width: 1500px) and (orientation: landscape) and (min-aspect-ratio: 5/4),
+  (max-height: 1181px) and (orientation: landscape) and (min-aspect-ratio: 5/4) {
+  /* landscape: the chip sits under the island, so the risk card keeps its full height */
+  #app.has-news {
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    grid-template-areas: "top top" "hud stage" "hud news" "days days";
+  }
+
+  #app.has-news #news {
+    margin-left: 0;
+  }
+}

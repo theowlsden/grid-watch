@@ -8,8 +8,9 @@ import { buildPolicy } from "../scripts/csp.mjs";
 
 const root = new URL("../out/", import.meta.url).pathname;
 const port = Number(process.env.PORT ?? 4173);
+const cmsOrigin = process.env.CMS_ORIGIN ?? "";
 const SECURITY = {
-  "content-security-policy": buildPolicy(root),
+  "content-security-policy": buildPolicy(root, cmsOrigin),
   "x-content-type-options": "nosniff",
   "referrer-policy": "strict-origin-when-cross-origin",
   "cross-origin-opener-policy": "same-origin",
@@ -29,6 +30,12 @@ const TYPES = {
 };
 
 createServer((req, res) => {
+  if (req.url.split("?")[0] === "/config.json") {
+    // like production: runtime config from the environment (deploy/web/Caddyfile)
+    res.writeHead(200, { ...SECURITY, "content-type": TYPES[".json"], "cache-control": "no-cache" });
+    res.end(JSON.stringify({ cmsOrigin }));
+    return;
+  }
   const path = normalize(decodeURIComponent(new URL(req.url, "http://x").pathname)).replace(/^(\.\.[/\\])+/, "");
   let file = join(root, path);
   try {

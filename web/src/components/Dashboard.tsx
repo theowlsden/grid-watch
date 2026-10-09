@@ -1,7 +1,10 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { Forecast, GridEvent } from "@/lib/schema";
-import { loadEvents, loadForecast, snapshotSites } from "@/lib/data";
+import { loadCmsSites, loadEvents, loadForecast, snapshotSites } from "@/lib/data";
+import { loadConfig } from "@/lib/config";
+import { loadNews, readDismissed, storeDismissed, type NewsItem } from "@/lib/news";
+import type { Site } from "@/lib/schema";
 import { getModePref, resolveMode, setModePref, subscribeModePref, type ModePref } from "@/lib/mode";
 import { siteView, warnUnknownSlugs } from "@/lib/view";
 import { LOCALE, translator, type Lang } from "@/i18n";
@@ -13,8 +16,9 @@ import { SiteCard } from "./SiteCard";
 import { StatTiles } from "./StatTiles";
 import { WeekChart } from "./WeekChart";
 import { DayStrip } from "./DayStrip";
+import { News } from "./News";
 
-const SITES = snapshotSites();
+const SNAPSHOT_SITES = snapshotSites();
 const noop = () => () => {};
 
 export function Dashboard() {
@@ -30,6 +34,9 @@ export function Dashboard() {
   const [picked, setPicked] = useState(false);
   const [eventsOpen, setEventsOpen] = useState(false);
   const [webgl, setWebgl] = useState(true);
+  const [sites, setSites] = useState<Site[]>(SNAPSHOT_SITES);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [dismissed, setDismissed] = useState<string[]>([]);
   const pref = useSyncExternalStore(subscribeModePref, getModePref, () => "auto" as ModePref);
   // false while hydrating the static HTML: mode-init.js already set data-mode before paint
   const hydrated = useSyncExternalStore(noop, () => true, () => false);
@@ -47,6 +54,18 @@ export function Dashboard() {
         }
       });
     loadEvents(ac.signal).then(setEvents);
+    // CMS content is optional: news and site records load in the background and the page
+    // never waits for them (spec 7.3, 7.4)
+    loadConfig(ac.signal).then(({ cmsOrigin }) => {
+      loadNews(cmsOrigin, ac.signal).then((n) => {
+        if (ac.signal.aborted) return;
+        setDismissed(readDismissed());
+        setNews(n);
+      });
+      loadCmsSites(cmsOrigin, ac.signal).then((s) => {
+        if (s && !ac.signal.aborted) setSites(s);
+      });
+    });
     return () => ac.abort();
   }, []);
 
@@ -79,10 +98,16 @@ export function Dashboard() {
 
   const day = forecast?.days[Math.min(dayIdx, forecast.days.length - 1)] ?? null;
   useEffect(() => {
-    if (day) warnUnknownSlugs(day, SITES);
-  }, [day]);
+    if (day) warnUnknownSlugs(day, sites);
+  }, [day, sites]);
+  const dismiss = (id: string) => {
+    const next = [...dismissed, id];
+    setDismissed(next);
+    storeDismissed(next);
+  };
+  const visibleNews = news.filter((n) => !dismissed.includes(n.id));
 
-  const stageSites: StageSite[] = SITES.map((s) => {
+  const stageSites: StageSite[] = sites.map((s) => {
     const v = day ? siteView(s, day) : null;
     const meta = !v ? "" : s.kind === "wind" ? (v.hasData ? t("site.meta.wind", { pct: v.estOutputPct ?? 0 }) : t("site.noData")) : t("site.meta.thermal");
     return {
@@ -93,18 +118,21 @@ export function Dashboard() {
       scene: { slug: s.slug, kind: s.kind, uv: s.placeholder_uv ?? [0, 0], parkCount: Math.max(1, s.parks?.length ?? 1) },
     };
   });
-  const site = SITES.find((s) => s.slug === selected);
+  const site = sites.find((s) => s.slug === selected);
   const card =
     site && forecast && day ? (
       <SiteCard site={site} name={stageSites.find((x) => x.slug === site.slug)!.name} forecast={forecast} day={day} locale={locale} t={t} onClose={() => select(null)} />
     ) : null;
 
   const example = forecast?.data_mode === "example";
-  const appClass = [selected && "sheet-open", picked && "picked", !webgl && "no-webgl"].filter(Boolean).join(" ");
+  const appClass = [selected && "sheet-open", picked && "picked", !webgl && "no-webgl", visibleNews.length && "has-news"].filter(Boolean).join(" ");
+  // the scene is built once per site list; a different list from the CMS rebuilds it
+  const sceneKey = stageSites.map((s) => `${s.slug}:${s.scene.kind}:${s.scene.uv.join("/")}:${s.scene.parkCount}`).join("|");
 
   return (
     <div id="app" className={appClass}>
       <IslandStage
+        key={sceneKey}
         sites={stageSites}
         windMs={day?.drivers.wind_ms_100m ?? 0}
         selected={selected}
@@ -136,6 +164,7 @@ export function Dashboard() {
         {forecast && day ? (
           <>
             <RiskCard forecast={forecast} day={day} locale={locale} t={t} />
+            <News items={visibleNews} lang={lang} locale={locale} onDismiss={dismiss} t={t} />
             <StatTiles day={day} t={t} />
           </>
         ) : (

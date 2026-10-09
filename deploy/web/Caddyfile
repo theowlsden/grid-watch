@@ -30,6 +30,13 @@
 		respond "ok" 200
 	}
 
+	# Runtime configuration for the page (web/src/lib/config.ts), from the environment
+	handle /config.json {
+		header Content-Type "application/json"
+		header Cache-Control "no-cache"
+		respond `\{"cmsOrigin":"{$CMS_ORIGIN:}"\}` 200
+	}
+
 	# Forecast data: pipeline output on the shared volume wins over the copy in the build,
 	# so a daily run never needs a rebuild. Short cache (spec 7.6).
 	@fromVolume {

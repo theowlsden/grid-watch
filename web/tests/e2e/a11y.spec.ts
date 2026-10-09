@@ -41,6 +41,26 @@ for (const mode of ["day", "night"] as const) {
       await scan(page);
     });
 
+    for (const [label, size] of [["portrait", { width: 390, height: 844 }], ["wide", WIDE[0]]] as const) {
+      test(`${label} with news`, async ({ page }) => {
+        const now = new Date().toISOString().replace("T", " ");
+        await page.route("https://cms.grid.test/api/collections/news/records*", (r) =>
+          r.fulfill({
+            json: {
+              items: [
+                { id: "n1", title_en: "Planned maintenance notice", title_pap: "", body_en: "Text.", body_pap: "", severity: "important", link: "https://example.org", pinned: true, publishedAt: now, expiresAt: "" },
+                { id: "n2", title_en: "Method update", title_pap: "", body_en: "Text.", body_pap: "", severity: "notice", link: "", pinned: false, publishedAt: now, expiresAt: "" },
+              ],
+            },
+          }),
+        );
+        await page.setViewportSize(size);
+        await open(page);
+        await page.locator("#news .ntitle").first().click();
+        await scan(page);
+      });
+    }
+
     test("wide with site card", async ({ page }) => {
       await page.setViewportSize(WIDE[0]);
       await open(page);
