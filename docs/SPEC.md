@@ -415,12 +415,13 @@ Two looks via `data-mode` on the root element, tokens as CSS variables.
 | `--glow` / `--edge` (ground gradient) | #f6fcfe / #d3eaf2 | #16314a / #04080d |
 | `--panel` | #ffffff | rgba(16,28,39,.9) |
 | `--soft` | #eef7fa | #1a2b3a |
-| `--ink` / `--muted` | #10312a / #5f7f7c | #e8f3f1 / #8ea9ad |
+| `--ink` / `--muted` | #10312a / #547370 (was #5f7f7c, darkened for AA) | #e8f3f1 / #8ea9ad |
 | `--line` | #d5e8ee | #26394a |
 | `--blue` (progress, leader line) | #1b7bff | #5aa2ff |
+| `--blue-text` (blue numbers and links) | #1667d6 | #5aa2ff |
 | Selected control | bg #10312a, fg #fff | bg #aee04f, fg #10312a |
 
-Status colours (same in both modes): ok #27c76f, watch #f4c20d, warn #ff8a2b, crit #ff4d4f, unknown #9fb6c0 (night #6f8794). Text on tone: #10312a, white on crit.
+Status colours (same in both modes): ok #27c76f, watch #f4c20d, warn #ff8a2b, crit #ff5c5e, unknown #9fb6c0 (night #8299a5). Text on every tone, crit included: #10312a. (Changed 8 Oct 2026 to pass WCAG AA, spec 4.8: crit was #ff4d4f with white text at 3.3:1, night unknown was #6f8794 at 3.7:1, muted was #5f7f7c at 4.0:1 on `--soft`.)
 
 Type: **Baloo 2** (display, 700/800) and **Nunito** (body, 600 to 800). Numbers use tabular figures. Scale in the prototype: title 46 px desktop, percentage 56 px desktop / 40 px mobile, card titles 19 to 20 px, body 13 to 14 px, labels 11 to 12 px.
 

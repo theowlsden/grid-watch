@@ -9,15 +9,16 @@
   --glow: #f6fcfe;
   --edge: #d3eaf2;
   --ink: #10312a;
-  --muted: #5f7f7c;
+  --muted: #547370; /* darkened from #5f7f7c for WCAG AA on --soft (spec 4.8) */
   --panel: #ffffff;
   --soft: #eef7fa;
   --line: #d5e8ee;
   --blue: #1b7bff;
+  --blue-text: #1667d6; /* --blue is too light for small text on white */
   --ok: #27c76f;
   --watch: #f4c20d;
   --warn: #ff8a2b;
-  --crit: #ff4d4f;
+  --crit: #ff5c5e; /* lightened from #ff4d4f so dark text passes WCAG AA (spec 4.8) */
   --unknown: #9fb6c0;
   --on-tone: #10312a;
   --sel-bg: #10312a;
@@ -44,7 +45,8 @@
   --soft: #1a2b3a;
   --line: #26394a;
   --blue: #5aa2ff;
-  --unknown: #6f8794;
+  --blue-text: #5aa2ff;
+  --unknown: #8299a5; /* lightened from #6f8794 so dark text passes WCAG AA (spec 4.8) */
   --sel-bg: #aee04f;
   --sel-fg: #10312a;
   --tag-bg: #aee04f;
@@ -236,7 +238,7 @@ h2 {
 
 .pill.crit {
   background: var(--crit);
-  color: #fff;
+  color: var(--on-tone);
 }
 
 /* segmented day/night control */
@@ -440,7 +442,7 @@ h2 {
   padding: 4px 8px;
   border-radius: 999px;
   background: var(--crit);
-  color: #fff;
+  color: var(--on-tone);
 }
 
 .evl li.minor time {
@@ -540,7 +542,7 @@ h2 {
 }
 
 #card .pr span:last-child {
-  color: var(--blue);
+  color: var(--blue-text);
   font-size: 15px;
   font-variant-numeric: tabular-nums;
 }
@@ -685,7 +687,7 @@ h2 {
 
 #days .crit .dp {
   background: var(--crit);
-  color: #fff;
+  color: var(--on-tone);
 }
 
 #days button[aria-pressed="true"] {
@@ -907,7 +909,7 @@ h2 {
 
   .chip.crit {
     background: var(--crit);
-    color: #fff;
+    color: var(--on-tone);
   }
 
   #week {
@@ -1334,6 +1336,7 @@ h2 {
   #card {
     position: absolute;
     bottom: 0;
+    box-sizing: border-box;
     /* about 54 percent of the screen, but always leave part of the island in view */
     max-height: min(54vh, calc(100% - 120px));
   }
@@ -1487,7 +1490,7 @@ h2 {
 .evl .src {
   margin-top: 4px;
   font: 700 12px/1.3 var(--font-body);
-  color: var(--blue);
+  color: var(--blue-text);
   justify-self: start;
 }
 
