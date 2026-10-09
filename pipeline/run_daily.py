@@ -14,7 +14,9 @@ Each run logs one line with the inputs hash, versions and duration (spec 9).
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime as dt
+import fcntl
 import hashlib
 import json
 import os
@@ -62,7 +64,24 @@ def publishing() -> bool:
     return os.environ.get("GRIDWATCH_PUBLISH", "").lower() in ("1", "true", "yes")
 
 
+@contextlib.contextmanager
+def single_run():
+    """One run at a time: a manual run waits for a scheduled one (and the other way round)."""
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    with (DATA_DIR / ".run.lock").open("w") as fh:
+        fcntl.flock(fh, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(fh, fcntl.LOCK_UN)
+
+
 def run(trigger: str, source=None, now: dt.datetime | None = None) -> int:  # noqa: ANN001
+    with single_run():
+        return _run(trigger, source, now)
+
+
+def _run(trigger: str, source=None, now: dt.datetime | None = None) -> int:  # noqa: ANN001
     started = time.monotonic()
     now = (now or dt.datetime.now(dt.timezone.utc)).replace(microsecond=0)
     previous = read_heartbeat()

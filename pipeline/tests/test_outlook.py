@@ -235,3 +235,29 @@ def test_manual_runs_are_rate_limited(run_daily, tmp_path):
     assert run_daily.run("manual", FakeSource(), ISSUED) == 0
     assert run_daily.run("manual", FakeSource(), ISSUED + dt.timedelta(minutes=10)) == 2
     assert run_daily.run("manual", FakeSource(), ISSUED + dt.timedelta(minutes=31)) in (0, 1)  # allowed (fake data repeats the issue time)
+
+
+# ---------- manual runs requested by the bot ----------
+
+
+def test_run_requests_claim_run_and_report(tmp_path, monkeypatch):
+    import importlib
+
+    control = tmp_path / "control"
+    control.mkdir()
+    monkeypatch.setenv("GRIDWATCH_DATA_DIR", str(tmp_path / "data"))
+    monkeypatch.setenv("GRIDWATCH_CONTROL_DIR", str(control))
+    import run_daily
+    import run_requests
+
+    importlib.reload(run_daily)
+    importlib.reload(run_requests)
+    calls = []
+    monkeypatch.setattr(run_requests.run_daily, "run", lambda trigger: calls.append(trigger) or 0)
+    assert run_requests.main() == 0 and calls == [], "nothing requested, nothing run"
+    (control / "run-request.json").write_text(json.dumps({"id": "abc123"}))
+    assert run_requests.main() == 0
+    assert calls == ["manual"]
+    assert not (control / "run-request.json").exists() and not (control / "run-request.processing").exists()
+    result = json.loads((control / "run-result.abc123.json").read_text())
+    assert result["result"] == "ok" and (control / "last-run.json").exists()
