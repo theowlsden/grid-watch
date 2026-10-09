@@ -16,7 +16,21 @@ const LEGEND = [
 ] as const;
 
 // Lollipop chart of the stress index; it is also the day picker in the wide layout (spec 4.1).
-export function WeekChart({ days, selected, onSelect, dates, t }: { days: ForecastDay[]; selected: number; onSelect: (i: number) => void; dates: DateNames; t: Translate }) {
+export function WeekChart({
+  days,
+  selected,
+  onSelect,
+  dates,
+  t,
+  footnote = null,
+}: {
+  days: ForecastDay[];
+  selected: number;
+  onSelect: (i: number) => void;
+  dates: DateNames;
+  t: Translate;
+  footnote?: string | null;
+}) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   return (
     <section id="week" className="card">
@@ -63,6 +77,7 @@ export function WeekChart({ days, selected, onSelect, dates, t }: { days: Foreca
           ))}
         </div>
       </div>
+      {footnote && <p className="sub weeknote">{footnote}</p>}
     </section>
   );
 }

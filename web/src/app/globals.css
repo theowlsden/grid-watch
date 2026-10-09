@@ -736,8 +736,12 @@ h2 {
     right: var(--gutter);
     bottom: var(--gutter);
     height: 284px;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
     gap: 12px;
+  }
+
+  #below.no-events {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   #side {
@@ -2015,4 +2019,26 @@ html[lang="pap"] .doc[data-doc-lang="en"] {
 
 html[lang="pap"] .doc[data-doc-lang="pap"] {
   display: block;
+}
+
+/* wide layout chart: the day columns end before the threshold labels on the right */
+@media (min-width: 1501px) and (min-height: 1182px) {
+  #plot .cols {
+    right: 118px;
+  }
+
+  #plot .gl span {
+    width: 110px;
+    text-align: right;
+  }
+
+  #week {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #week .weeknote {
+    margin: 4px 0 0;
+    font-size: 12px;
+  }
 }

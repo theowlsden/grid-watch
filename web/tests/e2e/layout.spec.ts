@@ -43,7 +43,6 @@ for (const mode of ["day", "night"] as const) {
       await noHorizontalScroll(page);
       await expect(page.locator("#brand")).toBeVisible();
       await expect(page.locator("#week")).toBeVisible();
-      await expect(page.locator("#evCard")).toBeVisible();
       await expect(page.locator("#topbar")).toBeHidden();
       await expect(page.locator("#days")).toBeHidden();
       const island = await islandBox(page);
@@ -54,6 +53,44 @@ for (const mode of ["day", "night"] as const) {
       await info.attach(`${size.width}x${size.height}-${mode}`, { body: await page.screenshot(), contentType: "image/png" });
     });
   }
+}
+
+const EVENT = {
+  id: "2026-10-06-test",
+  title: "Controlled outages",
+  start_local: "2026-10-06",
+  end_local: null,
+  type: "controlled_switching",
+  severity: "minor",
+  drivers: [],
+  summary: "Test event.",
+  sources: [{ publisher: "Test", title: "Report", url: "https://example.org/report", published_at: "2026-10-06", retrieved_at: "2026-10-07" }],
+  verified: true,
+};
+
+for (const withEvents of [false, true]) {
+  test(`wide bottom row ${withEvents ? "with" : "without"} events`, async ({ page }) => {
+    if (withEvents) await page.route("**/data/events.json", (r) => r.fulfill({ json: [EVENT] }));
+    await page.setViewportSize({ width: 1920, height: 1200 });
+    await open(page);
+    const week = (await rect(page, "#week"))!;
+    const below = (await rect(page, "#below"))!;
+    if (withEvents) {
+      await expect(page.locator("#evCard")).toBeVisible();
+      // columns 1.9fr and 1fr: the chart takes about 65 percent of the row
+      expect((week.x1 - week.x0) / (below.x1 - below.x0)).toBeGreaterThan(0.6);
+      await expect(page.locator("#week .weeknote")).toHaveCount(0);
+    } else {
+      await expect(page.locator("#evCard")).toHaveCount(0);
+      expect(week.x1 - week.x0).toBeGreaterThan(below.x1 - below.x0 - 2);
+    }
+    // the "cannot show" note stays visible either way (spec 4.6)
+    await expect(page.getByText(/What this page cannot show/).filter({ visible: true })).toBeInViewport();
+    // no day column runs under the threshold labels
+    const labels = await page.locator("#plot .gl span").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().left));
+    const cols = await page.locator("#plot .col").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().right));
+    expect(Math.max(...cols)).toBeLessThanOrEqual(Math.min(...labels));
+  });
 }
 
 test("wide layout needs at least 1182 px of height", async ({ page }) => {

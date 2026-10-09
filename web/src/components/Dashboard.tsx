@@ -208,11 +208,17 @@ export function Dashboard() {
         t={t}
       />
 
-      <div id="below">
-        {forecast && <WeekChart days={forecast.days} selected={dayIdx} onSelect={setDayIdx} dates={dates} t={t} />}
-        <section id="evCard" className="card">
-          <EventsList events={events} dates={dates} t={t} />
-        </section>
+      {/* without published events the chart takes the whole row; the "cannot show" note
+          (spec 4.6, always visible) then moves into the chart card */}
+      <div id="below" className={events.length ? undefined : "no-events"}>
+        {forecast && (
+          <WeekChart days={forecast.days} selected={dayIdx} onSelect={setDayIdx} dates={dates} t={t} footnote={events.length ? null : t("events.cannotShow")} />
+        )}
+        {events.length > 0 && (
+          <section id="evCard" className="card">
+            <EventsList events={events} dates={dates} t={t} />
+          </section>
+        )}
       </div>
 
       <div id="side">
