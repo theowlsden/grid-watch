@@ -86,3 +86,23 @@ test("invalid events file leaves the page intact", async ({ page }) => {
   await open(page);
   await expect(page.locator("#hud .pct")).toBeVisible();
 });
+
+test.describe("404 page", () => {
+  test("shows the bolt and a way back, still with reduced motion", async ({ page }) => {
+    const res = await page.goto("/does-not-exist");
+    expect(res?.status()).toBe(404);
+    await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+    await expect(page.locator(".notfound .bolt")).toBeVisible();
+    await expect(page.locator(".notfound .bolt")).toHaveCSS("animation-name", "none");
+    await page.getByRole("link", { name: "Back to Grid Watch Curaçao" }).click();
+    await expect(page).toHaveURL(/\/$/);
+  });
+
+  test.describe("with motion", () => {
+    test.use({ reducedMotion: "no-preference" });
+    test("the bolt blinks", async ({ page }) => {
+      await page.goto("/does-not-exist");
+      await expect(page.locator(".notfound .bolt")).toHaveCSS("animation-name", "bolt-flicker");
+    });
+  });
+});

@@ -35,7 +35,9 @@ createServer((req, res) => {
     if (statSync(file).isDirectory()) file = join(file, "index.html");
     statSync(file);
   } catch {
-    res.writeHead(404, { "content-type": "text/plain" }).end("not found");
+    // like production (deploy/web/Caddyfile): the site's own 404 page
+    res.writeHead(404, { ...SECURITY, "content-type": TYPES[".html"] });
+    createReadStream(join(root, "404.html")).pipe(res);
     return;
   }
   res.writeHead(200, { ...SECURITY, "content-type": TYPES[extname(file)] ?? "application/octet-stream", "cache-control": "no-store" });

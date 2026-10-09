@@ -1601,6 +1601,43 @@ h2 {
   font: 800 32px/1.1 var(--font-display);
 }
 
+.notfound .bolt {
+  justify-self: center;
+  width: 72px;
+  height: 144px;
+  fill: #ffc93c;
+  stroke: #10312a;
+  stroke-width: 3;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 14px rgba(255, 201, 60, 0.75));
+  animation: bolt-flicker 2.4s steps(1, end) infinite;
+}
+
+/* a failing light: two short dips per 2.4 s cycle, well under the WCAG limit of
+   three flashes per second (spec 4.8: no flashing) */
+@keyframes bolt-flicker {
+  0%,
+  62%,
+  70%,
+  100% {
+    opacity: 1;
+  }
+
+  58% {
+    opacity: 0.25;
+  }
+
+  66% {
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notfound .bolt {
+    animation: none;
+  }
+}
+
 .notfound a {
   color: var(--blue-text);
 }
