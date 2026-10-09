@@ -55,3 +55,6 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# Local pipeline output (GRIDWATCH_DATA_DIR default)
+/var/
