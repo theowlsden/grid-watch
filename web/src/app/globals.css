@@ -46,9 +46,9 @@
   --edge: #000f33;
   --ink: #f4f1e6;
   --muted: #a0aeca;
-  --panel: rgba(4, 24, 70, 0.9);
-  --soft: #0d2660;
-  --line: #1c3878;
+  --panel: rgba(11, 42, 108, 0.92); /* a step lighter than --sea so cards stand out */
+  --soft: #06215a;
+  --line: #28488f;
   --blue: #86a8ff;
   --blue-text: #a3bdff;
   --unknown: #8299a5; /* lightened from #6f8794 so dark text passes WCAG AA (spec 4.8) */

@@ -423,10 +423,10 @@ Two looks via `data-mode` on the root element, tokens as CSS variables. The chro
 |---|---|---|
 | `--sea` (ground) | #e9eef8 | #001b52 |
 | `--glow` / `--edge` (ground gradient) | #fdfbf4 / #d5deef | #0a3278 / #000f33 |
-| `--panel` | #fbf8ef (off-white) | rgba(4,24,70,.9) |
-| `--soft` | #eef1f8 | #0d2660 |
+| `--panel` | #fbf8ef (off-white) | rgba(11,42,108,.92) |
+| `--soft` | #eef1f8 | #06215a |
 | `--ink` / `--muted` | #001d57 / #4b5b7c | #f4f1e6 / #a0aeca |
-| `--line` | #d9e0ee | #1c3878 |
+| `--line` | #d9e0ee | #28488f |
 | `--blue` (progress, leader line) | #1f56c8 | #86a8ff |
 | `--blue-text` (blue numbers and links) | #002b7f | #a3bdff |
 | Selected control, tags | bg #002b7f, fg #fbf8ef | bg #f9e814, fg #001d57 |
