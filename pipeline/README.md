@@ -63,3 +63,10 @@ ensemble, so update the methodology wording on the ensemble at the same time.
 at every past 06:00 and 16:00 issue time, from the GFS run published by then, into
 `data/hindcasts/gfs/` (see its README). Resumable; about 15 MB is read per issue time.
 
+### Observations and the backtest report (Phase 3)
+
+`python pipeline/tools/fetch_metar.py --start 2025-01-01` downloads the Hato airport METAR (TNCC)
+from the Iowa Environmental Mesonet into `data/observations/tncc/`. `python
+pipeline/tools/run_backtest.py` then scores the hindcasts (spec 5.3) and writes
+`data/backtests/rules-v0-gfs.json` and `docs/results.md`, from stored files only.
+
