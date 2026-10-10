@@ -33,11 +33,15 @@ Papiamentu is being reviewed. It disappears automatically once the translation i
   visible until you update it. Saving the row clears the flag.
 - A key the code no longer uses is marked `obsolete`: hidden from the site, the text is kept.
 - Keys cannot be added or renamed in the CMS; that happens in the code.
+- You can also translate in `web/src/i18n/pap.json`: on the next deploy, every CMS row that has no
+  Papiamentu yet is filled from it and published. Rows that already have text in the CMS are never
+  overwritten, so after the first fill, edit those in the CMS (or clear the field there first).
+  Entries that break a placeholder or a date list are skipped.
 
 ## The bundled copy
 
 `web/src/i18n/pap.json` is the fallback the site uses when the CMS cannot be reached (and the seed for
-a fresh CMS). Refresh it now and then from the published text and commit it:
+empty CMS rows). Refresh it now and then from the published text and commit it:
 
 ```sh
 cd web

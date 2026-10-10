@@ -150,6 +150,20 @@ def test_sync_adds_flags_and_retires_keys(tmp_path):
         _, body, _ = api.call("PATCH", f"{URL}/{a['id']}", {"pap": "pap a2 {time}"}, token=admin)
         assert body["needs_review"] is False
 
+    # pap.json fills empty rows only: "c" is filled and published, "a" keeps the CMS text,
+    # and a fill that breaks the placeholders is skipped
+    write(i18n, {"a": "Last updated {time}", "b": "Low", "c": "New", "d": "At {time}"}, {"a": "from file {time}", "c": "pap new", "d": "no placeholder"})
+    with serve(binary, data, i18n) as (api, admin):
+        c = row(api, admin, "c")
+        assert (c["pap"], c["status"], c["updatedBy"]) == ("pap new", "published", "pap.json")
+        assert row(api, admin, "a")["pap"] == "pap a2 {time}"
+        assert row(api, admin, "d")["pap"] == ""
+        # once a row has text in the CMS, pap.json no longer touches it
+        api.call("PATCH", f"{URL}/{c['id']}", {"pap": "edited in cms"}, token=admin)
+    write(i18n, {"a": "Last updated {time}", "b": "Low", "c": "New"}, {"c": "pap new"})
+    with serve(binary, data, i18n) as (api, admin):
+        assert row(api, admin, "c")["pap"] == "edited in cms"
+
     # "b" is no longer used: hidden from the public, text kept
     write(i18n, {"a": "Last updated {time}", "c": "New"}, {})
     with serve(binary, data, i18n) as (api, admin):
