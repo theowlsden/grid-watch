@@ -1,10 +1,16 @@
 import { expect, test } from "@playwright/test";
 import en from "../../src/i18n/en.json";
-import { dateNames, translator } from "../../src/i18n";
+import pap from "../../src/i18n/pap.json";
+import { dateNames, translator, type MessageKey } from "../../src/i18n";
 import { dateMedium, eventRange, issuedShort } from "../../src/lib/time";
 
-test("missing Papiamentu keys fall back to English", () => {
-  expect(translator("pap")("level.high")).toBe(en["level.high"]);
+test("Papiamentu uses its own text where it has one, English otherwise, never a key name", () => {
+  const t = translator("pap");
+  const own = pap as Partial<Record<MessageKey, string>>;
+  for (const k of Object.keys(en) as MessageKey[]) {
+    if (k.startsWith("date.")) continue; // lists are checked below
+    expect(t(k), k).toBe(own[k] || en[k]);
+  }
   expect(translator("en")("week.threshold", { level: "High", value: 60 })).toBe("High from 60");
 });
 

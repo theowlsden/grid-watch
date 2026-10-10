@@ -4,6 +4,10 @@ import { expect, open, snapshot, test } from "./helpers";
 
 // Spec 4.7: EN / PAP toggle, stored choice, English fallback per key, *_pap content from the CMS.
 const en: Record<string, string> = JSON.parse(readFileSync(join(__dirname, "..", "..", "src", "i18n", "en.json"), "utf8"));
+const pap: Record<string, string> = JSON.parse(readFileSync(join(__dirname, "..", "..", "src", "i18n", "pap.json"), "utf8"));
+// what the bundled files show for a key in PAP: Papiamentu where it exists, English otherwise
+const bundled = (k: string) => pap[k] || en[k];
+const papCoverage = Object.keys(en).filter((k) => pap[k]).length / Object.keys(en).length;
 const CMS = "https://cms.grid.test";
 
 test.use({ viewport: { width: 390, height: 844 } });
@@ -21,14 +25,16 @@ test("English by default; PAP is remembered and sets the page language", async (
   await expect(page.locator("#topbar").getByRole("button", { name: "Papiamentu" })).toHaveAttribute("aria-pressed", "true");
 });
 
-test("untranslated text falls back to English, never to a key name", async ({ page }) => {
+test("PAP shows the bundled text (English where untranslated), never a key name", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("gridwatch-lang", "pap"));
   await open(page);
-  await expect(page.locator("#hud .pill")).toHaveText(en["level.low"]);
+  await expect(page.locator("#hud .pill")).toHaveText(bundled("level.low"));
   const text = await page.locator("body").innerText();
   const leaked = Object.keys(en).filter((k) => text.includes(k));
   expect(leaked).toEqual([]);
-  await expect(page.locator(".langnote").filter({ visible: true })).toBeVisible();
+  // the "being reviewed" note shows only while under 95 % is translated
+  if (papCoverage < 0.95) await expect(page.locator(".langnote").filter({ visible: true })).toBeVisible();
+  else await expect(page.locator(".langnote").filter({ visible: true })).toHaveCount(0);
 });
 
 test("Papiamentu fields from the CMS are used in PAP", async ({ page }) => {
@@ -98,7 +104,7 @@ test("without the CMS the bundled Papiamentu (or English) is used", async ({ pag
   await page.route(`${CMS}/**`, (r) => r.abort("connectionrefused"));
   await page.addInitScript(() => localStorage.setItem("gridwatch-lang", "pap"));
   await open(page);
-  await expect(page.locator("#hud .pill")).toHaveText(en["level.low"]);
+  await expect(page.locator("#hud .pill")).toHaveText(bundled("level.low"));
 });
 
 test("the methodology page uses CMS translations too", async ({ page }) => {

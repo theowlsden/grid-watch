@@ -58,9 +58,6 @@ export function MethodologyBody({ lang, c }: { lang: Lang; c: StressConfig }) {
         <h2>{t("method.record.h")}</h2>
         <p>{t("method.record.p", { hours: c.stale_after_hours })}</p>
 
-        <h2>{t("method.limits.h")}</h2>
-        <p>{t("method.limits.p")}</p>
-
         <h2>{t("method.sources.h")}</h2>
         <p>
           {t("method.sources.p")}{" "}
@@ -68,9 +65,6 @@ export function MethodologyBody({ lang, c }: { lang: Lang; c: StressConfig }) {
             {t("method.sources.link")}
           </a>
         </p>
-
-        <h2>{t("method.news.h")}</h2>
-        <p>{t("method.news.p")}</p>
 
         <h2>{t("method.contact.h")}</h2>
         <p>
