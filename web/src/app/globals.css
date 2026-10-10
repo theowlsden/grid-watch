@@ -1374,6 +1374,11 @@ h2 {
     padding: 6px 6px 6px 18px;
     border-radius: 999px;
   }
+
+  /* in one row every control is centred, also when a long tagline makes the bar taller */
+  #lseg {
+    align-self: center;
+  }
 }
 
 /* Landscape: risk card left, island right. The site card replaces the risk card while open. */

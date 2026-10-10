@@ -93,6 +93,26 @@ for (const withEvents of [false, true]) {
   });
 }
 
+// iPad 11" portrait and the 768 px tablet: the top bar is one row, and its controls stay
+// centred on one line even when the Papiamentu tagline wraps and makes the bar taller
+for (const size of [{ width: 768, height: 1024 }, { width: 820, height: 1180 }, { width: 834, height: 1194 }]) {
+  for (const lang of ["en", "pap"] as const) {
+    test(`top bar controls line up ${size.width}x${size.height} ${lang}`, async ({ page }) => {
+      await page.addInitScript((l) => localStorage.setItem("gridwatch-lang", l), lang);
+      await page.setViewportSize(size);
+      await open(page);
+      await expect(page.locator("html")).toHaveAttribute("lang", lang);
+      const mid = async (sel: string) => {
+        const r = (await rect(page, sel))!;
+        return (r.y0 + r.y1) / 2;
+      };
+      const ev = await mid("#evBtn");
+      expect(Math.abs((await mid("#lseg")) - ev), "language switch").toBeLessThanOrEqual(1);
+      expect(Math.abs((await mid("#mseg")) - ev), "day/night switch").toBeLessThanOrEqual(1);
+    });
+  }
+}
+
 test("wide layout needs at least 1182 px of height", async ({ page }) => {
   await page.setViewportSize({ width: 1600, height: 1181 });
   await open(page);
