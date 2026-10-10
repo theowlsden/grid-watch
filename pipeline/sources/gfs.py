@@ -99,6 +99,20 @@ def open_dataset():  # noqa: ANN201 - xarray is imported lazily
     return xr.open_zarr(repo.readonly_session("main").store, consolidated=False, chunks=None)
 
 
+def lead_hours(box) -> list[float]:  # noqa: ANN001
+    import numpy as np
+
+    return [float(h) for h in box.lead_time.values / np.timedelta64(1, "h")]
+
+
+def point_series(box, var: str, lat: float, lon: float) -> list[float | None]:  # noqa: ANN001
+    """One variable at one point, interpolated for every lead time in the box."""
+    lats = [float(x) for x in box.latitude.values]
+    lons = [float(x) for x in box.longitude.values]
+    arr = box[var].values  # (lead, lat, lon)
+    return [bilinear(lats, lons, arr[k].tolist(), lat, lon) for k in range(arr.shape[0])]
+
+
 def _utc(t) -> dt.datetime:  # noqa: ANN001 - numpy datetime64
     return dt.datetime.fromisoformat(str(t)[:19]).replace(tzinfo=dt.timezone.utc)
 
@@ -115,31 +129,28 @@ class Gfs:
             self._ds = open_dataset()
         return self._ds
 
-    def _box(self, init: dt.datetime, n_leads: int):  # noqa: ANN202
+    def box(self, init: dt.datetime, n_leads: int, variables: list[str] = VARIABLES):  # noqa: ANN201
+        """One run's values for the box around the island, lead times up to `n_leads` hours."""
         import numpy as np
 
         ds = self.ds
         lat_desc = float(ds.latitude[0]) > float(ds.latitude[-1])
         lat_slice = slice(BOX["lat"][1], BOX["lat"][0]) if lat_desc else slice(*BOX["lat"])
-        sub = ds[VARIABLES].sel(init_time=np.datetime64(init.replace(tzinfo=None)), latitude=lat_slice, longitude=slice(*BOX["lon"]))
+        sub = ds[variables].sel(init_time=np.datetime64(init.replace(tzinfo=None)), latitude=lat_slice, longitude=slice(*BOX["lon"]))
         hours = (sub.lead_time.values / np.timedelta64(1, "h")).astype(int)
         keep = int((hours <= n_leads).sum())
         return sub.isel(lead_time=slice(0, keep)).load()
 
-    def pull(self, points: dict[str, tuple[float, float]], days: int, init: dt.datetime) -> WeatherPull:
-        """Point series from one forecast run (UTC init time)."""
-        import numpy as np
-
-        box = self._box(init, leads_needed(init, days))
-        lats = [float(x) for x in box.latitude.values]
-        lons = [float(x) for x in box.longitude.values]
-        valid = [init + dt.timedelta(hours=float(h)) for h in box.lead_time.values / np.timedelta64(1, "h")]
+    def pull(self, points: dict[str, tuple[float, float]], days: int, init: dt.datetime, box=None) -> WeatherPull:  # noqa: ANN001
+        """Point series from one forecast run (UTC init time); `box` reuses values already loaded."""
+        if box is None:
+            box = self.box(init, leads_needed(init, days))
+        valid = [init + dt.timedelta(hours=h) for h in lead_hours(box)]
         out = {}
         for name, (lat, lon) in points.items():
 
             def series(var: str) -> list[float | None]:
-                arr = box[var].values  # (lead, lat, lon)
-                return [bilinear(lats, lons, arr[k].tolist(), lat, lon) for k in range(arr.shape[0])]
+                return point_series(box, var, lat, lon)
 
             u, v = series("wind_u_100m"), series("wind_v_100m")
             local = [t.astimezone(TZ) for t in valid]

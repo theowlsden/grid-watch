@@ -167,6 +167,8 @@ Weather alone cannot explain every event (the April 2026 outage was mostly maint
 - Report precision, recall, false-positive rate and lead time at thresholds 30 to 80 percent, plus Brier score and calibration curve with an explicit small-sample warning.
 - Case studies for 27 Aug 2025, Apr 2026, Aug 2026, 6 Oct 2026: "what would the model have known at T-7 d, T-72 h, T-24 h, T-6 h, T-1 h". Wording: "in a retrospective experiment the model would have indicated X", never "the AI predicted the blackout".
 
+**As built (Phase 3.2, 10 Oct 2026)**: hindcasts from archived GFS runs for every 06:00 and 16:00 issue time from 1 Jan 2025 (`data/hindcasts/gfs/`, `pipeline/tools/run_hindcasts.py`). An issue time only uses a run that started at least six hours before it. Each record keeps the evening inputs (so the rules can be re-run with other weights) and GFS 10 m wind and 2 m temperature at Hato airport for the METAR check. They are labelled retrospective and kept apart from the live archive. Starting in January 2025 leaves only seven months before the first event: the seasonal-average baseline, which may only use earlier data, can be scored fairly from about January 2026.
+
 ### 5.4 Prospective validation (Phase 4)
 
 - Run daily on a schedule, store every issuance immutably (append-only, timestamped, model version included). Do not change rules based on outcomes during the validation window.

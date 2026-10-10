@@ -23,8 +23,14 @@ class LeakageError(RuntimeError):
     """An input claims to come from after the issue time (spec 5.3: no leakage)."""
 
 
-def check_no_leakage(pull: WeatherPull, ensemble: EnsemblePull | None, issued_at: dt.datetime) -> None:
-    for label, t in (("model run", pull.run_time), ("retrieval", pull.retrieved_at), ("ensemble run", ensemble.run_time if ensemble else None)):
+def check_no_leakage(pull: WeatherPull, ensemble: EnsemblePull | None, issued_at: dt.datetime, retrospective: bool = False) -> None:
+    """Retrospective runs (hindcasts) read an archived model run long after the fact, so the
+    retrieval time is not checked; the run itself must still be from before the issue time
+    (the hindcast tool also requires it to have been published by then)."""
+    checks = [("model run", pull.run_time), ("ensemble run", ensemble.run_time if ensemble else None)]
+    if not retrospective:
+        checks.append(("retrieval", pull.retrieved_at))
+    for label, t in checks:
         if t is not None and t > issued_at:
             raise LeakageError(f"{label} time {t.isoformat()} is after the issue time {issued_at.isoformat()}")
 
@@ -63,9 +69,10 @@ def build_forecast(
     trigger: str,
     pipeline_version: str,
     points: dict[str, tuple[float, float]] | None = None,
+    retrospective: bool = False,
 ) -> tuple[dict, dict]:
     """Returns (public forecast, archived inputs record)."""
-    check_no_leakage(pull, ensemble, issued_at)
+    check_no_leakage(pull, ensemble, issued_at, retrospective)
     hours = cfg.window_hours
     wind_points = [n for n in pull.points if n != DEMAND_POINT]
     demand = pull.points[DEMAND_POINT]

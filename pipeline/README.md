@@ -57,3 +57,9 @@ the coming evenings and prints wind, heat, index and level side by side (live AP
 published). Run it before switching `source.provider`. Switching to `noaa-gfs` also drops the
 ensemble, so update the methodology wording on the ensemble at the same time.
 
+### Hindcasts (Phase 3)
+
+`python pipeline/tools/run_hindcasts.py --start 2025-01-01` computes what the rules would have said
+at every past 06:00 and 16:00 issue time, from the GFS run published by then, into
+`data/hindcasts/gfs/` (see its README). Resumable; about 15 MB is read per issue time.
+

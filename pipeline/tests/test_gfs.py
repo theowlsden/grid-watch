@@ -29,6 +29,8 @@ def fake_dataset(inits: list[dt.datetime], nan_after_h: int | None = None) -> xr
         "wind_v_100m": np.full(shape, 4.0, dtype="float32"),
         "temperature_2m": np.full(shape, 30.0, dtype="float32"),
         "relative_humidity_2m": np.full(shape, 70.0, dtype="float32"),
+        "wind_u_10m": np.full(shape, 0.6, dtype="float32"),
+        "wind_v_10m": np.full(shape, 0.8, dtype="float32"),
     }
     if nan_after_h is not None:
         k = hours.index(nan_after_h)
