@@ -20,6 +20,7 @@ def pb(tmp_path_factory):
     env = {
         **os.environ,
         "PB_SEED_FILE": str(ROOT / "data/sites.snapshot.json"),
+        "PB_I18N_DIR": str(ROOT / "web/src/i18n"),
         "PB_BOT_EMAIL": BOT[0],
         "PB_BOT_PASSWORD": BOT[1],
     }

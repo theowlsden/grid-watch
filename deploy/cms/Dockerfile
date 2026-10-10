@@ -26,6 +26,8 @@ COPY cms/pb_migrations /pb/pb_migrations
 COPY cms/pb_hooks /pb/pb_hooks
 # seed for the first start: sites and island start identical to the static fallback
 COPY data/sites.snapshot.json /pb/seed/sites.snapshot.json
+# interface text: keys and English are synced into the translations collection on every start
+COPY web/src/i18n/en.json web/src/i18n/pap.json /pb/seed/i18n/
 COPY deploy/cms/entrypoint.sh /usr/local/bin/entrypoint.sh
 USER 10002
 WORKDIR /pb
