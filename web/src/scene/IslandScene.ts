@@ -626,7 +626,7 @@ export class IslandScene {
           seg.position.set(cx, 1.5 + j * 0.7 + 0.35, -0.5);
           a.add(seg);
         });
-        const rimc = cyl(0.34, 0.3, 0.14, mat(0x10312a), 20);
+        const rimc = cyl(0.34, 0.3, 0.14, mat(0x001d57), 20);
         rimc.position.set(cx, 3.65, -0.5);
         a.add(rimc);
         for (let q = 0; q < 2; q++) {

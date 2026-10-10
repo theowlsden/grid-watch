@@ -5,30 +5,35 @@
    island and day strip, in portrait or landscape (spec 4.1, 4.2, 12.12).
    Keep the media queries in step with src/scene/layout.ts. */
 :root {
-  --sea: #e6f4f9;
-  --glow: #f6fcfe;
-  --edge: #d3eaf2;
-  --ink: #10312a;
-  --muted: #547370; /* darkened from #5f7f7c for WCAG AA on --soft (spec 4.8) */
-  --panel: #ffffff;
-  --soft: #eef7fa;
-  --line: #d5e8ee;
-  --blue: #1b7bff;
-  --blue-text: #1667d6; /* --blue is too light for small text on white */
+  /* Chrome colours are shades of the Curaçao flag: blue #002B7F, yellow #F9E814 and an
+     off-white for its white. The four stress levels keep their own colours (spec 10). */
+  --flag-blue: #002b7f;
+  --flag-yellow: #f9e814;
+  --offwhite: #fbf8ef;
+  --sea: #e9eef8;
+  --glow: #fdfbf4;
+  --edge: #d5deef;
+  --ink: #001d57;
+  --muted: #4b5b7c; /* WCAG AA on --soft (spec 4.8) */
+  --panel: var(--offwhite);
+  --soft: #eef1f8;
+  --line: #d9e0ee;
+  --blue: #1f56c8;
+  --blue-text: #002b7f; /* --blue is too light for small text on the panels */
   --ok: #27c76f;
   --watch: #f4c20d;
   --warn: #ff8a2b;
   --crit: #ff5c5e; /* lightened from #ff4d4f so dark text passes WCAG AA (spec 4.8) */
   --unknown: #9fb6c0;
-  --on-tone: #10312a;
-  --sel-bg: #10312a;
-  --sel-fg: #ffffff;
-  --tag-bg: #10312a;
-  --tag-fg: #ffffff;
-  --hl: rgba(174, 224, 79, 0.38);
-  --ring: rgba(174, 224, 79, 0.4);
-  --mbg: #10312a;
-  --shadow: 0 10px 28px rgba(40, 100, 125, 0.16);
+  --on-tone: #001d57;
+  --sel-bg: #002b7f;
+  --sel-fg: #fbf8ef;
+  --tag-bg: #002b7f;
+  --tag-fg: #fbf8ef;
+  --hl: rgba(249, 232, 20, 0.34);
+  --ring: rgba(249, 232, 20, 0.5);
+  --mbg: #002b7f;
+  --shadow: 0 10px 28px rgba(0, 43, 127, 0.14);
   --font-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
   --font-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
   --gutter: 16px;
@@ -36,24 +41,24 @@
 }
 
 :root[data-mode="night"] {
-  --sea: #070d14;
-  --glow: #16314a;
-  --edge: #04080d;
-  --ink: #e8f3f1;
-  --muted: #8ea9ad;
-  --panel: rgba(16, 28, 39, 0.9);
-  --soft: #1a2b3a;
-  --line: #26394a;
-  --blue: #5aa2ff;
-  --blue-text: #5aa2ff;
+  --sea: #020b22;
+  --glow: #0d2c6e;
+  --edge: #010618;
+  --ink: #f4f1e6;
+  --muted: #a0aeca;
+  --panel: rgba(4, 24, 70, 0.9);
+  --soft: #0d2660;
+  --line: #1c3878;
+  --blue: #86a8ff;
+  --blue-text: #a3bdff;
   --unknown: #8299a5; /* lightened from #6f8794 so dark text passes WCAG AA (spec 4.8) */
-  --sel-bg: #aee04f;
-  --sel-fg: #10312a;
-  --tag-bg: #aee04f;
-  --tag-fg: #10312a;
-  --hl: rgba(174, 224, 79, 0.2);
-  --ring: rgba(174, 224, 79, 0.28);
-  --mbg: #2b5a4c;
+  --sel-bg: #f9e814;
+  --sel-fg: #001d57;
+  --tag-bg: #f9e814;
+  --tag-fg: #001d57;
+  --hl: rgba(134, 168, 255, 0.24); /* yellow mixes to olive on the navy */
+  --ring: rgba(249, 232, 20, 0.3);
+  --mbg: #0c3290;
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
   color-scheme: dark;
 }
@@ -471,7 +476,7 @@ h2 {
   background: var(--panel);
   border-radius: 24px;
   padding: 16px;
-  box-shadow: 0 14px 34px rgba(0, 20, 40, 0.28);
+  box-shadow: 0 14px 34px rgba(0, 20, 60, 0.28);
   z-index: 3;
   display: grid;
   gap: 12px;
@@ -1620,10 +1625,10 @@ h2 {
   width: 72px;
   height: 144px;
   fill: #ffc93c;
-  stroke: #10312a;
+  stroke: var(--ink);
   stroke-width: 3;
   stroke-linejoin: round;
-  filter: drop-shadow(0 0 14px rgba(255, 201, 60, 0.75));
+  filter: drop-shadow(0 0 14px rgba(249, 232, 20, 0.75));
   animation: bolt-flicker 2.4s steps(1, end) infinite;
 }
 

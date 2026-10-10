@@ -415,25 +415,26 @@ Footer or brand card reads **"Grid Watch by Noir Visuals"** (plain text until th
 
 ## 10. Design system
 
-Two looks via `data-mode` on the root element, tokens as CSS variables.
+Two looks via `data-mode` on the root element, tokens as CSS variables. The chrome uses shades of the Curaçao flag: blue #002B7F, yellow #F9E814, and off-white #fbf8ef in place of its white (changed 9 Oct 2026, replacing the earlier teal and green). The status colours below do not change, so the levels never borrow the flag yellow.
 
 | Token | Day | Night |
 |---|---|---|
-| `--sea` (ground) | #e6f4f9 | #070d14 |
-| `--glow` / `--edge` (ground gradient) | #f6fcfe / #d3eaf2 | #16314a / #04080d |
-| `--panel` | #ffffff | rgba(16,28,39,.9) |
-| `--soft` | #eef7fa | #1a2b3a |
-| `--ink` / `--muted` | #10312a / #547370 (was #5f7f7c, darkened for AA) | #e8f3f1 / #8ea9ad |
-| `--line` | #d5e8ee | #26394a |
-| `--blue` (progress, leader line) | #1b7bff | #5aa2ff |
-| `--blue-text` (blue numbers and links) | #1667d6 | #5aa2ff |
-| Selected control | bg #10312a, fg #fff | bg #aee04f, fg #10312a |
+| `--sea` (ground) | #e9eef8 | #020b22 |
+| `--glow` / `--edge` (ground gradient) | #fdfbf4 / #d5deef | #0d2c6e / #010618 |
+| `--panel` | #fbf8ef (off-white) | rgba(4,24,70,.9) |
+| `--soft` | #eef1f8 | #0d2660 |
+| `--ink` / `--muted` | #001d57 / #4b5b7c | #f4f1e6 / #a0aeca |
+| `--line` | #d9e0ee | #1c3878 |
+| `--blue` (progress, leader line) | #1f56c8 | #86a8ff |
+| `--blue-text` (blue numbers and links) | #002b7f | #a3bdff |
+| Selected control, tags | bg #002b7f, fg #fbf8ef | bg #f9e814, fg #001d57 |
+| Selected day glow / ring | flag yellow at .34 / .5 | light blue at .24 / flag yellow at .3 |
 
-Status colours (same in both modes): ok #27c76f, watch #f4c20d, warn #ff8a2b, crit #ff5c5e, unknown #9fb6c0 (night #8299a5). Text on every tone, crit included: #10312a. (Changed 8 Oct 2026 to pass WCAG AA, spec 4.8: crit was #ff4d4f with white text at 3.3:1, night unknown was #6f8794 at 3.7:1, muted was #5f7f7c at 4.0:1 on `--soft`.)
+Status colours (same in both modes): ok #27c76f, watch #f4c20d, warn #ff8a2b, crit #ff5c5e, unknown #9fb6c0 (night #8299a5). Text on every tone, crit included: #001d57 (was #10312a). (Changed 8 Oct 2026 to pass WCAG AA, spec 4.8: crit was #ff4d4f with white text at 3.3:1, night unknown was #6f8794 at 3.7:1, muted was #5f7f7c at 4.0:1 on `--soft`.)
 
 Type: **Baloo 2** (display, 700/800) and **Nunito** (body, 600 to 800). Numbers use tabular figures. Scale in the prototype: title 46 px desktop, percentage 56 px desktop / 40 px mobile, card titles 19 to 20 px, body 13 to 14 px, labels 11 to 12 px.
 
-Shape: pill-shaped controls and chips (999 px), cards 24 px radius (20 px for the mobile risk card), soft shadow `0 10px 28px rgba(40,100,125,.16)`.
+Shape: pill-shaped controls and chips (999 px), cards 24 px radius (20 px for the mobile risk card), soft shadow `0 10px 28px rgba(0,43,127,.14)`.
 
 3D palette: grass #aee04f, hills #c3ea6a, bushes #52b53a / #6cc443, rim #b9784a with band #d9a06a, turbines white with #ffc93c hubs, plant #fff0cf with #ff7a5c roof.
 
