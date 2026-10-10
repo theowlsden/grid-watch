@@ -1,4 +1,5 @@
-// Translation status (spec 4.7): which English keys have no Papiamentu text yet.
+// Translation status of the bundled pap.json (spec 4.7); the live text is edited in the CMS
+// (docs/translating.md). Which English keys have no Papiamentu text yet.
 //   npm run i18n:status            summary and the missing keys with their English text
 //   npm run i18n:status -- --json  the missing entries as JSON, ready to paste into pap.json
 import { readFileSync } from "node:fs";

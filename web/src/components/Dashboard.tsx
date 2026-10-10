@@ -9,8 +9,9 @@ import { loadNews, readDismissed, storeDismissed, type NewsItem } from "@/lib/ne
 import type { Island, Site } from "@/lib/schema";
 import { getModePref, resolveMode, setModePref, subscribeModePref, type ModePref } from "@/lib/mode";
 import { siteView, warnUnknownSlugs } from "@/lib/view";
-import { coverage, dateNames, translator } from "@/i18n";
-import { getLang, setLang, subscribeLang } from "@/lib/lang";
+import { coverage } from "@/i18n";
+import { useI18n } from "@/i18n/use";
+import { setLang } from "@/lib/lang";
 import { LangSwitch } from "./LangSwitch";
 import { EventsList } from "./EventsList";
 import { IslandStage, type StageSite } from "./IslandStage";
@@ -35,9 +36,7 @@ const noop = () => () => {};
 
 export function Dashboard() {
   // EN / PAP (spec 4.7); English while hydrating, then the stored choice
-  const lang = useSyncExternalStore(subscribeLang, getLang, () => "en" as const);
-  const t = useMemo(() => translator(lang), [lang]);
-  const dates = useMemo(() => dateNames(lang), [lang]);
+  const { lang, t, dates } = useI18n();
 
   const [forecast, setForecast] = useState<Forecast | null>(null);
   const [events, setEvents] = useState<GridEvent[]>([]);

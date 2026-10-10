@@ -58,3 +58,53 @@ test("the methodology page follows the chosen language", async ({ page }) => {
   await expect(page.locator('main.doc[lang="pap"]')).toBeVisible();
   await expect(page.locator('main.doc[lang="en"]')).toBeHidden();
 });
+
+// Papiamentu interface text published in the CMS (translations collection)
+const TRANSLATIONS = `${CMS}/api/collections/translations/records*`;
+const placeholderKey = Object.keys(en).find((k) => en[k].includes("{") && !k.startsWith("method."))!;
+
+test("published CMS translations replace the bundled text; unfit rows are ignored", async ({ page }) => {
+  let asked = 0;
+  await page.route(TRANSLATIONS, (r) => {
+    asked++;
+    return r.fulfill({
+      json: {
+        items: [
+          { key: "level.low", pap: "TEST low" },
+          { key: "made.up.key", pap: "never shown" },
+          // placeholders differ from English: stays English
+          { key: placeholderKey, pap: "no placeholders" },
+          { key: "level.high", pap: "<b>TEST</b>" },
+        ],
+      },
+    });
+  });
+  await open(page);
+  expect(asked, "English visitors do not ask the CMS").toBe(0);
+  await page.locator("#topbar").getByRole("button", { name: "Papiamentu" }).click();
+  await expect(page.locator("#hud .pill")).toHaveText("TEST low");
+  expect(await page.locator("body").innerText()).not.toContain("no placeholders");
+  // text is text, never markup
+  expect(await page.locator("b", { hasText: "TEST" }).count()).toBe(0);
+
+  // a repeat visit with the CMS down uses the copy kept in the browser
+  await page.unroute(TRANSLATIONS);
+  await page.route(`${CMS}/**`, (r) => r.abort("connectionrefused"));
+  await page.reload();
+  await expect(page.locator("#hud .pill")).toHaveText("TEST low");
+});
+
+test("without the CMS the bundled Papiamentu (or English) is used", async ({ page }) => {
+  await page.route(`${CMS}/**`, (r) => r.abort("connectionrefused"));
+  await page.addInitScript(() => localStorage.setItem("gridwatch-lang", "pap"));
+  await open(page);
+  await expect(page.locator("#hud .pill")).toHaveText(en["level.low"]);
+});
+
+test("the methodology page uses CMS translations too", async ({ page }) => {
+  await page.route(TRANSLATIONS, (r) => r.fulfill({ json: { items: [{ key: "method.title", pap: "TEST method title" }] } }));
+  await page.addInitScript(() => localStorage.setItem("gridwatch-lang", "pap"));
+  await page.goto("/methodology");
+  await expect(page.locator('main.doc[lang="pap"] h1')).toHaveText("TEST method title");
+  await expect(page.locator('main.doc[lang="en"] h1')).toHaveText(en["method.title"]);
+});

@@ -11,10 +11,45 @@ export type MessageKey = keyof typeof en;
 
 const MESSAGES: Record<Lang, Partial<Record<MessageKey, string>>> = { en, pap };
 
+// Published text from the CMS (src/lib/translations.ts) wins over the bundled file, which
+// stays as the fallback when the CMS is down. A small external store, so pages re-render
+// when it arrives.
+const remote: Partial<Record<Lang, Partial<Record<MessageKey, string>>>> = {};
+let version = 0;
+const listeners = new Set<() => void>();
+
+export function subscribeMessages(l: () => void): () => void {
+  listeners.add(l);
+  return () => listeners.delete(l);
+}
+
+export function messagesVersion(): number {
+  return version;
+}
+
+const placeholders = (s: string) => [...new Set(s.match(/\{[A-Za-z0-9_]+\}/g) ?? [])].sort().join(",");
+
+/** Use CMS rows ({ key, pap }) that fit: known key, plain string, same placeholders as English
+ *  (the CMS checks the same on save: cms/pb_hooks/lib/i18n.js). Returns how many were used. */
+export function applyRemote(lang: Lang, rows: unknown): number {
+  if (lang === "en" || !Array.isArray(rows)) return 0;
+  const out: Partial<Record<MessageKey, string>> = {};
+  for (const r of rows as { key?: unknown; pap?: unknown }[]) {
+    if (!r || typeof r.key !== "string" || !Object.hasOwn(en, r.key) || typeof r.pap !== "string") continue;
+    const key = r.key as MessageKey;
+    const text = r.pap.trim().slice(0, 2000);
+    if (text && placeholders(text) === placeholders(en[key])) out[key] = text;
+  }
+  remote[lang] = out;
+  version++;
+  listeners.forEach((l) => l());
+  return Object.keys(out).length;
+}
+
 export type Translate = (key: MessageKey, vars?: Record<string, string | number>) => string;
 
 function message(lang: Lang, key: MessageKey): string {
-  return MESSAGES[lang][key] ?? en[key] ?? key;
+  return remote[lang]?.[key] ?? MESSAGES[lang][key] ?? en[key] ?? key;
 }
 
 export function translator(lang: Lang): Translate {
@@ -42,5 +77,5 @@ export function dateNames(lang: Lang): DateNames {
 /** Share of English keys that have a translation (for the "being translated" note). */
 export function coverage(lang: Lang): number {
   const keys = Object.keys(en) as MessageKey[];
-  return keys.filter((k) => MESSAGES[lang][k]).length / keys.length;
+  return keys.filter((k) => remote[lang]?.[k] || MESSAGES[lang][k]).length / keys.length;
 }
