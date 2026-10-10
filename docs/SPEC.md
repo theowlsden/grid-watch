@@ -419,8 +419,8 @@ Two looks via `data-mode` on the root element, tokens as CSS variables. The chro
 
 | Token | Day | Night |
 |---|---|---|
-| `--sea` (ground) | #e9eef8 | #020b22 |
-| `--glow` / `--edge` (ground gradient) | #fdfbf4 / #d5deef | #0d2c6e / #010618 |
+| `--sea` (ground) | #e9eef8 | #001b52 |
+| `--glow` / `--edge` (ground gradient) | #fdfbf4 / #d5deef | #0a3278 / #000f33 |
 | `--panel` | #fbf8ef (off-white) | rgba(4,24,70,.9) |
 | `--soft` | #eef1f8 | #0d2660 |
 | `--ink` / `--muted` | #001d57 / #4b5b7c | #f4f1e6 / #a0aeca |

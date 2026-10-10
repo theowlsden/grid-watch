@@ -41,9 +41,9 @@
 }
 
 :root[data-mode="night"] {
-  --sea: #020b22;
-  --glow: #0d2c6e;
-  --edge: #010618;
+  --sea: #001b52;
+  --glow: #0a3278;
+  --edge: #000f33;
   --ink: #f4f1e6;
   --muted: #a0aeca;
   --panel: rgba(4, 24, 70, 0.9);
