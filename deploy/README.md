@@ -32,6 +32,7 @@ pinned by digest. Nothing is published on host ports: only Coolify's proxy reach
    |---|---|---|
    | `SITE_ORIGIN` | cms | `https://grid.noirvisuals.studio` (CORS: only the site may call the CMS) |
    | `CMS_ORIGIN` | web | `https://cms.grid.noirvisuals.studio` (added to the CSP `connect-src`) |
+   | `EVENTS_ENABLED` | web | empty (off) until the events in `data/events/events.yaml` have reliable public sources, then `true`; restart web to apply |
    | `PB_SUPERUSER_EMAIL`, `PB_SUPERUSER_PASSWORD` | cms | strong, unique; set **before the first deploy** |
    | `PB_ENCRYPTION_KEY` | cms | 32 random characters, e.g. `openssl rand -hex 16`; keep a copy in your password manager |
    | `PB_ADMIN_IPS` | cms | optional: your IPs/subnets, space-separated |

@@ -1,8 +1,16 @@
 // Runtime configuration served at /config.json. In production the web server fills it from
 // the environment (deploy/web/Caddyfile), so one build works for any domain; the file in
-// public/ is the development default (no CMS).
+// public/ is the development default (no CMS, no events).
 export interface RuntimeConfig {
   cmsOrigin: string;
+  // Reported events section (spec 4.6), switched on with EVENTS_ENABLED once events have
+  // reliable public sources. Off by default.
+  events: boolean;
+}
+
+/** "true", "1", "yes" or "on" (any case), or a JSON true. */
+export function flag(v: unknown): boolean {
+  return v === true || (typeof v === "string" && /^(true|1|yes|on)$/i.test(v.trim()));
 }
 
 export async function loadConfig(signal?: AbortSignal): Promise<RuntimeConfig> {
@@ -11,9 +19,9 @@ export async function loadConfig(signal?: AbortSignal): Promise<RuntimeConfig> {
     const data = (await res.json()) as Partial<RuntimeConfig>;
     const raw = typeof data.cmsOrigin === "string" ? data.cmsOrigin.trim().replace(/\/+$/, "") : "";
     const origin = /^https?:\/\/[^/\s]+$/.test(raw) ? raw : "";
-    return { cmsOrigin: origin };
+    return { cmsOrigin: origin, events: flag(data.events) };
   } catch {
-    return { cmsOrigin: "" };
+    return { cmsOrigin: "", events: false };
   }
 }
 

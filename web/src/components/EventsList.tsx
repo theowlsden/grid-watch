@@ -27,6 +27,19 @@ function EventItem({ e, dates, t }: { e: GridEvent; dates: DateNames; t: Transla
   );
 }
 
+/** Shown instead of the events while that section is switched off (EVENTS_ENABLED): the
+ *  footnote of spec 4.6 still has to be reachable on phones and tablets. */
+export function LimitsNote({ t, onClose }: { t: Translate; onClose: () => void }) {
+  return (
+    <div className="evhead">
+      <p className="sub limits">{t("events.cannotShow")}</p>
+      <button type="button" className="x" aria-label={t("limits.close")} onClick={onClose}>
+        ×
+      </button>
+    </div>
+  );
+}
+
 export function EventsList({ events, dates, t, onClose }: { events: GridEvent[]; dates: DateNames; t: Translate; onClose?: () => void }) {
   return (
     <>

@@ -16,6 +16,8 @@ services:
     environment:
       # added to the CSP connect-src so the page may fetch news from the CMS
       CMS_ORIGIN: ${CMS_ORIGIN:-}
+      # true once the events in data/events/events.yaml have reliable public sources
+      EVENTS_ENABLED: ${EVENTS_ENABLED:-}
     volumes:
       - gridwatch-data:/var/lib/gridwatch:ro
     read_only: true

@@ -2052,3 +2052,9 @@ html[lang="pap"] .doc[data-doc-lang="pap"] {
     font-size: 12px;
   }
 }
+
+/* the "cannot show" note on its own, while the events section is switched off */
+.evhead .limits {
+  margin: 0;
+}
+

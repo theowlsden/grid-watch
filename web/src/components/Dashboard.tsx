@@ -13,7 +13,7 @@ import { coverage } from "@/i18n";
 import { useI18n } from "@/i18n/use";
 import { setLang } from "@/lib/lang";
 import { LangSwitch } from "./LangSwitch";
-import { EventsList } from "./EventsList";
+import { EventsList, LimitsNote } from "./EventsList";
 import { IslandStage, type StageSite } from "./IslandStage";
 import { ModeSwitch } from "./ModeSwitch";
 import { RiskCard } from "./RiskCard";
@@ -39,7 +39,10 @@ export function Dashboard() {
   const { lang, t, dates } = useI18n();
 
   const [forecast, setForecast] = useState<Forecast | null>(null);
-  const [events, setEvents] = useState<GridEvent[]>([]);
+  const [loadedEvents, setEvents] = useState<GridEvent[]>([]);
+  // the events section is off until the runtime config switches it on (EVENTS_ENABLED)
+  const [eventsOn, setEventsOn] = useState(false);
+  const events = eventsOn ? loadedEvents : [];
   const [failed, setFailed] = useState(false);
   const [preview, setPreview] = useState(false);
   const [dayIdx, setDayIdx] = useState(0);
@@ -88,10 +91,13 @@ export function Dashboard() {
           setFailed(true);
         }
       });
-    loadEvents(ac.signal).then(setEvents);
     // CMS content is optional: news and site records load in the background and the page
     // never waits for them (spec 7.3, 7.4)
-    loadConfig(ac.signal).then(({ cmsOrigin }) => {
+    loadConfig(ac.signal).then(({ cmsOrigin, events: withEvents }) => {
+      if (withEvents && !ac.signal.aborted) {
+        setEventsOn(true);
+        loadEvents(ac.signal).then(setEvents);
+      }
       loadNews(cmsOrigin, ac.signal).then((n) => {
         if (ac.signal.aborted) return;
         setDismissed(readDismissed());
@@ -257,7 +263,7 @@ export function Dashboard() {
           <span className="disc">{t("app.disclaimer")}</span>
         </div>
         <button id="evBtn" ref={evBtnRef} type="button" aria-expanded={eventsOpen} aria-controls="events" onClick={() => setEventsOpen((o) => !o)}>
-          {t("events.button")}
+          {eventsOn ? t("events.button") : t("limits.button")}
         </button>
         <div id="lseg">
           <LangSwitch lang={lang} onChange={setLang} t={t} />
@@ -267,8 +273,8 @@ export function Dashboard() {
         </div>
         {papPending && <p className="langnote">{t("lang.papPending")}</p>}
       </header>
-      <aside id="events" ref={eventsRef} className="card" hidden={!eventsOpen} aria-label={t("events.title")}>
-        <EventsList events={events} dates={dates} t={t} onClose={closeEvents} />
+      <aside id="events" ref={eventsRef} className="card" hidden={!eventsOpen} aria-label={eventsOn ? t("events.title") : t("limits.button")}>
+        {eventsOn ? <EventsList events={events} dates={dates} t={t} onClose={closeEvents} /> : <LimitsNote t={t} onClose={closeEvents} />}
         <p className="credit">{t("app.credit")}</p>
       </aside>
 

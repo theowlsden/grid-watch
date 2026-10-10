@@ -117,6 +117,8 @@ Structure: icon and kind, name, status pill, optional progress row (wind: estima
 - **Every event must show a source link** (publisher, title, date). The prototype does not have these yet; this is a Phase 1 blocker for publishing.
 - Footnote always visible: what the page cannot show (generators in service, real demand, battery charge).
 
+**As built (switch, 10 Oct 2026)**: the section is off unless the web service's `EVENTS_ENABLED` is `true` (served in `/config.json`; a restart applies it, no rebuild). Off by default until the events have reliable public sources. While off, events.json is not loaded, the desktop events card is hidden (the footnote sits under the chart), and on phones and tablets the "Reported events" button becomes "What this can't show", opening just the footnote.
+
 ### 4.7 Language
 
 **Decided: English by default, with a visible EN / PAP toggle (Papiamentu).** Dutch is out of scope for launch; keep the i18n structure so `nl.json` can be added later without code changes. Use message keys from the start (no hard-coded strings in components). The choice is stored in `localStorage` (`gridwatch-lang`) and the first visit defaults to English. The toggle sits next to the Auto/Day/Night control. Papiamentu copy must be reviewed by a native speaker before launch, and untranslated keys fall back to English rather than showing a key name. Risk level names (Low, Moderate, Elevated, High) and all disclaimers need Papiamentu versions. Event titles and source names stay in their original language. Dates and times use the `America/Curacao` zone (UTC-4, no daylight saving).
