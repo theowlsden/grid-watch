@@ -97,7 +97,7 @@ def build_forecast(
     if len(days) < 3:
         raise RuntimeError(f"only {len(days)} complete evenings in the weather data; at least 3 are needed")
 
-    model_label = {"ecmwf_ifs025": "ECMWF IFS 0.25°"}.get(pull.model, pull.model)
+    model_label = {"ecmwf_ifs025": "ECMWF IFS 0.25°", "gfs025": "GFS 0.25°"}.get(pull.model, pull.model)
     forecast = {
         "issued_at": issued_at.astimezone(dt.timezone.utc).isoformat().replace("+00:00", "Z"),
         "timezone": "America/Curacao",

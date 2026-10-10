@@ -23,7 +23,10 @@ jobs:
         run: pip install -r pipeline/requirements-dev.txt
 
       - name: Licences (dependencies must allow MIT distribution, spec 12b)
-        run: pip-licenses --partial-match --allow-only="MIT License;MIT;BSD License;BSD-3-Clause;BSD-2-Clause;Apache Software License;Apache-2.0;ISC License (ISCL);PSF-2.0;Python Software Foundation License"
+        run: |
+          pip-licenses --partial-match --ignore-packages icechunk --allow-only="MIT License;MIT;BSD License;BSD-3-Clause;BSD-2-Clause;Apache Software License;Apache-2.0;ISC License (ISCL);PSF-2.0;Python Software Foundation License"
+          # icechunk's wheel carries no licence metadata; its bundled LICENSE file must be Apache-2.0
+          python -c "import importlib.metadata as m; f=[p for p in m.files('icechunk') if p.name=='LICENSE'][0]; assert 'Apache License' in f.read_text()[:200], 'icechunk licence changed'"
 
       - name: Unit tests
         run: python -m pytest -q pipeline/tests bot/tests

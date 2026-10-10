@@ -41,7 +41,7 @@ The public methodology page (`/methodology`) reads the same file.
 | Provider | Module | Status |
 |---|---|---|
 | `open-meteo` | `sources/open_meteo.py` | in use: ECMWF IFS 0.25 deg plus its 51-member ensemble; free API, non-commercial, CC BY 4.0 |
-| `noaa-gfs` | `sources/gfs.py` | planned: AWS Open Data, also the archive for Phase 3 backtests |
+| `noaa-gfs` | `sources/gfs.py` | available: NOAA GFS 0.25 deg from dynamical.org's Zarr archive (CC BY 4.0, every run since May 2021, also the archive for the Phase 3 hindcasts); no ensemble, so confidence uses the horizon alone |
 
 | File | Purpose |
 |---|---|
@@ -49,3 +49,11 @@ The public methodology page (`/methodology`) reads the same file.
 | `events.py`, `tools/build_events.py` | `data/events/events.yaml` -> `events.json`, sourced events only |
 | `tools/build_island.py`, `tools/export_sites.py` | OSM geography; refresh the snapshot from the CMS |
 | `healthcheck.py` | container health from the heartbeat |
+
+### Comparing sources
+
+`python pipeline/tools/compare_sources.py` runs Open-Meteo and NOAA GFS through the same rules for
+the coming evenings and prints wind, heat, index and level side by side (live APIs, nothing is
+published). Run it before switching `source.provider`. Switching to `noaa-gfs` also drops the
+ensemble, so update the methodology wording on the ensemble at the same time.
+

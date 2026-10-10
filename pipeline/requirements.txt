@@ -1,3 +1,11 @@
-# Pipeline runtime dependencies (pinned; all MIT licensed)
+# Pipeline runtime dependencies (pinned). Licences: PyYAML, jsonschema, zarr MIT; numpy, pandas
+# BSD; xarray, icechunk Apache-2.0 (icechunk's wheel has no licence metadata: CI checks its
+# LICENSE file instead, see .github/workflows/data.yml).
 PyYAML==6.0.3
 jsonschema==4.26.0
+# NOAA GFS source (sources/gfs.py): reads dynamical.org's Icechunk Zarr archive
+numpy==2.5.4
+pandas==3.0.6
+xarray==2026.9.0
+zarr==3.4.1
+icechunk==2.3.0
