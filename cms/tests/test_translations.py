@@ -83,10 +83,13 @@ def test_keys_cannot_be_added_by_hand(pb, admin):
 
 def test_public_and_bot_cannot_write(pb, admin, bot):
     r = row(pb, admin, "level.elevated")
+    before = public_keys(pb).get("level.elevated")
     for token in (None, bot):
         status, _, _ = pb.call("PATCH", f"{URL}/{r['id']}", {"pap": "x", "status": "published"}, token=token)
         assert status in (400, 401, 403, 404)
-    assert "level.elevated" not in public_keys(pb)
+    # unchanged, whether or not the bundled pap.json had published it
+    assert public_keys(pb).get("level.elevated") == before
+    assert row(pb, admin, "level.elevated")["pap"] == r["pap"]
 
 
 def test_public_reads_are_cacheable(pb):
