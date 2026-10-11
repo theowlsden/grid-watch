@@ -15,3 +15,7 @@ web/out
 var
 assets/src
 docs
+# backtest inputs: in the repo for reproducibility, not needed in any container
+data/hindcasts
+data/observations
+data/backtests

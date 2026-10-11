@@ -1,0 +1,29 @@
+{
+  "missing": {},
+  "label": "Retrospective: computed later from archived NOAA GFS runs; not an outlook issued at the time",
+  "source": {
+    "name": "NOAA GFS via dynamical.org",
+    "url": "https://dynamical.org/catalog/noaa-gfs-forecast/",
+    "dataset": "noaa-gfs-forecast/v0.2.7.icechunk",
+    "licence": "CC BY 4.0"
+  },
+  "issue_times_local": [
+    "06:00",
+    "16:00"
+  ],
+  "available_after_hours": 6.0,
+  "airport": {
+    "id": "TNCC",
+    "lat": 12.18885,
+    "lon": -68.9598
+  },
+  "rules": {
+    "name": "rules-v0",
+    "version": "0.1.0",
+    "config_sha256": "93a532dc16e50db99712697affe7937a6f6874667bbce44f2b74375d46f28277"
+  },
+  "first": "2025-01-01T10:00:00Z",
+  "last": "2026-10-09T20:00:00Z",
+  "count": 1294,
+  "updated_at": "2026-10-11T00:45:38Z"
+}

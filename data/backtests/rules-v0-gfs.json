@@ -1,0 +1,1708 @@
+{
+ "generated_at": "2026-10-11T00:45:47Z",
+ "label": "Retrospective experiment on archived forecasts (spec 5.3)",
+ "rules": {
+  "name": "rules-v0",
+  "version": "0.1.0",
+  "config_sha256": "93a532dc16e50db99712697affe7937a6f6874667bbce44f2b74375d46f28277"
+ },
+ "hindcasts": {
+  "source": {
+   "name": "NOAA GFS via dynamical.org",
+   "url": "https://dynamical.org/catalog/noaa-gfs-forecast/",
+   "dataset": "noaa-gfs-forecast/v0.2.7.icechunk",
+   "licence": "CC BY 4.0"
+  },
+  "first": "2025-01-01T10:00:00Z",
+  "last": "2026-10-09T20:00:00Z",
+  "count": 1294,
+  "missing": 0
+ },
+ "events": {
+  "sourced": 0,
+  "unsourced_excluded": 5,
+  "coverage": [
+   "2025-01-01",
+   "2026-10-09"
+  ]
+ },
+ "caveats": [
+  "Retrospective experiment: computed now from archived GFS runs, not outlooks issued at the time.",
+  "Very small sample: 0 event evenings. Every rate here can change a lot with one more event.",
+  "The index is not a probability; Brier scores read it as one only to show how far off that would be.",
+  "The evening window is 19:00 to 22:00: events outside it (such as the 02:30 blackout of 27 August 2025) are not what the rules look at.",
+  "Weather cannot see generator outages or maintenance, the cause of several recent events.",
+  "Forecast error is measured at 10 m at Hato airport; the rules use 100 m wind at the parks, which is not measured publicly.",
+  "5 known events are left out until they have a public source.",
+  "GFS differs from the airport already in the first hours (10 m wind +2.6 m/s, temperature -1.6 °C): its 0.25° grid cells around Hato are mostly sea, the station is on land. That is a difference of place, not forecast skill; read the change of error with the horizon, not its level. A cooler GFS also means a lower heat index for the demand proxy.",
+  "The seasonal-average baseline only has a value from 2025-12-26, once a full earlier month of the same name is in the data."
+ ],
+ "weather_error": {
+  "wind_ms_10m": [
+   {
+    "lead_h_from": 0,
+    "lead_h_to": 6,
+    "n": 7699,
+    "mae": 2.66,
+    "rmse": 2.91,
+    "bias": 2.64
+   },
+   {
+    "lead_h_from": 6,
+    "lead_h_to": 12,
+    "n": 7697,
+    "mae": 3.19,
+    "rmse": 3.41,
+    "bias": 3.19
+   },
+   {
+    "lead_h_from": 12,
+    "lead_h_to": 24,
+    "n": 15384,
+    "mae": 3.09,
+    "rmse": 3.35,
+    "bias": 3.07
+   },
+   {
+    "lead_h_from": 24,
+    "lead_h_to": 48,
+    "n": 30732,
+    "mae": 3.13,
+    "rmse": 3.41,
+    "bias": 3.1
+   },
+   {
+    "lead_h_from": 48,
+    "lead_h_to": 72,
+    "n": 30684,
+    "mae": 3.07,
+    "rmse": 3.37,
+    "bias": 3.0
+   },
+   {
+    "lead_h_from": 72,
+    "lead_h_to": 96,
+    "n": 30640,
+    "mae": 3.03,
+    "rmse": 3.36,
+    "bias": 2.92
+   },
+   {
+    "lead_h_from": 96,
+    "lead_h_to": 120,
+    "n": 30592,
+    "mae": 3.04,
+    "rmse": 3.39,
+    "bias": 2.91
+   },
+   {
+    "lead_h_from": 120,
+    "lead_h_to": 144,
+    "n": 10170,
+    "mae": 3.04,
+    "rmse": 3.39,
+    "bias": 2.89
+   },
+   {
+    "lead_h_from": 144,
+    "lead_h_to": 168,
+    "n": 11421,
+    "mae": 3.05,
+    "rmse": 3.41,
+    "bias": 2.9
+   }
+  ],
+  "temp_c": [
+   {
+    "lead_h_from": 0,
+    "lead_h_to": 6,
+    "n": 7697,
+    "mae": 1.74,
+    "rmse": 2.3,
+    "bias": -1.64
+   },
+   {
+    "lead_h_from": 6,
+    "lead_h_to": 12,
+    "n": 7698,
+    "mae": 1.62,
+    "rmse": 2.16,
+    "bias": -1.33
+   },
+   {
+    "lead_h_from": 12,
+    "lead_h_to": 24,
+    "n": 15383,
+    "mae": 1.68,
+    "rmse": 2.21,
+    "bias": -1.49
+   },
+   {
+    "lead_h_from": 24,
+    "lead_h_to": 48,
+    "n": 30730,
+    "mae": 1.68,
+    "rmse": 2.22,
+    "bias": -1.49
+   },
+   {
+    "lead_h_from": 48,
+    "lead_h_to": 72,
+    "n": 30682,
+    "mae": 1.69,
+    "rmse": 2.24,
+    "bias": -1.51
+   },
+   {
+    "lead_h_from": 72,
+    "lead_h_to": 96,
+    "n": 30638,
+    "mae": 1.71,
+    "rmse": 2.25,
+    "bias": -1.53
+   },
+   {
+    "lead_h_from": 96,
+    "lead_h_to": 120,
+    "n": 30590,
+    "mae": 1.71,
+    "rmse": 2.26,
+    "bias": -1.53
+   },
+   {
+    "lead_h_from": 120,
+    "lead_h_to": 144,
+    "n": 10168,
+    "mae": 1.72,
+    "rmse": 2.26,
+    "bias": -1.56
+   },
+   {
+    "lead_h_from": 144,
+    "lead_h_to": 168,
+    "n": 11418,
+    "mae": 1.65,
+    "rmse": 2.18,
+    "bias": -1.5
+   }
+  ]
+ },
+ "level_frequency": [
+  {
+   "month": "2025-01",
+   "low": 21,
+   "moderate": 6,
+   "elevated": 4,
+   "high": 0
+  },
+  {
+   "month": "2025-02",
+   "low": 25,
+   "moderate": 3,
+   "elevated": 0,
+   "high": 0
+  },
+  {
+   "month": "2025-03",
+   "low": 17,
+   "moderate": 12,
+   "elevated": 2,
+   "high": 0
+  },
+  {
+   "month": "2025-04",
+   "low": 19,
+   "moderate": 9,
+   "elevated": 2,
+   "high": 0
+  },
+  {
+   "month": "2025-05",
+   "low": 23,
+   "moderate": 7,
+   "elevated": 1,
+   "high": 0
+  },
+  {
+   "month": "2025-06",
+   "low": 30,
+   "moderate": 0,
+   "elevated": 0,
+   "high": 0
+  },
+  {
+   "month": "2025-07",
+   "low": 31,
+   "moderate": 0,
+   "elevated": 0,
+   "high": 0
+  },
+  {
+   "month": "2025-08",
+   "low": 22,
+   "moderate": 6,
+   "elevated": 0,
+   "high": 3
+  },
+  {
+   "month": "2025-09",
+   "low": 22,
+   "moderate": 3,
+   "elevated": 1,
+   "high": 4
+  },
+  {
+   "month": "2025-10",
+   "low": 5,
+   "moderate": 11,
+   "elevated": 6,
+   "high": 9
+  },
+  {
+   "month": "2025-11",
+   "low": 16,
+   "moderate": 13,
+   "elevated": 1,
+   "high": 0
+  },
+  {
+   "month": "2025-12",
+   "low": 20,
+   "moderate": 5,
+   "elevated": 6,
+   "high": 0
+  },
+  {
+   "month": "2026-01",
+   "low": 18,
+   "moderate": 12,
+   "elevated": 1,
+   "high": 0
+  },
+  {
+   "month": "2026-02",
+   "low": 24,
+   "moderate": 3,
+   "elevated": 1,
+   "high": 0
+  },
+  {
+   "month": "2026-03",
+   "low": 19,
+   "moderate": 8,
+   "elevated": 4,
+   "high": 0
+  },
+  {
+   "month": "2026-04",
+   "low": 15,
+   "moderate": 12,
+   "elevated": 3,
+   "high": 0
+  },
+  {
+   "month": "2026-05",
+   "low": 31,
+   "moderate": 0,
+   "elevated": 0,
+   "high": 0
+  },
+  {
+   "month": "2026-06",
+   "low": 30,
+   "moderate": 0,
+   "elevated": 0,
+   "high": 0
+  },
+  {
+   "month": "2026-07",
+   "low": 30,
+   "moderate": 1,
+   "elevated": 0,
+   "high": 0
+  },
+  {
+   "month": "2026-08",
+   "low": 29,
+   "moderate": 1,
+   "elevated": 1,
+   "high": 0
+  },
+  {
+   "month": "2026-09",
+   "low": 26,
+   "moderate": 4,
+   "elevated": 0,
+   "high": 0
+  },
+  {
+   "month": "2026-10",
+   "low": 6,
+   "moderate": 3,
+   "elevated": 0,
+   "high": 0
+  }
+ ],
+ "detection": {
+  "event_evenings": 0,
+  "evenings": 647,
+  "by_lead_days": {
+   "0": {
+    "n": 1294,
+    "event_evenings": 0,
+    "methods": {
+     "rules": {
+      "brier": {
+       "n": 1294,
+       "brier": 0.049
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 262,
+        "fn": 0,
+        "tn": 1032,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.202
+       },
+       "40": {
+        "tp": 0,
+        "fp": 143,
+        "fn": 0,
+        "tn": 1151,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.111
+       },
+       "50": {
+        "tp": 0,
+        "fp": 58,
+        "fn": 0,
+        "tn": 1236,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.045
+       },
+       "60": {
+        "tp": 0,
+        "fp": 26,
+        "fn": 0,
+        "tn": 1268,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.02
+       },
+       "70": {
+        "tp": 0,
+        "fp": 13,
+        "fn": 0,
+        "tn": 1281,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.01
+       },
+       "80": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1294,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "wind_only": {
+      "brier": {
+       "n": 1294,
+       "brier": 0.0919
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 343,
+        "fn": 0,
+        "tn": 951,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.265
+       },
+       "40": {
+        "tp": 0,
+        "fp": 263,
+        "fn": 0,
+        "tn": 1031,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.203
+       },
+       "50": {
+        "tp": 0,
+        "fp": 196,
+        "fn": 0,
+        "tn": 1098,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.151
+       },
+       "60": {
+        "tp": 0,
+        "fp": 125,
+        "fn": 0,
+        "tn": 1169,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.097
+       },
+       "70": {
+        "tp": 0,
+        "fp": 71,
+        "fn": 0,
+        "tn": 1223,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.055
+       },
+       "80": {
+        "tp": 0,
+        "fp": 36,
+        "fn": 0,
+        "tn": 1258,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.028
+       }
+      }
+     },
+     "persistence": {
+      "brier": {
+       "n": 1294,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1294,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "seasonal": {
+      "brier": {
+       "n": 564,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 564,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "base_rate": {
+      "brier": {
+       "n": 1292,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1292,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     }
+    }
+   },
+   "1": {
+    "n": 1292,
+    "event_evenings": 0,
+    "methods": {
+     "rules": {
+      "brier": {
+       "n": 1292,
+       "brier": 0.0554
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 274,
+        "fn": 0,
+        "tn": 1018,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.212
+       },
+       "40": {
+        "tp": 0,
+        "fp": 160,
+        "fn": 0,
+        "tn": 1132,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.124
+       },
+       "50": {
+        "tp": 0,
+        "fp": 81,
+        "fn": 0,
+        "tn": 1211,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.063
+       },
+       "60": {
+        "tp": 0,
+        "fp": 33,
+        "fn": 0,
+        "tn": 1259,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.026
+       },
+       "70": {
+        "tp": 0,
+        "fp": 16,
+        "fn": 0,
+        "tn": 1276,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.012
+       },
+       "80": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "tn": 1291,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.001
+       }
+      }
+     },
+     "wind_only": {
+      "brier": {
+       "n": 1292,
+       "brier": 0.1037
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 370,
+        "fn": 0,
+        "tn": 922,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.286
+       },
+       "40": {
+        "tp": 0,
+        "fp": 281,
+        "fn": 0,
+        "tn": 1011,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.217
+       },
+       "50": {
+        "tp": 0,
+        "fp": 219,
+        "fn": 0,
+        "tn": 1073,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.17
+       },
+       "60": {
+        "tp": 0,
+        "fp": 145,
+        "fn": 0,
+        "tn": 1147,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.112
+       },
+       "70": {
+        "tp": 0,
+        "fp": 89,
+        "fn": 0,
+        "tn": 1203,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.069
+       },
+       "80": {
+        "tp": 0,
+        "fp": 44,
+        "fn": 0,
+        "tn": 1248,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.034
+       }
+      }
+     },
+     "persistence": {
+      "brier": {
+       "n": 1292,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1292,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "seasonal": {
+      "brier": {
+       "n": 564,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 564,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "base_rate": {
+      "brier": {
+       "n": 1290,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1290,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     }
+    }
+   },
+   "2": {
+    "n": 1290,
+    "event_evenings": 0,
+    "methods": {
+     "rules": {
+      "brier": {
+       "n": 1290,
+       "brier": 0.0594
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 293,
+        "fn": 0,
+        "tn": 997,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.227
+       },
+       "40": {
+        "tp": 0,
+        "fp": 181,
+        "fn": 0,
+        "tn": 1109,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.14
+       },
+       "50": {
+        "tp": 0,
+        "fp": 82,
+        "fn": 0,
+        "tn": 1208,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.064
+       },
+       "60": {
+        "tp": 0,
+        "fp": 42,
+        "fn": 0,
+        "tn": 1248,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.033
+       },
+       "70": {
+        "tp": 0,
+        "fp": 20,
+        "fn": 0,
+        "tn": 1270,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.016
+       },
+       "80": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "tn": 1289,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.001
+       }
+      }
+     },
+     "wind_only": {
+      "brier": {
+       "n": 1290,
+       "brier": 0.1137
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 379,
+        "fn": 0,
+        "tn": 911,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.294
+       },
+       "40": {
+        "tp": 0,
+        "fp": 310,
+        "fn": 0,
+        "tn": 980,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.24
+       },
+       "50": {
+        "tp": 0,
+        "fp": 235,
+        "fn": 0,
+        "tn": 1055,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.182
+       },
+       "60": {
+        "tp": 0,
+        "fp": 159,
+        "fn": 0,
+        "tn": 1131,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.123
+       },
+       "70": {
+        "tp": 0,
+        "fp": 95,
+        "fn": 0,
+        "tn": 1195,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.074
+       },
+       "80": {
+        "tp": 0,
+        "fp": 57,
+        "fn": 0,
+        "tn": 1233,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.044
+       }
+      }
+     },
+     "persistence": {
+      "brier": {
+       "n": 1290,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1290,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "seasonal": {
+      "brier": {
+       "n": 564,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 564,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "base_rate": {
+      "brier": {
+       "n": 1288,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1288,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     }
+    }
+   },
+   "3": {
+    "n": 1288,
+    "event_evenings": 0,
+    "methods": {
+     "rules": {
+      "brier": {
+       "n": 1288,
+       "brier": 0.0673
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 331,
+        "fn": 0,
+        "tn": 957,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.257
+       },
+       "40": {
+        "tp": 0,
+        "fp": 213,
+        "fn": 0,
+        "tn": 1075,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.165
+       },
+       "50": {
+        "tp": 0,
+        "fp": 105,
+        "fn": 0,
+        "tn": 1183,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.082
+       },
+       "60": {
+        "tp": 0,
+        "fp": 45,
+        "fn": 0,
+        "tn": 1243,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.035
+       },
+       "70": {
+        "tp": 0,
+        "fp": 26,
+        "fn": 0,
+        "tn": 1262,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.02
+       },
+       "80": {
+        "tp": 0,
+        "fp": 2,
+        "fn": 0,
+        "tn": 1286,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.002
+       }
+      }
+     },
+     "wind_only": {
+      "brier": {
+       "n": 1288,
+       "brier": 0.1296
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 419,
+        "fn": 0,
+        "tn": 869,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.325
+       },
+       "40": {
+        "tp": 0,
+        "fp": 334,
+        "fn": 0,
+        "tn": 954,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.259
+       },
+       "50": {
+        "tp": 0,
+        "fp": 267,
+        "fn": 0,
+        "tn": 1021,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.207
+       },
+       "60": {
+        "tp": 0,
+        "fp": 195,
+        "fn": 0,
+        "tn": 1093,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.151
+       },
+       "70": {
+        "tp": 0,
+        "fp": 121,
+        "fn": 0,
+        "tn": 1167,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.094
+       },
+       "80": {
+        "tp": 0,
+        "fp": 70,
+        "fn": 0,
+        "tn": 1218,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.054
+       }
+      }
+     },
+     "persistence": {
+      "brier": {
+       "n": 1288,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1288,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "seasonal": {
+      "brier": {
+       "n": 564,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 564,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "base_rate": {
+      "brier": {
+       "n": 1286,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1286,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     }
+    }
+   },
+   "4": {
+    "n": 1286,
+    "event_evenings": 0,
+    "methods": {
+     "rules": {
+      "brier": {
+       "n": 1286,
+       "brier": 0.0676
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 326,
+        "fn": 0,
+        "tn": 960,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.253
+       },
+       "40": {
+        "tp": 0,
+        "fp": 211,
+        "fn": 0,
+        "tn": 1075,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.164
+       },
+       "50": {
+        "tp": 0,
+        "fp": 112,
+        "fn": 0,
+        "tn": 1174,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.087
+       },
+       "60": {
+        "tp": 0,
+        "fp": 58,
+        "fn": 0,
+        "tn": 1228,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.045
+       },
+       "70": {
+        "tp": 0,
+        "fp": 19,
+        "fn": 0,
+        "tn": 1267,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.015
+       },
+       "80": {
+        "tp": 0,
+        "fp": 6,
+        "fn": 0,
+        "tn": 1280,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.005
+       }
+      }
+     },
+     "wind_only": {
+      "brier": {
+       "n": 1286,
+       "brier": 0.1293
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 407,
+        "fn": 0,
+        "tn": 879,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.316
+       },
+       "40": {
+        "tp": 0,
+        "fp": 339,
+        "fn": 0,
+        "tn": 947,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.264
+       },
+       "50": {
+        "tp": 0,
+        "fp": 266,
+        "fn": 0,
+        "tn": 1020,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.207
+       },
+       "60": {
+        "tp": 0,
+        "fp": 180,
+        "fn": 0,
+        "tn": 1106,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.14
+       },
+       "70": {
+        "tp": 0,
+        "fp": 126,
+        "fn": 0,
+        "tn": 1160,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.098
+       },
+       "80": {
+        "tp": 0,
+        "fp": 75,
+        "fn": 0,
+        "tn": 1211,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.058
+       }
+      }
+     },
+     "persistence": {
+      "brier": {
+       "n": 1286,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1286,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "seasonal": {
+      "brier": {
+       "n": 564,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 564,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "base_rate": {
+      "brier": {
+       "n": 1284,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1284,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     }
+    }
+   },
+   "5": {
+    "n": 1284,
+    "event_evenings": 0,
+    "methods": {
+     "rules": {
+      "brier": {
+       "n": 1284,
+       "brier": 0.068
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 339,
+        "fn": 0,
+        "tn": 945,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.264
+       },
+       "40": {
+        "tp": 0,
+        "fp": 220,
+        "fn": 0,
+        "tn": 1064,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.171
+       },
+       "50": {
+        "tp": 0,
+        "fp": 119,
+        "fn": 0,
+        "tn": 1165,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.093
+       },
+       "60": {
+        "tp": 0,
+        "fp": 53,
+        "fn": 0,
+        "tn": 1231,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.041
+       },
+       "70": {
+        "tp": 0,
+        "fp": 14,
+        "fn": 0,
+        "tn": 1270,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.011
+       },
+       "80": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1284,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "wind_only": {
+      "brier": {
+       "n": 1284,
+       "brier": 0.1324
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 415,
+        "fn": 0,
+        "tn": 869,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.323
+       },
+       "40": {
+        "tp": 0,
+        "fp": 350,
+        "fn": 0,
+        "tn": 934,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.273
+       },
+       "50": {
+        "tp": 0,
+        "fp": 272,
+        "fn": 0,
+        "tn": 1012,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.212
+       },
+       "60": {
+        "tp": 0,
+        "fp": 203,
+        "fn": 0,
+        "tn": 1081,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.158
+       },
+       "70": {
+        "tp": 0,
+        "fp": 124,
+        "fn": 0,
+        "tn": 1160,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.097
+       },
+       "80": {
+        "tp": 0,
+        "fp": 75,
+        "fn": 0,
+        "tn": 1209,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.058
+       }
+      }
+     },
+     "persistence": {
+      "brier": {
+       "n": 1284,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1284,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "seasonal": {
+      "brier": {
+       "n": 564,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 564,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "base_rate": {
+      "brier": {
+       "n": 1282,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1282,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     }
+    }
+   },
+   "6": {
+    "n": 1282,
+    "event_evenings": 0,
+    "methods": {
+     "rules": {
+      "brier": {
+       "n": 1282,
+       "brier": 0.0667
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 325,
+        "fn": 0,
+        "tn": 957,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.254
+       },
+       "40": {
+        "tp": 0,
+        "fp": 220,
+        "fn": 0,
+        "tn": 1062,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.172
+       },
+       "50": {
+        "tp": 0,
+        "fp": 109,
+        "fn": 0,
+        "tn": 1173,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.085
+       },
+       "60": {
+        "tp": 0,
+        "fp": 49,
+        "fn": 0,
+        "tn": 1233,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.038
+       },
+       "70": {
+        "tp": 0,
+        "fp": 11,
+        "fn": 0,
+        "tn": 1271,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.009
+       },
+       "80": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1282,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "wind_only": {
+      "brier": {
+       "n": 1282,
+       "brier": 0.1312
+      },
+      "thresholds": {
+       "30": {
+        "tp": 0,
+        "fp": 419,
+        "fn": 0,
+        "tn": 863,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.327
+       },
+       "40": {
+        "tp": 0,
+        "fp": 331,
+        "fn": 0,
+        "tn": 951,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.258
+       },
+       "50": {
+        "tp": 0,
+        "fp": 261,
+        "fn": 0,
+        "tn": 1021,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.204
+       },
+       "60": {
+        "tp": 0,
+        "fp": 195,
+        "fn": 0,
+        "tn": 1087,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.152
+       },
+       "70": {
+        "tp": 0,
+        "fp": 130,
+        "fn": 0,
+        "tn": 1152,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.101
+       },
+       "80": {
+        "tp": 0,
+        "fp": 72,
+        "fn": 0,
+        "tn": 1210,
+        "precision": 0.0,
+        "recall": null,
+        "fpr": 0.056
+       }
+      }
+     },
+     "persistence": {
+      "brier": {
+       "n": 1282,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1282,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "seasonal": {
+      "brier": {
+       "n": 564,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 564,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     },
+     "base_rate": {
+      "brier": {
+       "n": 1280,
+       "brier": 0.0
+      },
+      "thresholds": {
+       "50": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1280,
+        "precision": null,
+        "recall": null,
+        "fpr": 0.0
+       }
+      }
+     }
+    }
+   }
+  },
+  "calibration": [
+   {
+    "index_from": 0,
+    "index_to": 10,
+    "n": 4580,
+    "event_evenings": 0,
+    "observed_rate": 0.0
+   },
+   {
+    "index_from": 10,
+    "index_to": 20,
+    "n": 1481,
+    "event_evenings": 0,
+    "observed_rate": 0.0
+   },
+   {
+    "index_from": 20,
+    "index_to": 30,
+    "n": 805,
+    "event_evenings": 0,
+    "observed_rate": 0.0
+   },
+   {
+    "index_from": 30,
+    "index_to": 40,
+    "n": 802,
+    "event_evenings": 0,
+    "observed_rate": 0.0
+   },
+   {
+    "index_from": 40,
+    "index_to": 50,
+    "n": 682,
+    "event_evenings": 0,
+    "observed_rate": 0.0
+   },
+   {
+    "index_from": 50,
+    "index_to": 60,
+    "n": 360,
+    "event_evenings": 0,
+    "observed_rate": 0.0
+   },
+   {
+    "index_from": 60,
+    "index_to": 70,
+    "n": 187,
+    "event_evenings": 0,
+    "observed_rate": 0.0
+   },
+   {
+    "index_from": 70,
+    "index_to": 80,
+    "n": 109,
+    "event_evenings": 0,
+    "observed_rate": 0.0
+   },
+   {
+    "index_from": 80,
+    "index_to": 90,
+    "n": 10,
+    "event_evenings": 0,
+    "observed_rate": 0.0
+   },
+   {
+    "index_from": 90,
+    "index_to": 100,
+    "n": 0,
+    "event_evenings": 0,
+    "observed_rate": null
+   }
+  ],
+  "warning_times": []
+ },
+ "case_studies": [],
+ "methods": {
+  "rules": "Rules (rules-v0)",
+  "wind_only": "Wind only (rules without demand)",
+  "persistence": "Persistence (event in the last 7 days)",
+  "seasonal": "Seasonal average (same month before)",
+  "base_rate": "Base rate (share of event evenings so far)"
+ },
+ "thresholds": [
+  30,
+  40,
+  50,
+  60,
+  70,
+  80
+ ]
+}
