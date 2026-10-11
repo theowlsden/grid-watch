@@ -1,7 +1,9 @@
 "use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import type { Lang } from "@/i18n";
 import { useTranslator } from "@/i18n/use";
+import { runtimeConfig } from "@/lib/config";
 import type { StressConfig } from "@/lib/model";
 
 const REPO = "https://github.com/theowlsden/grid-watch";
@@ -10,6 +12,11 @@ const REPO = "https://github.com/theowlsden/grid-watch";
 // text published in the CMS replaces the built text once it loads (spec 4.7, 8.2).
 export function MethodologyBody({ lang, c }: { lang: Lang; c: StressConfig }) {
   const { t } = useTranslator(lang);
+  // the results page is linked only once it is published (RESULTS_ENABLED)
+  const [results, setResults] = useState(false);
+  useEffect(() => {
+    runtimeConfig().then((c) => setResults(c.results));
+  }, []);
   const pct = (v: number) => Math.round(v * 100);
   return (
     <>
@@ -65,6 +72,12 @@ export function MethodologyBody({ lang, c }: { lang: Lang; c: StressConfig }) {
             {t("method.sources.link")}
           </a>
         </p>
+
+        {results && (
+          <p>
+            <Link href="/results">{t("results.link")} →</Link>
+          </p>
+        )}
 
         <h2>{t("method.contact.h")}</h2>
         <p>

@@ -267,24 +267,42 @@ def short_range_bias(err: dict) -> dict[str, float | None]:
     return {var: rows[0]["bias"] for var, rows in err.items()}
 
 
-def caveats(n_event_evenings: int, n_unsourced: int, seasonal_from: str | None, bias0: dict[str, float | None] | None = None) -> list[str]:
-    notes = [
-        "Retrospective experiment: computed now from archived GFS runs, not outlooks issued at the time.",
-        "The index is not a probability; Brier scores read it as one only to show how far off that would be.",
-        "The evening window is 19:00 to 22:00: events outside it (such as the 02:30 blackout of 27 August 2025) are not what the rules look at.",
-        "Weather cannot see generator outages or maintenance, the cause of several recent events.",
-        "Forecast error is measured at 10 m at Hato airport; the rules use 100 m wind at the parks, which is not measured publicly.",
-    ]
+def caveats(n_event_evenings: int, n_unsourced: int, seasonal_from: str | None, bias0: dict[str, float | None] | None = None) -> list[dict]:
+    """The report's warnings as codes with their numbers, so the site can show them in every
+    language (web/src/i18n: results.caveat.*); CAVEAT_TEXT holds the English for the Markdown."""
+    notes: list[dict] = [{"id": "retrospective"}]
     if n_event_evenings < SMALL_SAMPLE:
-        notes.insert(1, f"Very small sample: {n_event_evenings} event evening{'' if n_event_evenings == 1 else 's'}. Every rate here can change a lot with one more event.")
+        notes.append({"id": "small_sample", "n": n_event_evenings})
+    notes += [{"id": "not_probability"}, {"id": "evening_window"}, {"id": "capacity_blind"}, {"id": "airport_height"}]
     if n_unsourced:
-        notes.append(f"{n_unsourced} known events are left out until they have a public source.")
-    if bias0 and any(b is not None and abs(b) >= 1 for b in bias0.values()):
-        notes.append(
-            f"GFS differs from the airport already in the first hours (10 m wind {bias0.get('wind_ms_10m'):+.1f} m/s, temperature {bias0.get('temp_c'):+.1f} °C): "
-            "its 0.25° grid cells around Hato are mostly sea, the station is on land. That is a difference of place, not forecast skill; "
-            "read the change of error with the horizon, not its level. A cooler GFS also means a lower heat index for the demand proxy."
-        )
+        notes.append({"id": "unsourced", "n": n_unsourced})
+    if bias0 and all(bias0.get(k) is not None for k in ("wind_ms_10m", "temp_c")) and any(abs(b) >= 1 for b in bias0.values() if b is not None):
+        notes.append({"id": "place_bias", "wind": round(bias0["wind_ms_10m"], 1), "temp": round(bias0["temp_c"], 1)})
     if seasonal_from:
-        notes.append(f"The seasonal-average baseline only has a value from {seasonal_from}, once a full earlier month of the same name is in the data.")
+        notes.append({"id": "seasonal_from", "date": seasonal_from})
     return notes
+
+
+# English wording of the caveats; keep in step with results.caveat.* in web/src/i18n/en.json
+CAVEAT_TEXT = {
+    "retrospective": "Retrospective experiment: computed now from archived GFS runs, not outlooks issued at the time.",
+    "small_sample": "Very small sample: {n} event evening{s}. Every rate here can change a lot with one more event.",
+    "not_probability": "The index is not a probability; Brier scores read it as one only to show how far off that would be.",
+    "evening_window": "The evening window is 19:00 to 22:00: events outside it (such as the 02:30 blackout of 27 August 2025) are not what the rules look at.",
+    "capacity_blind": "Weather cannot see generator outages or maintenance, the cause of several recent events.",
+    "airport_height": "Forecast error is measured at 10 m at Hato airport; the rules use 100 m wind at the parks, which is not measured publicly.",
+    "unsourced": "{n} known events are left out until they have a public source.",
+    "place_bias": (
+        "GFS differs from the airport already in the first hours (10 m wind {wind:+.1f} m/s, temperature {temp:+.1f} °C): "
+        "its 0.25° grid cells around Hato are mostly sea, the station is on land. That is a difference of place, not forecast skill; "
+        "read the change of error with the horizon, not its level. A cooler GFS also means a lower heat index for the demand proxy."
+    ),
+    "seasonal_from": "The seasonal-average baseline only has a value from {date}, once a full earlier month of the same name is in the data.",
+}
+
+
+def caveat_text(c: dict) -> str:
+    params = {k: v for k, v in c.items() if k != "id"}
+    if "n" in params:
+        params["s"] = "" if params["n"] == 1 else "s"
+    return CAVEAT_TEXT[c["id"]].format(**params)

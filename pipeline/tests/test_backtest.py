@@ -136,3 +136,19 @@ def test_report_markdown_with_events_has_every_section():
         assert heading in md, heading
     assert "Very small sample: 1 event evening." in md
     assert "would have indicated" in md and "predicted" not in md
+
+
+def test_every_caveat_has_a_site_message_with_the_same_placeholders():
+    import json
+    import re
+
+    from backtest import CAVEAT_TEXT
+    from paths import ROOT
+
+    en = json.loads((ROOT / "web" / "src" / "i18n" / "en.json").read_text())
+    for cid, text in CAVEAT_TEXT.items():
+        key = f"results.caveat.{cid}"
+        assert key in en, key
+        python_params = set(re.findall(r"\{(\w+)", text)) - {"s"}
+        site_params = set(re.findall(r"\{(\w+)\}", en[key]))
+        assert python_params == site_params, cid

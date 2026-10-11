@@ -18,6 +18,8 @@ services:
       CMS_ORIGIN: ${CMS_ORIGIN:-}
       # true once the events in data/events/events.yaml have reliable public sources
       EVENTS_ENABLED: ${EVENTS_ENABLED:-}
+      # true once the backtest has sourced events to score (docs/results.md)
+      RESULTS_ENABLED: ${RESULTS_ENABLED:-}
     volumes:
       - gridwatch-data:/var/lib/gridwatch:ro
     read_only: true

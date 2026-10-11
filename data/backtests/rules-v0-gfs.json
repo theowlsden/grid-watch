@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-11T00:45:47Z",
+ "generated_at": "2026-10-11T21:13:47Z",
  "label": "Retrospective experiment on archived forecasts (spec 5.3)",
  "rules": {
   "name": "rules-v0",
@@ -27,15 +27,38 @@
   ]
  },
  "caveats": [
-  "Retrospective experiment: computed now from archived GFS runs, not outlooks issued at the time.",
-  "Very small sample: 0 event evenings. Every rate here can change a lot with one more event.",
-  "The index is not a probability; Brier scores read it as one only to show how far off that would be.",
-  "The evening window is 19:00 to 22:00: events outside it (such as the 02:30 blackout of 27 August 2025) are not what the rules look at.",
-  "Weather cannot see generator outages or maintenance, the cause of several recent events.",
-  "Forecast error is measured at 10 m at Hato airport; the rules use 100 m wind at the parks, which is not measured publicly.",
-  "5 known events are left out until they have a public source.",
-  "GFS differs from the airport already in the first hours (10 m wind +2.6 m/s, temperature -1.6 °C): its 0.25° grid cells around Hato are mostly sea, the station is on land. That is a difference of place, not forecast skill; read the change of error with the horizon, not its level. A cooler GFS also means a lower heat index for the demand proxy.",
-  "The seasonal-average baseline only has a value from 2025-12-26, once a full earlier month of the same name is in the data."
+  {
+   "id": "retrospective"
+  },
+  {
+   "id": "small_sample",
+   "n": 0
+  },
+  {
+   "id": "not_probability"
+  },
+  {
+   "id": "evening_window"
+  },
+  {
+   "id": "capacity_blind"
+  },
+  {
+   "id": "airport_height"
+  },
+  {
+   "id": "unsourced",
+   "n": 5
+  },
+  {
+   "id": "place_bias",
+   "wind": 2.6,
+   "temp": -1.6
+  },
+  {
+   "id": "seasonal_from",
+   "date": "2025-12-26"
+  }
  ],
  "weather_error": {
   "wind_ms_10m": [

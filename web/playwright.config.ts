@@ -37,8 +37,8 @@ export default defineConfig({
     : {
         command: `node tests/serve.mjs`,
         // a CMS origin that never resolves; tests serve it with page.route()
-        // events on, so the events tests run; tests/e2e/events-off.spec.ts covers the default
-        env: { PORT: String(PORT), CMS_ORIGIN: "https://cms.grid.test", EVENTS_ENABLED: "true" },
+        // events and results on, so their tests run; events-off.spec.ts and results.spec.ts cover the default
+        env: { PORT: String(PORT), CMS_ORIGIN: "https://cms.grid.test", EVENTS_ENABLED: "true", RESULTS_ENABLED: "true" },
         url: `http://localhost:${PORT}`,
         reuseExistingServer: !process.env.CI,
       },

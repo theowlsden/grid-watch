@@ -16,6 +16,6 @@ var
 assets/src
 docs
 # backtest inputs: in the repo for reproducibility, not needed in any container
+# (data/backtests is: the results page is built from it)
 data/hindcasts
 data/observations
-data/backtests

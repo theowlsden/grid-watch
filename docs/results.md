@@ -1,6 +1,6 @@
 # Results
 
-_Retrospective experiment on archived forecasts (spec 5.3). Generated 2026-10-11T00:45:47Z by `pipeline/tools/run_backtest.py` from stored files only; do not edit by hand._
+_Retrospective experiment on archived forecasts (spec 5.3). Generated 2026-10-11T21:13:47Z by `pipeline/tools/run_backtest.py` from stored files only; do not edit by hand._
 
 Rules rules-v0 0.1.0 on 1294 hindcast issue times (2025-01-01 to 2026-10-09, 06:00 and 16:00 Curaçao time) from NOAA GFS via dynamical.org. Events: 0 with a public source, scored for evenings 2025-01-01 to 2026-10-09.
 

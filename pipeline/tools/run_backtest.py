@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from backtest import METHODS, THRESHOLDS, case_studies, caveats, detection, level_frequency, predictions, short_range_bias, to_events, weather_error  # noqa: E402
+from backtest import METHODS, THRESHOLDS, case_studies, caveat_text, caveats, detection, level_frequency, predictions, short_range_bias, to_events, weather_error  # noqa: E402
 from config import load_config  # noqa: E402
 from events import has_sources, load_events_yaml  # noqa: E402
 from hindcast import read_records  # noqa: E402
@@ -80,7 +80,7 @@ def markdown(rep: dict) -> str:
         "",
         "## Read this first",
         "",
-        *[f"- {c}" for c in rep["caveats"]],
+        *[f"- {caveat_text(c)}" for c in rep["caveats"]],
         "",
         "## A. Weather forecast error at Hato airport (GFS against METAR TNCC)",
         "",

@@ -6,6 +6,9 @@ export interface RuntimeConfig {
   // Reported events section (spec 4.6), switched on with EVENTS_ENABLED once events have
   // reliable public sources. Off by default.
   events: boolean;
+  // Results page (spec 5.3, Phase 3), switched on with RESULTS_ENABLED once there is something
+  // to score. Off by default: the page then says the results are not published yet.
+  results: boolean;
 }
 
 /** "true", "1", "yes" or "on" (any case), or a JSON true. */
@@ -19,10 +22,18 @@ export async function loadConfig(signal?: AbortSignal): Promise<RuntimeConfig> {
     const data = (await res.json()) as Partial<RuntimeConfig>;
     const raw = typeof data.cmsOrigin === "string" ? data.cmsOrigin.trim().replace(/\/+$/, "") : "";
     const origin = /^https?:\/\/[^/\s]+$/.test(raw) ? raw : "";
-    return { cmsOrigin: origin, events: flag(data.events) };
+    return { cmsOrigin: origin, events: flag(data.events), results: flag(data.results) };
   } catch {
-    return { cmsOrigin: "", events: false };
+    return { cmsOrigin: "", events: false, results: false };
   }
+}
+
+let shared: Promise<RuntimeConfig> | null = null;
+
+/** The runtime config, fetched once per page load and shared by every component. */
+export function runtimeConfig(): Promise<RuntimeConfig> {
+  shared ??= loadConfig();
+  return shared;
 }
 
 /** fetch() with a timeout, so a slow CMS can never hold up the page. */

@@ -74,8 +74,10 @@ export function dateNames(lang: Lang): DateNames {
   };
 }
 
-/** Share of English keys that have a translation (for the "being translated" note). */
-export function coverage(lang: Lang): number {
-  const keys = Object.keys(en) as MessageKey[];
+/** Share of English keys that have a translation (for the "being translated" note). By
+ *  default the results page's own keys (results.*) are left out: that page has its own note.
+ *  Pass a prefix to measure one part, e.g. "results.". */
+export function coverage(lang: Lang, prefix?: string): number {
+  const keys = (Object.keys(en) as MessageKey[]).filter((k) => (prefix ? k.startsWith(prefix) : !k.startsWith("results.")));
   return keys.filter((k) => remote[lang]?.[k] || MESSAGES[lang][k]).length / keys.length;
 }

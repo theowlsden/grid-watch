@@ -7,7 +7,9 @@ const en: Record<string, string> = JSON.parse(readFileSync(join(__dirname, "..",
 const pap: Record<string, string> = JSON.parse(readFileSync(join(__dirname, "..", "..", "src", "i18n", "pap.json"), "utf8"));
 // what the bundled files show for a key in PAP: Papiamentu where it exists, English otherwise
 const bundled = (k: string) => pap[k] || en[k];
-const papCoverage = Object.keys(en).filter((k) => pap[k]).length / Object.keys(en).length;
+// like coverage() in src/i18n: the results page's keys have their own note
+const pageKeys = Object.keys(en).filter((k) => !k.startsWith("results."));
+const papCoverage = pageKeys.filter((k) => pap[k]).length / pageKeys.length;
 const CMS = "https://cms.grid.test";
 
 test.use({ viewport: { width: 390, height: 844 } });
