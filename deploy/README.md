@@ -146,3 +146,7 @@ docker inspect --format '{{json .State.Health}}' cms-<resource-uuid>          # 
 - [ ] PocketBase backups to off-VPS storage enabled, restore tested once
 - [ ] Response headers checked (e.g. securityheaders.com) and the site works with them
 - [ ] VPS has headroom next to the other Coolify apps
+
+## Load testing
+
+How much traffic the VPS handles: see [tools/loadtest/README.md](../tools/loadtest/README.md) (k6, read-only requests, run at a quiet time).
