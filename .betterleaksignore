@@ -2,3 +2,5 @@
 # The placeholder passwords ("change-me") in the first .env.example; the file now leaves them empty.
 f718b1edc58b341b4b9e29d27357a7dc26ef1587:.env.example:generic-password:10
 f718b1edc58b341b4b9e29d27357a7dc26ef1587:.env.example:generic-password:14
+# A deliberately wrong test password (cms/tests/test_client_ip.py), used to trigger the sign-in rate limit.
+225faa515b0b8d56e36b23ac2a920ceb01e6b5c7:cms/tests/test_client_ip.py:generic-password:10

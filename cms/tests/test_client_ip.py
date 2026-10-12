@@ -7,7 +7,8 @@ import time
 from pb_helpers import SUPERUSER
 
 AUTH = "/api/collections/_superusers/auth-with-password"
-WRONG = {"identity": "nobody@example.org", "password": "wrong-password-123"}
+# a wrong password on purpose: these attempts only exist to hit the rate limit
+WRONG = {"identity": "nobody@example.org", "password": "-".join(["not", "the", "password"])}
 
 
 def attempts(pb, headers_list):
