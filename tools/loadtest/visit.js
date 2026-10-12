@@ -12,7 +12,7 @@
 
 import http from "k6/http";
 import { check, group, sleep } from "k6";
-import { Trend } from "k6/metrics";
+import { Rate, Trend } from "k6/metrics";
 
 const BASE = (__ENV.BASE_URL || "https://grid.noirvisuals.studio").replace(/\/+$/, "");
 const CMS = (__ENV.CMS_URL || "https://cms.grid.noirvisuals.studio").replace(/\/+$/, "");
@@ -29,6 +29,10 @@ const CMS_REQUESTS = [
 const TRANSLATIONS = `${CMS}/api/collections/translations/records?perPage=1000&skipTotal=1&fields=key,pap`;
 
 const visitTime = new Trend("visit_duration", true);
+// The CMS allows each IP 120 requests per 10 s. A test from one machine is one IP, so above about
+// 35 visitors the CMS answers 429 by design. Those are counted here, not as failures (README).
+const cmsLimited = new Rate("cms_rate_limited");
+const CMS_PARAMS = { ...PARAMS, responseCallback: http.expectedStatuses({ min: 200, max: 399 }, 429) };
 
 const PROFILES = {
   smoke: { executor: "constant-vus", vus: 1, duration: "30s" },
@@ -106,10 +110,11 @@ export default function (data) {
   });
 
   group("cms", () => {
-    const reqs = CMS_REQUESTS.map(([name, url]) => ["GET", url, null, { ...PARAMS, tags: { part: "cms", name } }]);
-    if (pap) reqs.push(["GET", TRANSLATIONS, null, { ...PARAMS, tags: { part: "cms", name: "translations" } }]);
+    const reqs = CMS_REQUESTS.map(([name, url]) => ["GET", url, null, { ...CMS_PARAMS, tags: { part: "cms", name } }]);
+    if (pap) reqs.push(["GET", TRANSLATIONS, null, { ...CMS_PARAMS, tags: { part: "cms", name: "translations" } }]);
     const responses = http.batch(reqs);
-    check(responses, { "cms 200": (rs) => rs.every((r) => r.status === 200) });
+    for (const r of responses) cmsLimited.add(r.status === 429);
+    check(responses, { "cms 200 (or rate-limited)": (rs) => rs.every((r) => r.status === 200 || r.status === 429) });
   });
 
   visitTime.add(Date.now() - start);

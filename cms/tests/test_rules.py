@@ -156,7 +156,8 @@ def test_privacy_and_rate_limit_settings(pb, admin):
     _, s, _ = pb.call("GET", "/api/settings", token=admin)
     assert s["logs"]["logIP"] is False
     assert s["rateLimits"]["enabled"] is True
-    assert s["trustedProxy"]["headers"] == ["X-Forwarded-For"]
+    # set by pb_hooks/client_ip.pb.js on every request (Cloudflare-aware, see test_client_ip.py)
+    assert s["trustedProxy"]["headers"] == ["X-Grid-Client-IP"]
     assert s["batch"]["enabled"] is False
 
 

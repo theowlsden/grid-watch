@@ -52,6 +52,18 @@ docker run --rm -v "$PWD/tools/loadtest:/scripts:ro" -e PROFILE=smoke grafana/k6
 - The test stops by itself once more than 5 % of requests fail, so it does not turn into an
   outage.
 
+## The CMS's own rate limit
+
+The CMS allows each IP address 120 requests per 10 seconds (`cms/pb_migrations/1791500000_settings.js`).
+A test run from one machine counts as one visitor, so from about 35 simulated visitors on, the
+CMS answers part of the requests with **429 Too Many Requests**. That is the protection working,
+not an overload. The script counts these as `cms_rate_limited` instead of failures.
+
+To measure how much the CMS itself can take, raise the limit for the duration of the test (CMS
+admin → Settings → Rate limits, the `/api/` rule for guests) and set it back afterwards. With
+Cloudflare caching the CMS's public answers, most requests never reach the CMS and its limit;
+real visitors each have their own IP (`cms/pb_hooks/client_ip.pb.js` reads it from Cloudflare).
+
 ## What to watch on the server
 
 In a second terminal, over SSH to the VPS:
@@ -73,6 +85,7 @@ k6 prints a summary at the end. The lines that matter:
   the CMS. Watch `p(95)`, the time 95 % of requests stay under. Targets: 500 ms for static
   files, 1 s for the CMS.
 - `visit_duration`: the whole visit, all requests together. Target: under 3 s at p(95).
+- `cms_rate_limited`: share of CMS requests answered 429 by the rate limit (see above).
 - A ✗ next to a threshold means that target was missed.
 
 The useful number is the step of the ramp where response times start to climb or errors appear,

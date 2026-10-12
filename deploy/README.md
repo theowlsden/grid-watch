@@ -147,6 +147,49 @@ docker inspect --format '{{json .State.Health}}' cms-<resource-uuid>          # 
 - [ ] Response headers checked (e.g. securityheaders.com) and the site works with them
 - [ ] VPS has headroom next to the other Coolify apps
 
+## Cloudflare (CDN, analytics, backups)
+
+The whole `noirvisuals.studio` zone moves to Cloudflare (free plan: whole domain only), so every
+DNS record must exist there before the nameservers change at the registrar.
+
+**DNS and proxy**
+
+| Records | Proxy | Why |
+|---|---|---|
+| `grid`, `cms.grid` | Proxied (orange) | This project: cached, filtered, analytics |
+| Email (Resend CNAMEs, MX, SPF/DKIM/DMARC TXT) | DNS only | Mail cannot go through the proxy |
+| `coolify` | DNS only | Admin panel with live connections; no CDN in front of it |
+| File services and other projects | DNS only | Free plan rejects uploads over 100 MB; decide per project |
+
+The server's IP stays visible through the DNS-only records; that is accepted. The CMS trusts
+Cloudflare's `CF-Connecting-IP` only on requests that come from Cloudflare's address ranges
+(`cms/pb_hooks/client_ip.pb.js`), so rate limits count real visitors and the header cannot be
+faked by going to the IP directly. Recheck the ranges in `cms/pb_hooks/lib/client_ip.js` when
+upgrading PocketBase.
+
+**Settings**
+
+- SSL/TLS: **Full (strict)** (Coolify has valid certificates).
+- Leave **Rocket Loader** and **Email Address Obfuscation** off: they insert scripts the
+  Content Security Policy blocks. Same for Web Analytics' automatic script, until the CSP allows it.
+- Optional cache rule for `cms.grid.noirvisuals.studio`, path `/api/collections/*/records`:
+  eligible for cache, edge TTL "use cache-control header if present, bypass cache if not". Public
+  answers allow 60 s; signed-in answers are `private, no-store` and never cached.
+
+**Analytics**: Analytics → Traffic works with the proxy and needs no code.
+
+**Backups to R2**
+
+1. Create a bucket (e.g. `gridwatch-backups`) and an R2 API token with read and write access to
+   that bucket only.
+2. CMS: admin → Settings → Backups → S3: endpoint `https://<account-id>.r2.cloudflarestorage.com`,
+   region `auto`, the bucket and token keys, force path style on. Schedule e.g. `0 3 * * *`,
+   keep 7. The keys are stored in PocketBase, encrypted with `PB_ENCRYPTION_KEY`.
+3. Test a restore once (see Backups above).
+
+The pipeline's archive of issued outlooks (`gridwatch-data` volume) is not covered by the CMS
+backup; see Backups above.
+
 ## Load testing
 
 How much traffic the VPS handles: see [tools/loadtest/README.md](../tools/loadtest/README.md) (k6, read-only requests, run at a quiet time).
