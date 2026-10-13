@@ -16,7 +16,7 @@ export interface StressConfig {
   wind_stress: { no_stress_at_output: number };
   levels: { moderate: number; elevated: number; high: number };
   site_status: { high_below: number; elevated_below: number };
-  confidence: { high_until_day: number; medium_until_day: number; spread_downgrade_ms: number };
+  confidence: { best?: "low" | "medium" | "high"; high_until_day: number; medium_until_day: number; spread_downgrade_ms: number };
   stale_after_hours: number;
 }
 

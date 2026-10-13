@@ -55,7 +55,8 @@ def confidence(day_number: int, spread_ms: float | None, cfg: Config) -> str:
     i = 0 if day_number <= c["high_until_day"] else 1 if day_number <= c["medium_until_day"] else 2
     if spread_ms is not None and spread_ms > c["spread_downgrade_ms"]:
         i = min(2, i + 1)
-    return steps[i]
+    # never better than `best` (medium while the rules are uncalibrated)
+    return steps[max(i, steps.index(c.get("best", "high")))]
 
 
 @dataclass

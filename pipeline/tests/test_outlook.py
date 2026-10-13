@@ -63,9 +63,20 @@ def test_site_status_follows_wind():
 
 
 def test_confidence_from_horizon_and_spread():
-    assert [confidence(d, None, CFG) for d in (0, 1, 2, 3, 4, 6)] == ["high", "high", "medium", "medium", "low", "low"]
+    # capped at "medium" (shown as "fair") while the rules are uncalibrated
+    assert CFG["confidence"]["best"] == "medium"
+    assert [confidence(d, None, CFG) for d in (0, 1, 2, 3, 4, 6)] == ["medium", "medium", "medium", "medium", "low", "low"]
     assert confidence(0, 5.0, CFG) == "medium"
     assert confidence(5, 5.0, CFG) == "low"
+
+
+def test_confidence_without_a_cap_follows_the_horizon():
+    from config import Config
+
+    raw = {**CFG.raw, "confidence": {k: v for k, v in CFG["confidence"].items() if k != "best"}}
+    free = Config(raw, "test")
+    assert [confidence(d, None, free) for d in (0, 1, 2, 4)] == ["high", "high", "medium", "low"]
+    assert confidence(0, 5.0, free) == "medium"
 
 
 # ---------- window selection in America/Curacao ----------

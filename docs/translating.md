@@ -29,8 +29,9 @@ Papiamentu is being reviewed. It disappears automatically once the translation i
 
 - Keys and English are copied into the CMS on every start, from the `en.json` built into the CMS
   image. A new key in the code appears as a new draft row after the next deploy.
-- When the English of a key changes, its row is flagged `needs_review`; the old Papiamentu stays
-  visible until you update it. Saving the row clears the flag.
+- When the English of a key changes, its row is flagged `needs_review` and the site shows the
+  English for that text until you have checked the Papiamentu: old text can be wrong after a
+  change of meaning. Saving the row clears the flag and the Papiamentu is served again.
 - A key the code no longer uses is marked `obsolete`: hidden from the site, the text is kept.
 - Keys cannot be added or renamed in the CMS; that happens in the code.
 - You can also translate in `web/src/i18n/pap.json`: on the next deploy, every CMS row that has no

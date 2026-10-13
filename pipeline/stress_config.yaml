@@ -4,7 +4,7 @@
 # Bump `version` on any change; every issuance records the version it used.
 
 name: rules-v0
-version: 0.1.0
+version: 0.1.1
 label: Stress outlook
 timezone: America/Curacao
 window_local: { start: "19:00", end: "22:00" } # evening peak, hours 19, 20 and 21
@@ -39,8 +39,12 @@ levels: { moderate: 25, elevated: 45, high: 60 }
 # Wind site status from the island-wide evening wind at hub height (m/s), as in the prototype.
 site_status: { high_below: 5.5, elevated_below: 8.0 }
 
-# Confidence from the forecast horizon, one step lower when the ensemble disagrees.
+# Grade of the WEATHER FORECAST behind each evening (not of the outlook): from the forecast
+# horizon, one step lower when the ensemble disagrees. Shown as "reliable / fair / uncertain".
+# `best` caps it: the top grade is withheld while the rules are uncalibrated and generation
+# data is not public (0.1.1); set it back to high only after Phase 3 calibration.
 confidence:
+  best: medium
   high_until_day: 1 # day 0 (today or the first day) and day 1
   medium_until_day: 3
   spread_downgrade_ms: 3.0 # interquartile range of ensemble hub-height wind in the window

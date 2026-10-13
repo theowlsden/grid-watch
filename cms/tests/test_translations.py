@@ -147,6 +147,8 @@ def test_sync_adds_flags_and_retires_keys(tmp_path):
     with serve(binary, data, i18n) as (api, admin):
         a = row(api, admin, "a")
         assert a["en"] == "Last updated {time}" and a["needs_review"] and a["pap"] == "pap a {time}"
+        # flagged: not served until someone has checked it, so the site shows English
+        assert "a" not in public_keys(api)
         assert row(api, admin, "b")["pap"] == "pap low"
         assert row(api, admin, "c")["status"] == "draft"
         # saving the translation clears the flag

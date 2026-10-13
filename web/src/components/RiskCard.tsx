@@ -1,6 +1,6 @@
 import type { DateNames } from "@/lib/time";
 import type { Forecast, ForecastDay } from "@/lib/schema";
-import { demandTone, toneOfLevel, windTone, windWord, type Tone } from "@/lib/levels";
+import { demandTone, toneOfLevel, windTone, windWord, type Tone, shownConfidence } from "@/lib/levels";
 import { dateMedium, issuedShort } from "@/lib/time";
 import type { Translate } from "@/i18n";
 import Link from "next/link";
@@ -44,7 +44,7 @@ export function RiskCard({ forecast, day, stale, preview, dates, t }: Props) {
           <small className="scale">{t("risk.scale")}</small>
         </span>
         <span className={`pill ${tone}`}>{stale ? t("level.unknown") : t(`level.${day.level}`)}</span>
-        <span className="conf">{t("confidence.label", { level: t(`confidence.${day.confidence}`) })}</span>
+        <span className="conf">{t("confidence.label", { level: t(`confidence.${shownConfidence(day.confidence)}`) })}</span>
       </div>
       <p className="sub">
         {stale ? t("risk.staleExplain", { time: issuedShort(forecast.issued_at, dates) }) : t("risk.explain")}{" "}

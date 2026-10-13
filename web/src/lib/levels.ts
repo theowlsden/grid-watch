@@ -1,4 +1,14 @@
-import type { Demand, Level, SiteStatus } from "./schema";
+import type { Confidence, Demand, Level, SiteStatus } from "./schema";
+
+// The weather-forecast grade is never shown better than this while the rules are uncalibrated
+// (decision 23). Keep in step with `confidence.best` in pipeline/stress_config.yaml (a unit test
+// checks it); the site applies it too, so a file written before rules 0.1.1 cannot show "reliable".
+export const CONFIDENCE_BEST: Confidence = "medium";
+const GRADES: Confidence[] = ["low", "medium", "high"];
+
+export function shownConfidence(c: Confidence): Confidence {
+  return GRADES[Math.min(GRADES.indexOf(c), GRADES.indexOf(CONFIDENCE_BEST))] ?? "low";
+}
 
 // Visual tone used by CSS classes and the scene: ok / watch / warn / crit / unknown.
 export type Tone = "ok" | "watch" | "warn" | "crit" | "unknown";
