@@ -6,7 +6,6 @@ The following are not licensed for reuse:
 
 - "Grid Watch", "Grid Watch Curaçao" and "Grid Watch by Noir Visuals"
 - "Noir Visuals"
-- The mascot "Watt" when used as a logo or identifying mark
 
 You are welcome to fork and run your own copy under the code and content licences. If you do, please give it a different name and remove these marks, so that visitors do not mistake your copy for this project. Saying that your project is "based on Grid Watch" with a link back is fine.
 

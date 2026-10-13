@@ -9,8 +9,12 @@ import { buildPolicy } from "../scripts/csp.mjs";
 const root = new URL("../out/", import.meta.url).pathname;
 const port = Number(process.env.PORT ?? 4173);
 const cmsOrigin = process.env.CMS_ORIGIN ?? "";
+// PREVIEW_LAN=1: preview on other devices over plain http (e.g. a phone on the same Wi-Fi).
+// Drops upgrade-insecure-requests, which would make them ask for https that this server lacks;
+// browsers only exempt localhost. Production (Caddy, https) always keeps it.
+const policy = buildPolicy(root, cmsOrigin);
 const SECURITY = {
-  "content-security-policy": buildPolicy(root, cmsOrigin),
+  "content-security-policy": process.env.PREVIEW_LAN === "1" ? policy.replace(/;\s*upgrade-insecure-requests/, "") : policy,
   "x-content-type-options": "nosniff",
   "referrer-policy": "strict-origin-when-cross-origin",
   "cross-origin-opener-policy": "same-origin",

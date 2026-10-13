@@ -98,7 +98,7 @@ Stacked layout:
   - Not in v1: solar and battery storage (no confirmed public location or data; the evening peak is after sunset, so solar adds little to the evening outlook). They can be added later as normal `sites` records with a model node (7.4), and the prototype code for both is kept in `docs/prototype/` for reference.
 - Interaction: drag to orbit, wheel and pinch to zoom, tap a site label to select (tile lifts, card opens, dashed leader line on desktop), tap again or press Esc to close. Site labels are real `<button>`s.
 - Compass rotates with the camera. Camera polar angle limited to roughly 0.3 to 1.4 rad, zoom limited.
-- Mascot ("Watt"): green sprout-blob in a dark circle, expression follows the risk level (happy, content, uneasy, worried). It is decoration; it must never be the only carrier of meaning.
+- Mascot: a system emoji on the level circle, following the risk level: 😊 Low, 🙂 Moderate, 😟 Elevated, 😰 High, 😶 not public or out of date. Each device draws it in its own style (Apple, Google, Microsoft); nothing is bundled, so there is no licence to track. (Changed 13 Oct 2026; it was a drawn sprout-blob, "Watt".) It is decoration; it must never be the only carrier of meaning.
 - `prefers-reduced-motion`: no bobbing, spinning, smoke or idle animation.
 - Fallback when WebGL fails: a 2D list/diagram of the same four sites with the same statuses and cards (currently only a text message, improve in Phase 1).
 
@@ -507,7 +507,7 @@ Acceptance by phase:
 | Island outline and anything derived from OpenStreetMap | **ODbL 1.0**, "© OpenStreetMap contributors" | listed in `DATA_LICENSES.md`, attribution in the UI footer or about card |
 | Weather data pulled from Open-Meteo | **CC BY 4.0**, credit Open-Meteo wherever data or derived values are republished | `DATA_LICENSES.md`, methodology page |
 | Fonts (Baloo 2, Nunito) | SIL Open Font License, self-hosted with their licence files | `web/public/fonts/` |
-| Names and logos ("Grid Watch", "Noir Visuals", the mascot "Watt" if used as a logo) | **Not licensed for reuse** | `TRADEMARKS.md` |
+| Names and logos ("Grid Watch", "Noir Visuals") | **Not licensed for reuse** | `TRADEMARKS.md` |
 
 Required files in the repo root: `LICENSE`, `README.md` (what it is, what it is not, how to run, how to contribute), `DATA_LICENSES.md` (every third-party data source with licence, attribution text and retrieval date), `TRADEMARKS.md`, `CONTRIBUTING.md` (short: issues welcome, discuss before large PRs, contributions are accepted under the repo licences), `CODE_OF_CONDUCT.md` (a standard short one), `SECURITY.md` (how to report a vulnerability privately).
 
