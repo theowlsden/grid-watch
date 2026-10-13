@@ -9,6 +9,9 @@ export interface RuntimeConfig {
   // Results page (spec 5.3, Phase 3), switched on with RESULTS_ENABLED once there is something
   // to score. Off by default: the page then says the results are not published yet.
   results: boolean;
+  // Cloudflare Web Analytics token (ANALYTICS_TOKEN); "" leaves analytics off. Public by design:
+  // it is visible in every page that loads the beacon.
+  analytics: string;
 }
 
 /** "true", "1", "yes" or "on" (any case), or a JSON true. */
@@ -22,9 +25,10 @@ export async function loadConfig(signal?: AbortSignal): Promise<RuntimeConfig> {
     const data = (await res.json()) as Partial<RuntimeConfig>;
     const raw = typeof data.cmsOrigin === "string" ? data.cmsOrigin.trim().replace(/\/+$/, "") : "";
     const origin = /^https?:\/\/[^/\s]+$/.test(raw) ? raw : "";
-    return { cmsOrigin: origin, events: flag(data.events), results: flag(data.results) };
+    const token = typeof data.analytics === "string" && /^[0-9a-f]{32}$/.test(data.analytics.trim()) ? data.analytics.trim() : "";
+    return { cmsOrigin: origin, events: flag(data.events), results: flag(data.results), analytics: token };
   } catch {
-    return { cmsOrigin: "", events: false, results: false };
+    return { cmsOrigin: "", events: false, results: false, analytics: "" };
   }
 }
 

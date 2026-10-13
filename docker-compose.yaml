@@ -20,6 +20,8 @@ services:
       EVENTS_ENABLED: ${EVENTS_ENABLED:-}
       # true once the backtest has sourced events to score (docs/results.md)
       RESULTS_ENABLED: ${RESULTS_ENABLED:-}
+      # Cloudflare Web Analytics token (public, from the dashboard's JS snippet); empty: off
+      ANALYTICS_TOKEN: ${ANALYTICS_TOKEN:-}
     volumes:
       - gridwatch-data:/var/lib/gridwatch:ro
     read_only: true

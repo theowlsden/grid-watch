@@ -15,8 +15,12 @@ export function MethodologyBody({ lang, c }: { lang: Lang; c: StressConfig }) {
   const { t } = useTranslator(lang);
   // the results page is linked only once it is published (RESULTS_ENABLED)
   const [results, setResults] = useState(false);
+  const [analytics, setAnalytics] = useState(false);
   useEffect(() => {
-    runtimeConfig().then((c) => setResults(c.results));
+    runtimeConfig().then((c) => {
+      setResults(c.results);
+      setAnalytics(!!c.analytics);
+    });
   }, []);
   const pct = (v: number) => Math.round(v * 100);
   return (
@@ -80,6 +84,12 @@ export function MethodologyBody({ lang, c }: { lang: Lang; c: StressConfig }) {
             <Link href="/results">{t("results.link")} →</Link>
           </p>
         )}
+
+        <h2>{t("method.privacy.h")}</h2>
+        <p>
+          {t("method.privacy.p")}
+          {analytics && <> {t("method.privacy.analytics")}</>}
+        </p>
 
         <h2>{t("method.contact.h")}</h2>
         <p>

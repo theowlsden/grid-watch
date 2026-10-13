@@ -19,6 +19,11 @@ function* htmlFiles(d) {
   }
 }
 
+// Cloudflare Web Analytics (switched on with ANALYTICS_TOKEN): its beacon script and the address
+// it reports to. Allowed in every build, so the switch needs no rebuild.
+const ANALYTICS_SCRIPT = "https://static.cloudflareinsights.com";
+const ANALYTICS_REPORT = "https://cloudflareinsights.com";
+
 export function buildPolicy(dir, cmsOrigin = "") {
   const scripts = new Set();
   for (const file of htmlFiles(dir)) {
@@ -30,11 +35,11 @@ export function buildPolicy(dir, cmsOrigin = "") {
   }
   return [
     "default-src 'none'",
-    `script-src 'self' ${[...scripts].sort().join(" ")}`,
+    `script-src 'self' ${ANALYTICS_SCRIPT} ${[...scripts].sort().join(" ")}`,
     "style-src 'self'",
     "img-src 'self' data: blob:",
     "font-src 'self'",
-    `connect-src 'self'${cmsOrigin ? ` ${cmsOrigin}` : ""}`,
+    `connect-src 'self' ${ANALYTICS_REPORT}${cmsOrigin ? ` ${cmsOrigin}` : ""}`,
     "manifest-src 'self'",
     "base-uri 'none'",
     "form-action 'none'",

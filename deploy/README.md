@@ -32,6 +32,7 @@ pinned by digest. Nothing is published on host ports: only Coolify's proxy reach
    |---|---|---|
    | `SITE_ORIGIN` | cms | `https://grid.noirvisuals.studio` (CORS: only the site may call the CMS) |
    | `CMS_ORIGIN` | web | `https://cms.grid.noirvisuals.studio` (added to the CSP `connect-src`) |
+   | `ANALYTICS_TOKEN` | web | the token from Cloudflare Web Analytics' JS snippet (public), or empty for no analytics; restart web to apply |
    | `RESULTS_ENABLED` | web | empty (off) until the backtest has sourced events to score, then `true`: publishes `/results` and links it from the methodology page; restart web to apply |
    | `EVENTS_ENABLED` | web | empty (off) until the events in `data/events/events.yaml` have reliable public sources, then `true`; restart web to apply |
    | `PB_SUPERUSER_EMAIL`, `PB_SUPERUSER_PASSWORD` | cms | strong, unique; set **before the first deploy** |
