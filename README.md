@@ -9,7 +9,14 @@ A public dashboard that shows, in plain language and on a 3D model of the island
 
 ## Status
 
-Phase 1 (productionising the front end). Everything currently shown is **example data** and is labelled as such on screen. See [docs/SPEC.md](docs/SPEC.md) for the full requirements and phase plan.
+**Live since 13 October 2026** at [grid.noirvisuals.studio](https://grid.noirvisuals.studio). The outlook is calculated from live weather forecasts (Open-Meteo, ECMWF model) twice a day, at 06:00 and 16:00 Curaçao time, and every issued outlook is archived unchanged.
+
+The data is live, **the outlook is not a prediction**. It is a rule-based stress index for the evening peak, from fixed, published rules that have not been calibrated against real events yet. It says how strained supply could be given the forecast weather; it does not say whether an outage will happen, and it is not a probability.
+
+- Reported grid events and the backtest results page are built but switched off until the event list has reliable public sources.
+- Phase 3 (testing the rules on archived forecasts) is under way: [docs/results.md](docs/results.md).
+
+See [docs/SPEC.md](docs/SPEC.md) for the full requirements and phase plan, and the site's "How this works" page for the rules.
 
 ## What it is, and what it is not
 
@@ -25,8 +32,8 @@ Phase 1 (productionising the front end). Everything currently shown is **example
 web/        Next.js (App Router) + TypeScript front end, static export
 pipeline/   Python: weather fetch, power curve, stress index, backtests, publish
 data/       Sourced event database and the committed sites/island snapshot
-cms/        PocketBase migrations and hooks (news, sites, island)
-bot/        Telegram news bot (Phase 1b)
+cms/        PocketBase migrations and hooks (news, sites, island, translations)
+bot/        Telegram bot: news drafts and manual pipeline runs
 deploy/     Dockerfiles and compose for Coolify, static-server config
 assets/     Source 3D models and artwork
 docs/       Spec, prototype, methodology, data gaps, results
@@ -45,7 +52,7 @@ npm run build      # static site in web/out/
 
 To check a production build locally, serve `web/out/` with any static server, for example `python3 -m http.server 8000 -d web/out`.
 
-The page loads `/data/forecast.json` and `/data/events.json` at runtime. In development these come from `web/public/data/`, which currently holds **example data** (shown with an "Example data" tag on screen). Site positions come from `data/sites.snapshot.json` and are placeholders on a stylised map until the OpenStreetMap step lands.
+The page loads `/data/forecast.json` (and `/data/events.json` when events are switched on) at runtime. In production these are written by the pipeline. In development they come from `web/public/data/`, which holds **example data**, shown with an "Example data" tag on screen so it is never mistaken for a live outlook. The island outline and site positions come from OpenStreetMap, via `data/sites.snapshot.json`.
 
 ### Data
 

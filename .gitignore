@@ -58,3 +58,6 @@ Thumbs.db
 
 # Local pipeline output (GRIDWATCH_DATA_DIR default)
 /var/
+
+# Promo videos (recorded from the live site, kept out of the repo)
+promo/
