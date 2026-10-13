@@ -20,7 +20,9 @@ function* htmlFiles(d) {
 }
 
 // Cloudflare Web Analytics (switched on with ANALYTICS_TOKEN): its beacon script and the address
-// it reports to. Allowed in every build, so the switch needs no rebuild.
+// it reports to. Behind Cloudflare's proxy it reports to /cdn-cgi/rum on the site itself ('self');
+// cloudflareinsights.com is used when the site is not proxied. Allowed in every build, so the
+// switch needs no rebuild.
 const ANALYTICS_SCRIPT = "https://static.cloudflareinsights.com";
 const ANALYTICS_REPORT = "https://cloudflareinsights.com";
 
