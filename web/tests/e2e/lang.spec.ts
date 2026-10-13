@@ -116,3 +116,23 @@ test("the methodology page uses CMS translations too", async ({ page }) => {
   await expect(page.locator('main.doc[lang="pap"] h1')).toHaveText("TEST method title");
   await expect(page.locator('main.doc[lang="en"] h1')).toHaveText(en["method.title"]);
 });
+
+test("the methodology page has its own EN / PAP switch, remembered for the whole site", async ({ page }) => {
+  await page.goto("/methodology");
+  const en_ = page.locator('main.doc[lang="en"]');
+  await en_.getByRole("button", { name: "Papiamentu" }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "pap");
+  const pap_ = page.locator('main.doc[lang="pap"]');
+  await expect(pap_).toBeVisible();
+  await expect(en_).toBeHidden();
+  await expect(pap_.locator('.seg.lang button[lang="pap"]')).toHaveAttribute("aria-pressed", "true");
+  // the dashboard opens in the language chosen here
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("lang", "pap");
+  await page.goto("/methodology");
+  // the button labels are translated, so pick them by their lang attribute
+  await page.locator('main.doc[lang="pap"] .seg.lang button[lang="en"]').click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(en_).toBeVisible();
+});
+

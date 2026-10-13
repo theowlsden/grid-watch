@@ -9,6 +9,7 @@ import { loadNews, readDismissed, storeDismissed, type NewsItem } from "@/lib/ne
 import type { Island, Site } from "@/lib/schema";
 import { getModePref, resolveMode, setModePref, subscribeModePref, type ModePref } from "@/lib/mode";
 import { siteView, warnUnknownSlugs } from "@/lib/view";
+import { SIDE_CARD_MQ } from "@/scene/layout";
 import { coverage } from "@/i18n";
 import { useI18n } from "@/i18n/use";
 import { setLang } from "@/lib/lang";
@@ -52,14 +53,24 @@ export function Dashboard() {
   const eventsRef = useRef<HTMLElement>(null);
   const topbarRef = useRef<HTMLElement>(null);
   const evBtnRef = useRef<HTMLButtonElement>(null);
-  // The events panel opens just below the top bar (its height depends on the layout), and the
+  // The events panel opens just below the top bar (its height depends on the layout), as wide
+  // as the cards: the top bar when stacked, the risk card in the landscape side layout. The
   // close button takes focus; closing returns focus to the button that opened it.
   useLayoutEffect(() => {
     const panel = eventsRef.current;
     const bar = topbarRef.current;
     if (!eventsOpen || !panel || !bar) return;
-    panel.style.top = `${bar.offsetTop + bar.offsetHeight + 10}px`;
+    const place = () => {
+      const side = window.matchMedia(SIDE_CARD_MQ).matches ? document.getElementById("hud") : null;
+      const ref = side && side.offsetWidth ? side : bar;
+      panel.style.top = `${bar.offsetTop + bar.offsetHeight + 10}px`;
+      panel.style.left = `${ref.offsetLeft}px`;
+      panel.style.width = `${ref.offsetWidth}px`;
+    };
+    place();
     panel.querySelector<HTMLButtonElement>(".x")?.focus();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
   }, [eventsOpen]);
   const closeEvents = () => {
     setEventsOpen(false);

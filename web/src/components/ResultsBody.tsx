@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { DocLangSwitch } from "./DocLangSwitch";
 import { useEffect, useState } from "react";
 import { coverage, type Lang, type MessageKey, type Translate } from "@/i18n";
 import { useTranslator } from "@/i18n/use";
@@ -249,9 +250,10 @@ export function ResultsBody({ lang }: { lang: Lang }) {
   const r = REPORT;
   return (
     <main className="doc results" lang={lang} data-doc-lang={lang}>
-      <p>
+      <div className="doc-top">
         <Link href="/">← {t("method.back")}</Link>
-      </p>
+        <DocLangSwitch t={t} />
+      </div>
       <h1>{t("results.title")}</h1>
       {on === null && <p className="lead">{t("results.loading")}</p>}
       {on === false && <p className="lead">{t("results.off")}</p>}

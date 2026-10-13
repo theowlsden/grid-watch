@@ -1360,9 +1360,10 @@ h2 {
     max-height: min(54vh, calc(100% - 120px));
   }
 
+  /* left and width follow the cards (Dashboard.tsx), so the panel lines up with them */
   #events {
     bottom: calc(var(--gutter) + 82px);
-    max-width: 440px;
+    box-sizing: border-box;
   }
 }
 
@@ -2133,5 +2134,14 @@ html[lang="pap"] .doc[data-doc-lang="pap"] {
   .results .barhead {
     display: none;
   }
+}
+
+/* methodology and results pages: back link left, EN / PAP right */
+.doc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 8px;
 }
 

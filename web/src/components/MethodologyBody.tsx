@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { DocLangSwitch } from "./DocLangSwitch";
 import { useEffect, useState } from "react";
 import type { Lang } from "@/i18n";
 import { useTranslator } from "@/i18n/use";
@@ -21,9 +22,10 @@ export function MethodologyBody({ lang, c }: { lang: Lang; c: StressConfig }) {
   return (
     <>
       <main className="doc" lang={lang} data-doc-lang={lang}>
-        <p>
+        <div className="doc-top">
           <Link href="/">← {t("method.back")}</Link>
-        </p>
+          <DocLangSwitch t={t} />
+        </div>
         <h1>{t("method.title")}</h1>
         <p className="lead">{t("method.intro")}</p>
 

@@ -154,6 +154,11 @@ for (const size of [{ width: 360, height: 740 }, { width: 390, height: 844 }, { 
     const bar = (await page.locator("#topbar").boundingBox())!;
     const box = (await panel.boundingBox())!;
     expect(box.y).toBeGreaterThanOrEqual(bar.y + bar.height);
+    // as wide as the cards: the top bar when stacked, the risk card in the landscape side layout
+    const side = size.width > size.height;
+    const ref = (await page.locator(side ? "#hud" : "#topbar").boundingBox())!;
+    expect(Math.abs(box.x - ref.x), "left edge").toBeLessThanOrEqual(1);
+    expect(Math.abs(box.width - ref.width), "width").toBeLessThanOrEqual(1);
     await close.click();
     await expect(panel).toBeHidden();
     await expect(page.locator("#evBtn")).toBeFocused();
