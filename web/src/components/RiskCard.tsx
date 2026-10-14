@@ -20,7 +20,8 @@ export function RiskCard({ forecast, day, stale, preview, dates, t }: Props) {
   const tone = stale ? "unknown" : toneOfLevel(day.level);
   const d = day.drivers;
   const drivers: [string, string, Tone][] = [
-    [t("driver.wind"), t(`wind.${windWord(d.wind_ms_100m)}`), windTone(d.wind_ms_100m)],
+    // the number like the heat chip, and the word so the status is never colour alone (spec 4.8)
+    [t("driver.wind"), t("driver.windValue", { speed: d.wind_ms_100m.toFixed(1), word: t(`wind.${windWord(d.wind_ms_100m)}`) }), windTone(d.wind_ms_100m)],
     [t("driver.heat"), `${Math.round(d.temp_c)}°C`, demandTone(d.demand)],
     [t("driver.demand"), t(`demand.${d.demand}`), demandTone(d.demand)],
     [t("driver.capacity"), t("driver.unknown"), "unknown"],
@@ -43,7 +44,11 @@ export function RiskCard({ forecast, day, stale, preview, dates, t }: Props) {
           {day.index}
           <small className="scale">{t("risk.scale")}</small>
         </span>
-        <span className={`pill ${tone}`}>{stale ? t("level.unknown") : t(`level.${day.level}`)}</span>
+        {/* the caption says what the level is about, next to the weather-forecast grade below */}
+        <span className="lvl">
+          <small className="cap">{t("risk.levelCaption")}</small>
+          <span className={`pill ${tone}`}>{stale ? t("level.unknown") : t(`level.${day.level}`)}</span>
+        </span>
         <span className="conf">{t("confidence.label", { level: t(`confidence.${shownConfidence(day.confidence)}`) })}</span>
       </div>
       <p className="sub">
