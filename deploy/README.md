@@ -177,7 +177,11 @@ upgrading PocketBase.
   eligible for cache, edge TTL "use cache-control header if present, bypass cache if not". Public
   answers allow 60 s; signed-in answers are `private, no-store` and never cached.
 
-**Analytics**: Analytics → Traffic works with the proxy and needs no code.
+**Analytics**: Analytics → Traffic works with the proxy and needs no code. Web Analytics runs
+from the site's own snippet (`ANALYTICS_TOKEN`, entry `grid.noirvisuals.studio`, "JS snippet
+installation"). Keep **automatic setup off for the `noirvisuals.studio` entry**: it injects a second
+beacon into every proxied page (only for browser-like requests, so a plain `curl` does not show it),
+which starts first and takes the visits, leaving the snippet's entry at zero.
 
 **Backups to R2**
 
