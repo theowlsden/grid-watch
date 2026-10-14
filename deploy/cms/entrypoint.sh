@@ -1,7 +1,7 @@
 #!/bin/sh
 # Starts PocketBase. All settings come from environment variables (Coolify); nothing secret
 # is baked into the image.
-#   SITE_ORIGIN            allowed CORS origin (the public site), e.g. https://grid.noirvisuals.studio
+#   SITE_ORIGIN            allowed CORS origin (the public site), e.g. https://grid.example.org
 #   PB_ENCRYPTION_KEY      exactly 32 characters; encrypts stored settings such as S3 credentials
 #   PB_SUPERUSER_EMAIL / PB_SUPERUSER_PASSWORD   optional: create or update the admin on start
 #   PB_ADMIN_IPS           optional: space-separated IPs/subnets allowed to use the admin API
@@ -28,7 +28,7 @@ fatal() {
 SITE_ORIGIN="${SITE_ORIGIN:-}"
 SITE_ORIGIN="${SITE_ORIGIN%/}" # tolerate a trailing slash
 if [ -z "$SITE_ORIGIN" ]; then
-  fatal "SITE_ORIGIN is empty. Set it to the site's address, e.g. https://grid.noirvisuals.studio (CORS stays closed otherwise)."
+  fatal "SITE_ORIGIN is empty. Set it to the site's address, e.g. https://grid.example.org (CORS stays closed otherwise)."
 fi
 case "$SITE_ORIGIN" in
   http://*/* | https://*/*) fatal "SITE_ORIGIN must be only scheme and host, without a path: got '$SITE_ORIGIN'." ;;

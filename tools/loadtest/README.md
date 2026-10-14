@@ -32,13 +32,17 @@ Install k6 (`sudo apt install k6` after adding Grafana's repository, `brew insta
 Docker as below), then from the repository root:
 
 ```sh
-k6 run -e PROFILE=smoke tools/loadtest/visit.js   # always first
-k6 run tools/loadtest/visit.js                    # the ramp
+SITE="-e BASE_URL=https://grid.example.org -e CMS_URL=https://cms.grid.example.org"
+k6 run $SITE -e PROFILE=smoke tools/loadtest/visit.js   # always first
+k6 run $SITE tools/loadtest/visit.js                    # the ramp
 # without installing k6:
-docker run --rm -v "$PWD/tools/loadtest:/scripts:ro" -e PROFILE=smoke grafana/k6 run /scripts/visit.js
+docker run --rm -v "$PWD/tools/loadtest:/scripts:ro" $SITE -e PROFILE=smoke grafana/k6 run /scripts/visit.js
 ```
 
-`BASE_URL` and `CMS_URL` default to the live site; point them elsewhere to test a copy.
+`BASE_URL` and `CMS_URL` are required, with no defaults, so a copy of this repository can never
+load-test someone else's site by accident. Replace the example addresses with your own (for this
+project: `grid.noirvisuals.studio` and `cms.grid.noirvisuals.studio`). In zsh, write the two `-e`
+options out instead of using `$SITE`, since zsh does not split it into separate words.
 
 **Before running against the live site**
 

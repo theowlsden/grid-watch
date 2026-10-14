@@ -1,6 +1,6 @@
 // Copies the Papiamentu published in the CMS into src/i18n/pap.json (spec 4.7), so the
 // bundled fallback stays close to what the site shows. Reads the public API: published rows only.
-//   npm run i18n:pull -- https://cms.grid.noirvisuals.studio
+//   npm run i18n:pull -- https://cms.grid.example.org
 import { readFileSync, writeFileSync } from "node:fs";
 
 const origin = (process.argv[2] ?? "").replace(/\/+$/, "");

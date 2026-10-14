@@ -47,7 +47,7 @@ services:
     expose:
       - "8090"
     environment:
-      SITE_ORIGIN: ${SITE_ORIGIN:?set SITE_ORIGIN, e.g. https://grid.noirvisuals.studio}
+      SITE_ORIGIN: ${SITE_ORIGIN:?set SITE_ORIGIN, e.g. https://grid.example.org}
       PB_ENCRYPTION_KEY: ${PB_ENCRYPTION_KEY:-}
       PB_SUPERUSER_EMAIL: ${PB_SUPERUSER_EMAIL:-}
       PB_SUPERUSER_PASSWORD: ${PB_SUPERUSER_PASSWORD:-}

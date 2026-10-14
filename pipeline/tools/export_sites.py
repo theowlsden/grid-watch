@@ -4,7 +4,7 @@ The snapshot ships inside the static build as the fallback when the CMS is unrea
 the pipeline reads it so a CMS outage never blocks forecasting. Run after editing sites or the
 island in the CMS, review the diff, and commit it.
 
-    python pipeline/tools/export_sites.py --cms https://cms.grid.noirvisuals.studio
+    python pipeline/tools/export_sites.py --cms https://cms.grid.example.org
     python pipeline/tools/export_sites.py --cms ... --check   # exit 1 if the snapshot differs
 
 Uses the public API, so only enabled sites and the active island are exported.
@@ -72,7 +72,7 @@ def build_snapshot(cms: str, comment: str | None) -> dict:
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--cms", required=True, help="CMS origin, e.g. https://cms.grid.noirvisuals.studio")
+    p.add_argument("--cms", required=True, help="CMS origin, e.g. https://cms.grid.example.org")
     p.add_argument("--out", type=Path, default=SITES_SNAPSHOT)
     p.add_argument("--check", action="store_true", help="compare with the committed snapshot instead of writing")
     args = p.parse_args(argv)

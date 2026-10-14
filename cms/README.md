@@ -23,11 +23,11 @@ No public sign-up anywhere. Hooks run in isolated contexts: shared code lives in
 
 ## Editing
 
-- **News**: in the admin UI (`https://cms.grid.noirvisuals.studio/_/`) or later via the Telegram
+- **News**: in the admin UI (`https://cms.grid.example.org/_/`) or later via the Telegram
   bot. Plain text only; links must be `https://`. Drafts are never public; set `expiresAt` for
   time-limited notes. News never changes the stress outlook.
 - **Sites**: change names, parks, descriptions or positions here, then refresh the committed
-  fallback: `python pipeline/tools/export_sites.py --cms https://cms.grid.noirvisuals.studio`
+  fallback: `python pipeline/tools/export_sites.py --cms https://cms.grid.example.org`
   and commit `data/sites.snapshot.json`. A slug cannot change; retire a site with
   `enabled = false` and add a new one.
 

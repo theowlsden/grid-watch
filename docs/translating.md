@@ -1,7 +1,7 @@
 # Translating Grid Watch into Papiamentu
 
 English lives in the code (`web/src/i18n/en.json`). Papiamentu is written and published in the CMS,
-in the **translations** collection at `https://cms.grid.noirvisuals.studio/_/`. Any CMS superuser
+in the **translations** collection at `https://cms.grid.example.org/_/`. Any CMS superuser
 can translate and publish. A key without published Papiamentu shows the English text, never the key
 name, so you can translate in parts.
 
@@ -46,7 +46,7 @@ empty CMS rows). Refresh it now and then from the published text and commit it:
 
 ```sh
 cd web
-npm run i18n:pull -- https://cms.grid.noirvisuals.studio
+npm run i18n:pull -- https://cms.grid.example.org
 npm run i18n:status   # how far along the bundled copy is
 ```
 

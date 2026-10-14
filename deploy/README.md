@@ -1,13 +1,17 @@
 # Deployment (Coolify on the Hostinger VPS)
 
+> **This deployment**: the site runs at `grid.noirvisuals.studio` and the CMS at
+> `cms.grid.noirvisuals.studio`. The instructions below use `grid.example.org` and
+> `cms.grid.example.org` as placeholders; replace them with your own addresses.
+
 Spec 7.6. Four services from one compose file, `docker-compose.yaml` at the repository root
 (build context: the repo root). It sits at the root because Coolify runs compose with the repo
 root as project directory, and compose resolves build paths against that directory. The Telegram bot is added in its own step.
 
 | Service | Image | Listens | Domain | Data |
 |---|---|---|---|---|
-| `web` | Caddy serving the static export, security headers | 8080 | `grid.noirvisuals.studio` | reads `gridwatch-data` (read-only) |
-| `cms` | PocketBase 0.40.5 (pinned, checksum verified) | 8090 | `cms.grid.noirvisuals.studio` | `pb-data` |
+| `web` | Caddy serving the static export, security headers | 8080 | `grid.example.org` | reads `gridwatch-data` (read-only) |
+| `cms` | PocketBase 0.40.5 (pinned, checksum verified) | 8090 | `cms.grid.example.org` | `pb-data` |
 | `pipeline` | Python 3.12 + supercronic, two runs a day | none | none | writes `gridwatch-data`, reads run requests from `gridwatch-control` |
 | `bot` | Telegram news bot, Python standard library | none | none (long polling) | writes run requests to `gridwatch-control` |
 
@@ -17,21 +21,21 @@ pinned by digest. Nothing is published on host ports: only Coolify's proxy reach
 
 ## One-time setup
 
-1. **DNS**: `A` records for `grid.noirvisuals.studio` and `cms.grid.noirvisuals.studio` pointing
+1. **DNS**: `A` records for `grid.example.org` and `cms.grid.example.org` pointing
    to the VPS IP. Coolify issues the TLS certificates.
 2. **Coolify**: New resource → *Docker Compose* from this Git repository, branch `main`,
    base directory `/`, compose file `/docker-compose.yaml`. Turn on automatic deploys
    on push.
 3. **Domains** (per service in Coolify, `domain:port` means the container port):
-   - web: `https://grid.noirvisuals.studio:8080`
-   - cms: `https://cms.grid.noirvisuals.studio:8090`
+   - web: `https://grid.example.org:8080`
+   - cms: `https://cms.grid.example.org:8090`
    - pipeline and bot: no domain.
 4. **Environment variables** (Coolify → Environment; never in the repo, see `.env.example`):
 
    | Variable | Service | Value |
    |---|---|---|
-   | `SITE_ORIGIN` | cms | `https://grid.noirvisuals.studio` (CORS: only the site may call the CMS) |
-   | `CMS_ORIGIN` | web | `https://cms.grid.noirvisuals.studio` (added to the CSP `connect-src`) |
+   | `SITE_ORIGIN` | cms | `https://grid.example.org` (CORS: only the site may call the CMS) |
+   | `CMS_ORIGIN` | web | `https://cms.grid.example.org` (added to the CSP `connect-src`) |
    | `ANALYTICS_TOKEN` | web | the token from Cloudflare Web Analytics' JS snippet (public), or empty for no analytics; restart web to apply |
    | `RESULTS_ENABLED` | web | empty (off) until the backtest has sourced events to score, then `true`: publishes `/results` and links it from the methodology page; restart web to apply |
    | `EVENTS_ENABLED` | web | empty (off) until the events in `data/events/events.yaml` have reliable public sources, then `true`; restart web to apply |
@@ -65,13 +69,13 @@ first start the CMS seeds the sites and island from `data/sites.snapshot.json`. 
 - `cms`: `GET /api/health`.
 - `pipeline`: healthy while the last daily run succeeded less than 36 hours ago. Each run writes
   `/data/heartbeat.json` (time, status, version, inputs hash) and logs one summary line.
-  An external uptime monitor can watch `https://grid.noirvisuals.studio/data/heartbeat.json`.
+  An external uptime monitor can watch `https://grid.example.org/data/heartbeat.json`.
 
 ## Live outlook: preview first, then publish
 
 The pipeline runs at 06:00 and 16:00 Curaçao time (and once on start if its last forecast is
 older than 6 hours). With `GRIDWATCH_PUBLISH=0` it writes `/data/preview/forecast.json`; open
-`https://grid.noirvisuals.studio/?preview=1` to see it on the site, tagged "Preview, not
+`https://grid.example.org/?preview=1` to see it on the site, tagged "Preview, not
 published". When you are happy, set `GRIDWATCH_PUBLISH=1` and restart the pipeline: the next run
 replaces the example data. Every run is archived under `/data/history/`, published or not.
 
@@ -122,7 +126,7 @@ docker inspect --format '{{json .State.Health}}' cms-<resource-uuid>          # 
 
 | Message | Fix |
 |---|---|
-| `SITE_ORIGIN is empty` / `must start with https://` / `without a path` | set `SITE_ORIGIN=https://grid.noirvisuals.studio` on the cms service |
+| `SITE_ORIGIN is empty` / `must start with https://` / `without a path` | set `SITE_ORIGIN=https://grid.example.org` on the cms service |
 | `PB_ENCRYPTION_KEY must be exactly 32 characters` | generate with `openssl rand -hex 16`; changing it later makes stored settings unreadable, keep a copy |
 | `warning: superuser not changed: ...` | check `PB_SUPERUSER_EMAIL` (a valid address) and `PB_SUPERUSER_PASSWORD` (10+ characters); the CMS still starts |
 | `warning: PB_ADMIN_IPS not applied` | use space-separated IPs or CIDR subnets, e.g. `203.0.113.7 198.51.100.0/24`; leave it empty to allow any IP (the password still protects sign-in) |
@@ -150,7 +154,7 @@ docker inspect --format '{{json .State.Health}}' cms-<resource-uuid>          # 
 
 ## Cloudflare (CDN, analytics, backups)
 
-The whole `noirvisuals.studio` zone moves to Cloudflare (free plan: whole domain only), so every
+The whole domain (`example.org` here) moves to Cloudflare (free plan: whole domain only), so every
 DNS record must exist there before the nameservers change at the registrar.
 
 **DNS and proxy**
@@ -173,13 +177,13 @@ upgrading PocketBase.
 - SSL/TLS: **Full (strict)** (Coolify has valid certificates).
 - Leave **Rocket Loader** and **Email Address Obfuscation** off: they insert scripts the
   Content Security Policy blocks. Same for Web Analytics' automatic script, until the CSP allows it.
-- Optional cache rule for `cms.grid.noirvisuals.studio`, path `/api/collections/*/records`:
+- Optional cache rule for `cms.grid.example.org`, path `/api/collections/*/records`:
   eligible for cache, edge TTL "use cache-control header if present, bypass cache if not". Public
   answers allow 60 s; signed-in answers are `private, no-store` and never cached.
 
 **Analytics**: Analytics → Traffic works with the proxy and needs no code. Web Analytics runs
-from the site's own snippet (`ANALYTICS_TOKEN`, entry `grid.noirvisuals.studio`, "JS snippet
-installation"). Keep **automatic setup off for the `noirvisuals.studio` entry**: it injects a second
+from the site's own snippet (`ANALYTICS_TOKEN`, entry for the site's hostname, "JS snippet
+installation"). Keep **automatic setup off for the domain's own entry**: it injects a second
 beacon into every proxied page (only for browser-like requests, so a plain `curl` does not show it),
 which starts first and takes the visits, leaving the snippet's entry at zero.
 

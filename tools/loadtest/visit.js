@@ -1,12 +1,13 @@
 // Load test for the live site: simulated visitors loading the dashboard (k6, https://k6.io).
 // Read-only: only the public requests a browser makes; never sign-ins or writes.
 //
-//   k6 run tools/loadtest/visit.js                     # the default ramp, up to 200 visitors
-//   k6 run -e PROFILE=smoke tools/loadtest/visit.js    # 1 visitor for 30 s: check the script
-//   k6 run -e PROFILE=spike tools/loadtest/visit.js    # a sudden burst, e.g. a viral post
-//   k6 run -e PROFILE=soak  tools/loadtest/visit.js    # 60 visitors for 20 min
+//   export SITE="-e BASE_URL=https://grid.example.org -e CMS_URL=https://cms.grid.example.org"
+//   k6 run $SITE tools/loadtest/visit.js                     # the default ramp, up to 200 visitors
+//   k6 run $SITE -e PROFILE=smoke tools/loadtest/visit.js    # 1 visitor for 30 s: check the script
+//   k6 run $SITE -e PROFILE=spike tools/loadtest/visit.js    # a sudden burst, e.g. a viral post
+//   k6 run $SITE -e PROFILE=soak  tools/loadtest/visit.js    # 60 visitors for 20 min
 //
-// Environment: BASE_URL, CMS_URL, PAP_SHARE (share of visitors in Papiamentu, default 0.3),
+// Environment: BASE_URL and CMS_URL (required), PAP_SHARE (share of visitors in Papiamentu, default 0.3),
 // NEW_SHARE (share of first-time visitors who download the scripts and fonts, default 0.3).
 // See tools/loadtest/README.md before running it against the live site.
 
@@ -14,8 +15,12 @@ import http from "k6/http";
 import { check, group, sleep } from "k6";
 import { Rate, Trend } from "k6/metrics";
 
-const BASE = (__ENV.BASE_URL || "https://grid.noirvisuals.studio").replace(/\/+$/, "");
-const CMS = (__ENV.CMS_URL || "https://cms.grid.noirvisuals.studio").replace(/\/+$/, "");
+// No defaults on purpose: a copy of this repository must never load-test someone else's site.
+if (!__ENV.BASE_URL || !__ENV.CMS_URL) {
+  throw new Error("set BASE_URL and CMS_URL, e.g. -e BASE_URL=https://grid.example.org -e CMS_URL=https://cms.grid.example.org");
+}
+const BASE = __ENV.BASE_URL.replace(/\/+$/, "");
+const CMS = __ENV.CMS_URL.replace(/\/+$/, "");
 const PAP_SHARE = Number(__ENV.PAP_SHARE ?? 0.3);
 const NEW_SHARE = Number(__ENV.NEW_SHARE ?? 0.3);
 const PARAMS = { headers: { "User-Agent": "GridWatchLoadTest/1 (k6; +https://github.com/theowlsden/grid-watch)" } };
