@@ -43,6 +43,8 @@ test("works when storage is blocked", async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-10-08T12:00:00-04:00"));
   await page.setViewportSize({ width: 390, height: 844 });
   await open(page, { webgl: false });
+  // without storage the first-visit notice cannot be remembered, so it shows on every visit
+  await page.locator("#intro").getByRole("button", { name: "I understand" }).click();
   await page.locator("#topbar").getByRole("button", { name: "Night" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-mode", "night");
 });

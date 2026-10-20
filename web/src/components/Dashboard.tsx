@@ -23,6 +23,7 @@ import { StatTiles } from "./StatTiles";
 import { WeekChart } from "./WeekChart";
 import { DayStrip } from "./DayStrip";
 import { News } from "./News";
+import { Intro } from "./Intro";
 import Link from "next/link";
 
 const SNAPSHOT_SITES = snapshotSites();
@@ -210,6 +211,7 @@ export function Dashboard() {
 
   return (
     <div id="app" className={appClass}>
+      <Intro lang={lang} onLang={setLang} t={t} />
       <IslandStage
         key={sceneKey}
         sites={stageSites}

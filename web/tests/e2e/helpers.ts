@@ -28,9 +28,13 @@ export async function setMode(page: Page, mode: "auto" | "day" | "night") {
   await page.addInitScript((m) => localStorage.setItem("gridwatch-mode", m), mode);
 }
 
-/** Every test fails on a Content-Security-Policy violation (the server sends the production policy). */
-export const test = base.extend({
-  page: async ({ page }, provide) => {
+/** Every test fails on a Content-Security-Policy violation (the server sends the production policy).
+ *  The first-visit notice counts as already read, so it does not cover the page; intro.spec.ts
+ *  turns that off with test.use({ introSeen: false }). */
+export const test = base.extend<{ introSeen: boolean }>({
+  introSeen: [true, { option: true }],
+  page: async ({ page, introSeen }, provide) => {
+    if (introSeen) await page.addInitScript(() => localStorage.setItem("gridwatch-intro", "1"));
     const violations: string[] = [];
     await page.exposeFunction("__cspViolation", (v: string) => violations.push(v));
     await page.addInitScript(() => {

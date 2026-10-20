@@ -398,6 +398,8 @@ Plain, short sentences. Say "estimated" for estimates and "not public" for unkno
 ### 8.2 Required disclaimers
 Visible without scrolling on first load: "Experimental, built from public data, not an official forecast". Longer methodology and limits on a linked page.
 
+**As built (first-visit notice, 20 Oct 2026)**: on the first visit the dashboard also opens a modal notice, "An experiment, not a forecast": public data only, not an official forecast, no prediction of outages, the index is not a probability and is uncalibrated, generation and demand are not visible, and no affiliation with Aqualectra, MDC or RAC. It has the EN / PAP switch and a link to the methodology page. Closing it (button or Esc) is remembered per browser (`gridwatch-intro`); raising `INTRO_VERSION` in `web/src/components/Intro.tsx` shows it once more to everyone. With storage blocked it shows on every visit. The one-line disclaimer under the title stays.
+
 ### 8.3 Attribution
 Footer or brand card reads **"Grid Watch by Noir Visuals"** (plain text until the Noir Visuals site exists, then linked). Data sources credited on the methodology page. Map data: "Map data from OpenStreetMap" linked to openstreetmap.org/copyright (ODbL), shown on the island wherever OSM-derived geometry is used; weather: Open-Meteo (CC BY 4.0).
 
