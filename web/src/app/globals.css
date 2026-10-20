@@ -1514,6 +1514,12 @@ h2 {
   row-gap: 4px;
 }
 
+/* the gauge on the left beside the emoji, "Stress outlook" and the level on the right */
+#hud .readout {
+  justify-content: space-between;
+  align-self: stretch;
+}
+
 /* "Stress outlook" above the level pill */
 .readout .lvl {
   display: inline-flex;
@@ -2237,5 +2243,108 @@ html[lang="pap"] .doc[data-doc-lang="pap"] {
 #intro .intro-actions a {
   color: var(--blue-text);
   font-weight: 700;
+}
+
+/* ---------- Gauge with the stress index under its needle ---------- */
+.gauge-box {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  flex: none;
+}
+
+.gauge {
+  display: block;
+  width: 84px;
+  height: auto;
+  overflow: visible;
+}
+
+/* the number sits just under the hub, between the ends of the half circle */
+#hud .gauge-box .pct {
+  margin-top: 1px;
+  font-size: 28px;
+  line-height: 1;
+}
+
+#hud .gauge-box .pct .scale {
+  font-size: 11px;
+  margin-left: 2px;
+}
+
+.gauge .band {
+  fill: none;
+  stroke-width: 9;
+  opacity: 0.28;
+}
+
+.gauge .band.on {
+  opacity: 1;
+}
+
+.gauge .needle {
+  stroke-width: 4.5;
+  stroke-linecap: round;
+}
+
+.gauge .hub {
+  fill: var(--ink);
+}
+
+.gauge .t-ok {
+  stroke: var(--ok);
+}
+
+.gauge .t-watch {
+  stroke: var(--watch);
+}
+
+.gauge .t-warn {
+  stroke: var(--warn);
+}
+
+.gauge .t-crit {
+  stroke: var(--crit);
+}
+
+.gauge .t-unknown {
+  stroke: var(--unknown);
+}
+
+/* wide desktop: more room, a larger gauge and number */
+@media (min-width: 1501px) and (min-height: 1182px) {
+  .gauge {
+    width: 124px;
+  }
+
+  #hud .gauge-box .pct {
+    margin-top: 2px;
+    font-size: 42px;
+  }
+
+  #hud .gauge-box .pct .scale {
+    font-size: 13px;
+  }
+}
+
+/* short landscape screens (phones): a smaller gauge and tighter rows, so the card fits */
+@media (max-height: 520px) {
+  .gauge {
+    width: 50px;
+  }
+
+  #hud .gauge-box .pct {
+    margin-top: 0;
+    font-size: 20px;
+  }
+
+  #hud .gauge-box .pct .scale {
+    font-size: 10px;
+  }
+
+  #hud .readout {
+    row-gap: 0;
+    column-gap: 10px;
+  }
 }
 

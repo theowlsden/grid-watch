@@ -5,6 +5,7 @@ import { dateMedium, issuedShort } from "@/lib/time";
 import type { Translate } from "@/i18n";
 import Link from "next/link";
 import { Mascot } from "./Mascot";
+import { Gauge } from "./Gauge";
 
 interface Props {
   forecast: Forecast;
@@ -40,10 +41,12 @@ export function RiskCard({ forecast, day, stale, preview, dates, t }: Props) {
         </div>
       </div>
       <div className="readout">
-        <span className="pct">
-          {day.index}
-          <small className="scale">{t("risk.scale")}</small>
-        </span>
+        <Gauge index={day.index} tone={tone}>
+          <span className="pct">
+            {day.index}
+            <small className="scale">{t("risk.scale")}</small>
+          </span>
+        </Gauge>
         {/* the caption says what the level is about, next to the weather-forecast grade below */}
         <span className="lvl">
           <small className="cap">{t("risk.levelCaption")}</small>
