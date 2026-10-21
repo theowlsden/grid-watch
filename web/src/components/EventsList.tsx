@@ -1,6 +1,8 @@
 import type { DateNames } from "@/lib/time";
 import type { GridEvent } from "@/lib/schema";
-import { eventPeriod } from "@/lib/time";
+import { eventDate, eventPeriod } from "@/lib/time";
+import Link from "next/link";
+import type { CommunityDay } from "@/lib/community";
 import type { Lang, Translate } from "@/i18n";
 
 // An event with a start time and no end: "Ongoing" for 12 hours, then "End time not reported",
@@ -75,6 +77,8 @@ export function EventsList({
   lang = "en",
   now,
   onClose,
+  community = [],
+  canReport = false,
 }: {
   events: GridEvent[];
   dates: DateNames;
@@ -82,6 +86,8 @@ export function EventsList({
   lang?: Lang;
   now: number; // the dashboard's clock, ticking every minute
   onClose?: () => void;
+  community?: CommunityDay[]; // unverified community reports, grouped (decision 26)
+  canReport?: boolean; // the public report form is open (TURNSTILE_SITEKEY)
 }) {
   return (
     <>
@@ -103,6 +109,30 @@ export function EventsList({
       ) : (
         // only sourced events are published (spec 4.6); until the first one, say why the list is empty
         <p className="evl-empty">{t("events.empty")}</p>
+      )}
+      {canReport && (
+        <p className="evreport">
+          <Link href="/report">{t("report.link")} →</Link>
+        </p>
+      )}
+      {community.length > 0 && (
+        <section className="community" aria-labelledby="community-h">
+          <h3 id="community-h">{t("community.h")}</h3>
+          <p className="sub">{t("community.p")}</p>
+          <ul>
+            {community.map((d) => (
+              <li key={d.date}>
+                <strong>{t("community.day", { date: eventDate(d.date, dates), count: d.total })}</strong>
+                {" · "}
+                {[
+                  ...d.areas.map((a) => `${a.name} (${a.count})`),
+                  ...(d.island ? [t("community.island", { count: d.island })] : []),
+                  ...(d.unknown ? [t("community.unknown", { count: d.unknown })] : []),
+                ].join(", ")}
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
       <p className="sub">{t("events.cannotShow")}</p>
     </>

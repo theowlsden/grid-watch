@@ -1,0 +1,2489 @@
+{
+ "source": {
+  "name": "OpenStreetMap contributors",
+  "licence": "ODbL 1.0",
+  "url": "https://www.openstreetmap.org/copyright",
+  "retrieved_at": "2026-10-21",
+  "note": "Names of places tagged neighbourhood, suburb or quarter in Curaçao. Areas are mapped as polygons in OpenStreetMap, the others only as a point."
+ },
+ "neighbourhoods": [
+  {
+   "name": "Abrahamsz",
+   "osm": "relation/9506908",
+   "area": true,
+   "lat": 12.13864,
+   "lon": -68.86245
+  },
+  {
+   "name": "Amerikanenkamp",
+   "osm": "relation/9507014",
+   "area": true,
+   "lat": 12.15208,
+   "lon": -68.91158
+  },
+  {
+   "name": "Arrarat",
+   "osm": "relation/9507172",
+   "area": true,
+   "lat": 12.11113,
+   "lon": -68.92497
+  },
+  {
+   "name": "Asiento",
+   "osm": "relation/9506956",
+   "area": true,
+   "lat": 12.13098,
+   "lon": -68.92834
+  },
+  {
+   "name": "Baai Macola",
+   "osm": "relation/9507169",
+   "area": true,
+   "lat": 12.11302,
+   "lon": -68.91772
+  },
+  {
+   "name": "Bakufal",
+   "osm": "node/3196517097",
+   "area": false,
+   "lat": 12.13064,
+   "lon": -68.88466
+  },
+  {
+   "name": "Bandabou",
+   "osm": "node/11881250466",
+   "area": false,
+   "lat": 12.31469,
+   "lon": -69.12093
+  },
+  {
+   "name": "Barber",
+   "osm": "relation/9507068",
+   "area": true,
+   "lat": 12.27367,
+   "lon": -69.08183
+  },
+  {
+   "name": "Barbouquet",
+   "osm": "relation/9506889",
+   "area": true,
+   "lat": 12.12205,
+   "lon": -68.87875
+  },
+  {
+   "name": "Barica",
+   "osm": "relation/9506881",
+   "area": true,
+   "lat": 12.12656,
+   "lon": -68.86723
+  },
+  {
+   "name": "Batavier",
+   "osm": "relation/9507171",
+   "area": true,
+   "lat": 12.10476,
+   "lon": -68.92126
+  },
+  {
+   "name": "Ben Hoyer",
+   "osm": "relation/9506931",
+   "area": true,
+   "lat": 12.10177,
+   "lon": -68.89812
+  },
+  {
+   "name": "Berg Altena",
+   "osm": "node/3197111418",
+   "area": false,
+   "lat": 12.10378,
+   "lon": -68.92172
+  },
+  {
+   "name": "Beurs",
+   "osm": "relation/9506998",
+   "area": true,
+   "lat": 12.11261,
+   "lon": -68.85287
+  },
+  {
+   "name": "Biesheuvel",
+   "osm": "relation/9506954",
+   "area": true,
+   "lat": 12.13461,
+   "lon": -68.90636
+  },
+  {
+   "name": "Bijgelegen",
+   "osm": "relation/9506951",
+   "area": true,
+   "lat": 12.15032,
+   "lon": -68.90154
+  },
+  {
+   "name": "Bisento",
+   "osm": "node/3197111420",
+   "area": false,
+   "lat": 12.25446,
+   "lon": -69.07265
+  },
+  {
+   "name": "Bista Musikal",
+   "osm": "node/3196410963",
+   "area": false,
+   "lat": 12.09556,
+   "lon": -68.8633
+  },
+  {
+   "name": "Bivak",
+   "osm": "relation/9506966",
+   "area": true,
+   "lat": 12.13959,
+   "lon": -68.93716
+  },
+  {
+   "name": "Blauw",
+   "osm": "relation/9507134",
+   "area": true,
+   "lat": 12.13678,
+   "lon": -68.98398
+  },
+  {
+   "name": "Bleefamia",
+   "osm": "relation/9506984",
+   "area": true,
+   "lat": 12.15168,
+   "lon": -68.95069
+  },
+  {
+   "name": "Bloemfontein",
+   "osm": "relation/9506959",
+   "area": true,
+   "lat": 12.14786,
+   "lon": -68.91681
+  },
+  {
+   "name": "Blomonte",
+   "osm": "relation/9506979",
+   "area": true,
+   "lat": 12.15041,
+   "lon": -68.94696
+  },
+  {
+   "name": "Boca Gentil",
+   "osm": "node/3196410964",
+   "area": false,
+   "lat": 12.07276,
+   "lon": -68.87536
+  },
+  {
+   "name": "Boca Sint Michiel",
+   "osm": "relation/9507133",
+   "area": true,
+   "lat": 12.14196,
+   "lon": -68.99512
+  },
+  {
+   "name": "Bonam",
+   "osm": "relation/9506915",
+   "area": true,
+   "lat": 12.14706,
+   "lon": -68.87939
+  },
+  {
+   "name": "Bonam (zone)",
+   "osm": "relation/9507087",
+   "area": true,
+   "lat": 12.14315,
+   "lon": -68.8766
+  },
+  {
+   "name": "Bottelier",
+   "osm": "relation/9506928",
+   "area": true,
+   "lat": 12.0997,
+   "lon": -68.88795
+  },
+  {
+   "name": "Bou Barber",
+   "osm": "node/3197111427",
+   "area": false,
+   "lat": 12.28856,
+   "lon": -69.09371
+  },
+  {
+   "name": "Brakkeput Abou",
+   "osm": "relation/9507151",
+   "area": true,
+   "lat": 12.08682,
+   "lon": -68.86648
+  },
+  {
+   "name": "Brakkeput Ariba",
+   "osm": "relation/9507148",
+   "area": true,
+   "lat": 12.08518,
+   "lon": -68.85715
+  },
+  {
+   "name": "Brakkeput Mei Mei",
+   "osm": "relation/9507149",
+   "area": true,
+   "lat": 12.08776,
+   "lon": -68.86193
+  },
+  {
+   "name": "Brievengat",
+   "osm": "relation/9507005",
+   "area": true,
+   "lat": 12.14751,
+   "lon": -68.89263
+  },
+  {
+   "name": "Brionwerf",
+   "osm": "node/4720689777",
+   "area": false,
+   "lat": 12.1143,
+   "lon": -68.91206
+  },
+  {
+   "name": "Buena Vista",
+   "osm": "relation/9506967",
+   "area": true,
+   "lat": 12.14448,
+   "lon": -68.93591
+  },
+  {
+   "name": "Burundanga",
+   "osm": "relation/9506917",
+   "area": true,
+   "lat": 12.12365,
+   "lon": -68.89059
+  },
+  {
+   "name": "Cabo Verde",
+   "osm": "relation/9507020",
+   "area": true,
+   "lat": 12.16937,
+   "lon": -68.94325
+  },
+  {
+   "name": "Camellia",
+   "osm": "node/3798817713",
+   "area": false,
+   "lat": 12.12675,
+   "lon": -68.85199
+  },
+  {
+   "name": "Caracas",
+   "osm": "node/3196410966",
+   "area": false,
+   "lat": 12.11078,
+   "lon": -68.86934
+  },
+  {
+   "name": "Cas Cora",
+   "osm": "relation/9506939",
+   "area": true,
+   "lat": 12.13557,
+   "lon": -68.89284
+  },
+  {
+   "name": "Cas Grandi",
+   "osm": "relation/9507001",
+   "area": true,
+   "lat": 12.09654,
+   "lon": -68.85102
+  },
+  {
+   "name": "Chango",
+   "osm": "node/3196410968",
+   "area": false,
+   "lat": 12.11045,
+   "lon": -68.89382
+  },
+  {
+   "name": "Chango bij Groot Kwartier",
+   "osm": "relation/9506950",
+   "area": true,
+   "lat": 12.13584,
+   "lon": -68.90327
+  },
+  {
+   "name": "Chango bij Korporaal",
+   "osm": "relation/9506922",
+   "area": true,
+   "lat": 12.1105,
+   "lon": -68.89426
+  },
+  {
+   "name": "Charo",
+   "osm": "relation/9507040",
+   "area": true,
+   "lat": 12.1191,
+   "lon": -68.9561
+  },
+  {
+   "name": "Cheche",
+   "osm": "relation/9506893",
+   "area": true,
+   "lat": 12.12417,
+   "lon": -68.88673
+  },
+  {
+   "name": "Cher Asile",
+   "osm": "relation/9507181",
+   "area": true,
+   "lat": 12.10216,
+   "lon": -68.9163
+  },
+  {
+   "name": "Choloma",
+   "osm": "node/3196517110",
+   "area": false,
+   "lat": 12.11008,
+   "lon": -68.83994
+  },
+  {
+   "name": "Christoffel",
+   "osm": "relation/9507062",
+   "area": true,
+   "lat": 12.33189,
+   "lon": -69.09988
+  },
+  {
+   "name": "Claret",
+   "osm": "node/3196410971",
+   "area": false,
+   "lat": 12.12194,
+   "lon": -68.87706
+  },
+  {
+   "name": "Coco",
+   "osm": "relation/9507184",
+   "area": true,
+   "lat": 12.10525,
+   "lon": -68.91914
+  },
+  {
+   "name": "Cocorie",
+   "osm": "relation/9507168",
+   "area": true,
+   "lat": 12.14063,
+   "lon": -68.84732
+  },
+  {
+   "name": "Colonia",
+   "osm": "node/13348908656",
+   "area": false,
+   "lat": 12.25777,
+   "lon": -69.07721
+  },
+  {
+   "name": "Colón",
+   "osm": "relation/9507160",
+   "area": true,
+   "lat": 12.11097,
+   "lon": -68.94441
+  },
+  {
+   "name": "Confiansa",
+   "osm": "relation/9506884",
+   "area": true,
+   "lat": 12.11592,
+   "lon": -68.8566
+  },
+  {
+   "name": "Constancia",
+   "osm": "node/8147570554",
+   "area": false,
+   "lat": 12.15203,
+   "lon": -68.94445
+  },
+  {
+   "name": "Constancia bij Eendracht",
+   "osm": "relation/9506973",
+   "area": true,
+   "lat": 12.15252,
+   "lon": -68.94458
+  },
+  {
+   "name": "Constantia",
+   "osm": "relation/9506983",
+   "area": true,
+   "lat": 12.14972,
+   "lon": -68.95049
+  },
+  {
+   "name": "Coronet",
+   "osm": "relation/9507183",
+   "area": true,
+   "lat": 12.10266,
+   "lon": -68.92161
+  },
+  {
+   "name": "Costa Firma",
+   "osm": "relation/9506898",
+   "area": true,
+   "lat": 12.1309,
+   "lon": -68.88766
+  },
+  {
+   "name": "Curasol",
+   "osm": "node/2480676909",
+   "area": false,
+   "lat": 12.14263,
+   "lon": -68.98535
+  },
+  {
+   "name": "Damacor",
+   "osm": "relation/9506940",
+   "area": true,
+   "lat": 12.13279,
+   "lon": -68.89836
+  },
+  {
+   "name": "De Klundert",
+   "osm": "relation/9506867",
+   "area": true,
+   "lat": 12.11716,
+   "lon": -68.8565
+  },
+  {
+   "name": "De Savaan",
+   "osm": "relation/9507140",
+   "area": true,
+   "lat": 12.149,
+   "lon": -68.95856
+  },
+  {
+   "name": "Dein",
+   "osm": "relation/9507018",
+   "area": true,
+   "lat": 12.15221,
+   "lon": -68.93144
+  },
+  {
+   "name": "Diennoortje",
+   "osm": "node/3196410978",
+   "area": false,
+   "lat": 12.13025,
+   "lon": -68.89991
+  },
+  {
+   "name": "Dokterstuin",
+   "osm": "node/3197111430",
+   "area": false,
+   "lat": 12.27422,
+   "lon": -69.07995
+  },
+  {
+   "name": "Domi",
+   "osm": "relation/9507103",
+   "area": true,
+   "lat": 12.11655,
+   "lon": -68.94268
+  },
+  {
+   "name": "Domi Abou",
+   "osm": "relation/9507161",
+   "area": true,
+   "lat": 12.11432,
+   "lon": -68.94565
+  },
+  {
+   "name": "Dominguito",
+   "osm": "relation/9506932",
+   "area": true,
+   "lat": 12.10396,
+   "lon": -68.89656
+  },
+  {
+   "name": "Eendracht",
+   "osm": "relation/9506971",
+   "area": true,
+   "lat": 12.15088,
+   "lon": -68.941
+  },
+  {
+   "name": "Emmastad",
+   "osm": "relation/9506957",
+   "area": true,
+   "lat": 12.136,
+   "lon": -68.91365
+  },
+  {
+   "name": "Esperansa",
+   "osm": "node/8147800477",
+   "area": false,
+   "lat": 12.13258,
+   "lon": -68.85523
+  },
+  {
+   "name": "Esperansa bij Minguelito",
+   "osm": "relation/9506903",
+   "area": true,
+   "lat": 12.13274,
+   "lon": -68.85557
+  },
+  {
+   "name": "Esperansa bij Salsbach",
+   "osm": "relation/9507021",
+   "area": true,
+   "lat": 12.1637,
+   "lon": -68.94351
+  },
+  {
+   "name": "Esperanza",
+   "osm": "node/8147824289",
+   "area": false,
+   "lat": 12.11949,
+   "lon": -68.86543
+  },
+  {
+   "name": "Esperanza bij Herst",
+   "osm": "relation/9506886",
+   "area": true,
+   "lat": 12.11948,
+   "lon": -68.86546
+  },
+  {
+   "name": "Esperanza bij Waterloo",
+   "osm": "relation/9507012",
+   "area": true,
+   "lat": 12.1593,
+   "lon": -68.90298
+  },
+  {
+   "name": "Fantanja",
+   "osm": "relation/9506981",
+   "area": true,
+   "lat": 12.15028,
+   "lon": -68.9488
+  },
+  {
+   "name": "Fleur de Marie",
+   "osm": "relation/9507156",
+   "area": true,
+   "lat": 12.10934,
+   "lon": -68.93102
+  },
+  {
+   "name": "Flip",
+   "osm": "relation/9507063",
+   "area": true,
+   "lat": 12.3066,
+   "lon": -69.10491
+  },
+  {
+   "name": "Fortuna Abou",
+   "osm": "relation/9507026",
+   "area": true,
+   "lat": 12.17071,
+   "lon": -68.92862
+  },
+  {
+   "name": "Fortuna Ariba",
+   "osm": "relation/9507029",
+   "area": true,
+   "lat": 12.17903,
+   "lon": -68.93227
+  },
+  {
+   "name": "Francia",
+   "osm": "relation/9506948",
+   "area": true,
+   "lat": 12.13239,
+   "lon": -68.90204
+  },
+  {
+   "name": "Fuik",
+   "osm": "relation/9507003",
+   "area": true,
+   "lat": 12.08514,
+   "lon": -68.82365
+  },
+  {
+   "name": "Gaitu",
+   "osm": "relation/9506936",
+   "area": true,
+   "lat": 12.12737,
+   "lon": -68.90593
+  },
+  {
+   "name": "Gasparitu",
+   "osm": "relation/9506994",
+   "area": true,
+   "lat": 12.13352,
+   "lon": -68.94803
+  },
+  {
+   "name": "Gatu",
+   "osm": "relation/9507124",
+   "area": true,
+   "lat": 12.18244,
+   "lon": -68.9847
+  },
+  {
+   "name": "Gibraltar",
+   "osm": "relation/9506990",
+   "area": true,
+   "lat": 12.14286,
+   "lon": -68.94928
+  },
+  {
+   "name": "Girouette",
+   "osm": "relation/9506923",
+   "area": true,
+   "lat": 12.11566,
+   "lon": -68.89474
+  },
+  {
+   "name": "Goede Hoop",
+   "osm": "node/3196410983",
+   "area": false,
+   "lat": 12.11179,
+   "lon": -68.89754
+  },
+  {
+   "name": "Goede Hoop bij Hulanda",
+   "osm": "relation/9506925",
+   "area": true,
+   "lat": 12.11183,
+   "lon": -68.89757
+  },
+  {
+   "name": "Gora",
+   "osm": "relation/9506978",
+   "area": true,
+   "lat": 12.1478,
+   "lon": -68.94695
+  },
+  {
+   "name": "Gosie",
+   "osm": "node/3196517122",
+   "area": false,
+   "lat": 12.14735,
+   "lon": -68.92772
+  },
+  {
+   "name": "GreenLeaf Village",
+   "osm": "node/3798758625",
+   "area": false,
+   "lat": 12.13662,
+   "lon": -68.86469
+  },
+  {
+   "name": "Grimao",
+   "osm": "node/3196517123",
+   "area": false,
+   "lat": 12.14201,
+   "lon": -68.90006
+  },
+  {
+   "name": "Grinoli",
+   "osm": "relation/9507054",
+   "area": true,
+   "lat": 12.14061,
+   "lon": -68.95453
+  },
+  {
+   "name": "Groot Davelaar",
+   "osm": "relation/9506934",
+   "area": true,
+   "lat": 12.11979,
+   "lon": -68.90424
+  },
+  {
+   "name": "Groot Kwartier",
+   "osm": "relation/9506955",
+   "area": true,
+   "lat": 12.14069,
+   "lon": -68.90978
+  },
+  {
+   "name": "Groot Kwartier Zuid",
+   "osm": "relation/9506937",
+   "area": true,
+   "lat": 12.13031,
+   "lon": -68.90629
+  },
+  {
+   "name": "Groot Piscadera",
+   "osm": "relation/9507139",
+   "area": true,
+   "lat": 12.15564,
+   "lon": -68.9583
+  },
+  {
+   "name": "Grote Berg",
+   "osm": "relation/9507058",
+   "area": true,
+   "lat": 12.18997,
+   "lon": -68.99736
+  },
+  {
+   "name": "Gustavia",
+   "osm": "node/3196410987",
+   "area": false,
+   "lat": 12.10384,
+   "lon": -68.84541
+  },
+  {
+   "name": "Hamber",
+   "osm": "relation/9507055",
+   "area": true,
+   "lat": 12.14008,
+   "lon": -68.95682
+  },
+  {
+   "name": "Hanenberg",
+   "osm": "relation/9507000",
+   "area": true,
+   "lat": 12.10242,
+   "lon": -68.86213
+  },
+  {
+   "name": "Harmonie",
+   "osm": "relation/9506870",
+   "area": true,
+   "lat": 12.12911,
+   "lon": -68.85536
+  },
+  {
+   "name": "Hato",
+   "osm": "relation/9507072",
+   "area": true,
+   "lat": 12.21269,
+   "lon": -68.97977
+  },
+  {
+   "name": "Heintje Kool",
+   "osm": "node/3196517130",
+   "area": false,
+   "lat": 12.14037,
+   "lon": -68.94191
+  },
+  {
+   "name": "Helfrich Dorp",
+   "osm": "node/3197111431",
+   "area": false,
+   "lat": 12.28584,
+   "lon": -69.11782
+  },
+  {
+   "name": "Herst",
+   "osm": "relation/9506887",
+   "area": true,
+   "lat": 12.12141,
+   "lon": -68.86473
+  },
+  {
+   "name": "Hoenderberg",
+   "osm": "relation/9506995",
+   "area": true,
+   "lat": 12.10452,
+   "lon": -68.8581
+  },
+  {
+   "name": "Iland",
+   "osm": "relation/9506958",
+   "area": true,
+   "lat": 12.14504,
+   "lon": -68.9173
+  },
+  {
+   "name": "Jan Boos",
+   "osm": "relation/9506868",
+   "area": true,
+   "lat": 12.1183,
+   "lon": -68.85576
+  },
+  {
+   "name": "Jan Donker",
+   "osm": "node/1149224815",
+   "area": false,
+   "lat": 12.2989,
+   "lon": -69.12467
+  },
+  {
+   "name": "Jan Doret",
+   "osm": "node/297226775",
+   "area": false,
+   "lat": 12.15031,
+   "lon": -68.97782
+  },
+  {
+   "name": "Jan Luis",
+   "osm": "relation/9506905",
+   "area": true,
+   "lat": 12.13293,
+   "lon": -68.83596
+  },
+  {
+   "name": "Jan Sofat",
+   "osm": "relation/9507147",
+   "area": true,
+   "lat": 12.08559,
+   "lon": -68.85013
+  },
+  {
+   "name": "Jan Thiel",
+   "osm": "relation/9507152",
+   "area": true,
+   "lat": 12.08482,
+   "lon": -68.87732
+  },
+  {
+   "name": "Jan Thiel Oost",
+   "osm": "node/333413268",
+   "area": false,
+   "lat": 12.09079,
+   "lon": -68.87089
+  },
+  {
+   "name": "Janchi Wever",
+   "osm": "relation/9506891",
+   "area": true,
+   "lat": 12.12534,
+   "lon": -68.8814
+  },
+  {
+   "name": "Jandoret",
+   "osm": "relation/9507137",
+   "area": true,
+   "lat": 12.14869,
+   "lon": -68.9785
+  },
+  {
+   "name": "Janwé",
+   "osm": "relation/9506926",
+   "area": true,
+   "lat": 12.1081,
+   "lon": -68.89444
+  },
+  {
+   "name": "Jenefu",
+   "osm": "relation/9506987",
+   "area": true,
+   "lat": 12.14539,
+   "lon": -68.94896
+  },
+  {
+   "name": "Jonchi",
+   "osm": "relation/9506945",
+   "area": true,
+   "lat": 12.1201,
+   "lon": -68.89856
+  },
+  {
+   "name": "Jongbloed",
+   "osm": "relation/9506914",
+   "area": true,
+   "lat": 12.14235,
+   "lon": -68.88554
+  },
+  {
+   "name": "Jonisberg",
+   "osm": "relation/9506930",
+   "area": true,
+   "lat": 12.10085,
+   "lon": -68.89621
+  },
+  {
+   "name": "Juan Baeza",
+   "osm": "relation/9507057",
+   "area": true,
+   "lat": 12.14382,
+   "lon": -68.95525
+  },
+  {
+   "name": "Juan Domingo",
+   "osm": "node/3196517132",
+   "area": false,
+   "lat": 12.16273,
+   "lon": -68.96135
+  },
+  {
+   "name": "Juan Domingo bij Colón",
+   "osm": "relation/9507038",
+   "area": true,
+   "lat": 12.1126,
+   "lon": -68.94772
+  },
+  {
+   "name": "Juan Domingo bij Mahuma",
+   "osm": "relation/9507129",
+   "area": true,
+   "lat": 12.16378,
+   "lon": -68.9605
+  },
+  {
+   "name": "Juan Hato",
+   "osm": "relation/9506986",
+   "area": true,
+   "lat": 12.15655,
+   "lon": -68.94986
+  },
+  {
+   "name": "Juanota",
+   "osm": "relation/9506968",
+   "area": true,
+   "lat": 12.1506,
+   "lon": -68.93446
+  },
+  {
+   "name": "Julianadorp",
+   "osm": "relation/9507138",
+   "area": true,
+   "lat": 12.15523,
+   "lon": -68.96868
+  },
+  {
+   "name": "Kalabari",
+   "osm": "relation/9506985",
+   "area": true,
+   "lat": 12.15254,
+   "lon": -68.94906
+  },
+  {
+   "name": "Kanga",
+   "osm": "relation/9507019",
+   "area": true,
+   "lat": 12.15591,
+   "lon": -68.93779
+  },
+  {
+   "name": "Karpata",
+   "osm": "node/3196517137",
+   "area": false,
+   "lat": 12.13852,
+   "lon": -68.9398
+  },
+  {
+   "name": "Kas Chikitu",
+   "osm": "relation/9507047",
+   "area": true,
+   "lat": 12.13033,
+   "lon": -68.95482
+  },
+  {
+   "name": "Kashutuin",
+   "osm": "node/3106297767",
+   "area": false,
+   "lat": 12.20844,
+   "lon": -69.02167
+  },
+  {
+   "name": "Katoentuin",
+   "osm": "relation/9506996",
+   "area": true,
+   "lat": 12.09864,
+   "lon": -68.84656
+  },
+  {
+   "name": "Kent U Zelf",
+   "osm": "relation/9506875",
+   "area": true,
+   "lat": 12.12671,
+   "lon": -68.85969
+  },
+  {
+   "name": "Kintjan",
+   "osm": "relation/9507176",
+   "area": true,
+   "lat": 12.10439,
+   "lon": -68.90968
+  },
+  {
+   "name": "Kirindongo Abou",
+   "osm": "relation/9506916",
+   "area": true,
+   "lat": 12.14793,
+   "lon": -68.87032
+  },
+  {
+   "name": "Klein Davelaar",
+   "osm": "relation/11938036",
+   "area": true,
+   "lat": 12.11306,
+   "lon": -68.90201
+  },
+  {
+   "name": "Klein Kwartier",
+   "osm": "relation/9506919",
+   "area": true,
+   "lat": 12.11631,
+   "lon": -68.88698
+  },
+  {
+   "name": "Klein Marchena",
+   "osm": "relation/9506976",
+   "area": true,
+   "lat": 12.14706,
+   "lon": -68.94347
+  },
+  {
+   "name": "Klein Sint Michiel",
+   "osm": "node/2480676910",
+   "area": false,
+   "lat": 12.14777,
+   "lon": -68.98845
+  },
+  {
+   "name": "Klein St. Michiel",
+   "osm": "relation/9507136",
+   "area": true,
+   "lat": 12.14916,
+   "lon": -68.98987
+  },
+  {
+   "name": "Klein Zuurzak",
+   "osm": "node/3196410999",
+   "area": false,
+   "lat": 12.10476,
+   "lon": -68.87693
+  },
+  {
+   "name": "Kleine Berg",
+   "osm": "node/12668473160",
+   "area": false,
+   "lat": 12.19523,
+   "lon": -69.00566
+  },
+  {
+   "name": "Kolonchi",
+   "osm": "relation/9506895",
+   "area": true,
+   "lat": 12.12639,
+   "lon": -68.88681
+  },
+  {
+   "name": "Koraal Partier",
+   "osm": "relation/9506904",
+   "area": true,
+   "lat": 12.13265,
+   "lon": -68.85086
+  },
+  {
+   "name": "Koraal Specht",
+   "osm": "node/1799969288",
+   "area": false,
+   "lat": 12.09751,
+   "lon": -68.8983
+  },
+  {
+   "name": "Koraal Tabak",
+   "osm": "node/3196517143",
+   "area": false,
+   "lat": 12.14066,
+   "lon": -68.83968
+  },
+  {
+   "name": "Korporaal",
+   "osm": "relation/9506921",
+   "area": true,
+   "lat": 12.10796,
+   "lon": -68.88764
+  },
+  {
+   "name": "Kortijn",
+   "osm": "relation/9507032",
+   "area": true,
+   "lat": 12.11214,
+   "lon": -68.93894
+  },
+  {
+   "name": "Kudishi",
+   "osm": "relation/9506918",
+   "area": true,
+   "lat": 12.1228,
+   "lon": -68.89352
+  },
+  {
+   "name": "Kunuku Grandi",
+   "osm": "relation/9507008",
+   "area": true,
+   "lat": 12.15364,
+   "lon": -68.90052
+  },
+  {
+   "name": "Kunuku Hatoen",
+   "osm": "node/3196517144",
+   "area": false,
+   "lat": 12.17941,
+   "lon": -68.94098
+  },
+  {
+   "name": "Kustbatterij",
+   "osm": "relation/9507174",
+   "area": true,
+   "lat": 12.10121,
+   "lon": -68.91004
+  },
+  {
+   "name": "Kwarchi",
+   "osm": "relation/9506871",
+   "area": true,
+   "lat": 12.12393,
+   "lon": -68.85552
+  },
+  {
+   "name": "La Fama",
+   "osm": "relation/9507187",
+   "area": true,
+   "lat": 12.10471,
+   "lon": -68.91552
+  },
+  {
+   "name": "La Quinta Villas",
+   "osm": "node/3196517145",
+   "area": false,
+   "lat": 12.13945,
+   "lon": -68.83289
+  },
+  {
+   "name": "Labadera",
+   "osm": "relation/9506894",
+   "area": true,
+   "lat": 12.12628,
+   "lon": -68.88491
+  },
+  {
+   "name": "Lange Tuin",
+   "osm": "node/3196411006",
+   "area": false,
+   "lat": 12.08913,
+   "lon": -68.83894
+  },
+  {
+   "name": "Lelienberg",
+   "osm": "relation/9507064",
+   "area": true,
+   "lat": 12.30344,
+   "lon": -69.08825
+  },
+  {
+   "name": "Libie",
+   "osm": "relation/9506873",
+   "area": true,
+   "lat": 12.12328,
+   "lon": -68.86229
+  },
+  {
+   "name": "Lijsje",
+   "osm": "relation/9507007",
+   "area": true,
+   "lat": 12.15206,
+   "lon": -68.9034
+  },
+  {
+   "name": "Liverpool",
+   "osm": "node/3196517147",
+   "area": false,
+   "lat": 12.14255,
+   "lon": -68.88425
+  },
+  {
+   "name": "Ludunu",
+   "osm": "relation/9507127",
+   "area": true,
+   "lat": 12.16723,
+   "lon": -68.965
+  },
+  {
+   "name": "Luis Paula",
+   "osm": "relation/9506982",
+   "area": true,
+   "lat": 12.14689,
+   "lon": -68.95009
+  },
+  {
+   "name": "Ma Louisa",
+   "osm": "relation/9506869",
+   "area": true,
+   "lat": 12.13035,
+   "lon": -68.85827
+  },
+  {
+   "name": "Maduro",
+   "osm": "relation/9507143",
+   "area": true,
+   "lat": 12.14845,
+   "lon": -68.95518
+  },
+  {
+   "name": "Mahaai",
+   "osm": "relation/9506946",
+   "area": true,
+   "lat": 12.12384,
+   "lon": -68.89904
+  },
+  {
+   "name": "Mahuma",
+   "osm": "relation/9507131",
+   "area": true,
+   "lat": 12.16759,
+   "lon": -68.95313
+  },
+  {
+   "name": "Mangusa",
+   "osm": "relation/9506896",
+   "area": true,
+   "lat": 12.12836,
+   "lon": -68.88685
+  },
+  {
+   "name": "Manzanilla",
+   "osm": "node/3197111437",
+   "area": false,
+   "lat": 12.30152,
+   "lon": -69.10109
+  },
+  {
+   "name": "Marbella Estate",
+   "osm": "node/611933291",
+   "area": false,
+   "lat": 12.08814,
+   "lon": -68.87382
+  },
+  {
+   "name": "Marchena",
+   "osm": "relation/9507044",
+   "area": true,
+   "lat": 12.12774,
+   "lon": -68.95011
+  },
+  {
+   "name": "Maria Magdalena",
+   "osm": "relation/9506977",
+   "area": true,
+   "lat": 12.14613,
+   "lon": -68.94591
+  },
+  {
+   "name": "Marie Pampoen",
+   "osm": "relation/9507173",
+   "area": true,
+   "lat": 12.09318,
+   "lon": -68.90832
+  },
+  {
+   "name": "Matancia",
+   "osm": "node/3196517150",
+   "area": false,
+   "lat": 12.13896,
+   "lon": -68.90173
+  },
+  {
+   "name": "Matancia bij Groot Kwartier",
+   "osm": "relation/9506944",
+   "area": true,
+   "lat": 12.13907,
+   "lon": -68.90167
+  },
+  {
+   "name": "Meiberg",
+   "osm": "relation/9507071",
+   "area": true,
+   "lat": 12.19214,
+   "lon": -69.01948
+  },
+  {
+   "name": "Mina Scharbaai",
+   "osm": "relation/9507049",
+   "area": true,
+   "lat": 12.13552,
+   "lon": -68.95496
+  },
+  {
+   "name": "Minguelito",
+   "osm": "relation/9506902",
+   "area": true,
+   "lat": 12.13462,
+   "lon": -68.856
+  },
+  {
+   "name": "Mirla Plate",
+   "osm": "relation/9506991",
+   "area": true,
+   "lat": 12.14177,
+   "lon": -68.95005
+  },
+  {
+   "name": "Mon Repos",
+   "osm": "relation/9506952",
+   "area": true,
+   "lat": 12.1491,
+   "lon": -68.90632
+  },
+  {
+   "name": "Monchi",
+   "osm": "relation/9507142",
+   "area": true,
+   "lat": 12.15315,
+   "lon": -68.9536
+  },
+  {
+   "name": "Montaña",
+   "osm": "node/297064424",
+   "area": false,
+   "lat": 12.10777,
+   "lon": -68.85348
+  },
+  {
+   "name": "Montaña Abou",
+   "osm": "relation/9506883",
+   "area": true,
+   "lat": 12.11177,
+   "lon": -68.86382
+  },
+  {
+   "name": "Montaña Rey",
+   "osm": "relation/9506899",
+   "area": true,
+   "lat": 12.10658,
+   "lon": -68.8437
+  },
+  {
+   "name": "Montaña Rey Noord",
+   "osm": "node/3196517154",
+   "area": false,
+   "lat": 12.11762,
+   "lon": -68.84877
+  },
+  {
+   "name": "Monte Carmelo",
+   "osm": "relation/9506961",
+   "area": true,
+   "lat": 12.14743,
+   "lon": -68.92133
+  },
+  {
+   "name": "Monte Verde",
+   "osm": "relation/9507182",
+   "area": true,
+   "lat": 12.10219,
+   "lon": -68.91994
+  },
+  {
+   "name": "Morgenster",
+   "osm": "node/3196517155",
+   "area": false,
+   "lat": 12.13102,
+   "lon": -68.95291
+  },
+  {
+   "name": "Muizenberg Nobo",
+   "osm": "relation/9507017",
+   "area": true,
+   "lat": 12.15763,
+   "lon": -68.92523
+  },
+  {
+   "name": "Mundo Nobo",
+   "osm": "relation/9507039",
+   "area": true,
+   "lat": 12.11292,
+   "lon": -68.95133
+  },
+  {
+   "name": "Nabij Santa Rosa",
+   "osm": "relation/9506880",
+   "area": true,
+   "lat": 12.12622,
+   "lon": -68.86383
+  },
+  {
+   "name": "Nabij Vetter",
+   "osm": "relation/9506911",
+   "area": true,
+   "lat": 12.14468,
+   "lon": -68.86566
+  },
+  {
+   "name": "Nanie",
+   "osm": "relation/9506972",
+   "area": true,
+   "lat": 12.15395,
+   "lon": -68.94119
+  },
+  {
+   "name": "Nieuw Nederland",
+   "osm": "relation/9507155",
+   "area": true,
+   "lat": 12.10026,
+   "lon": -68.92102
+  },
+  {
+   "name": "Nieuwe Haven",
+   "osm": "relation/9507101",
+   "area": true,
+   "lat": 12.11867,
+   "lon": -68.9123
+  },
+  {
+   "name": "Nooit Gedacht",
+   "osm": "relation/9506942",
+   "area": true,
+   "lat": 12.14581,
+   "lon": -68.89689
+  },
+  {
+   "name": "Noord Jan Thiel",
+   "osm": "node/3196411016",
+   "area": false,
+   "lat": 12.09525,
+   "lon": -68.87807
+  },
+  {
+   "name": "Noord Santa Rosa",
+   "osm": "relation/9506877",
+   "area": true,
+   "lat": 12.1326,
+   "lon": -68.86548
+  },
+  {
+   "name": "Noord Zapateer",
+   "osm": "relation/9506912",
+   "area": true,
+   "lat": 12.14073,
+   "lon": -68.8743
+  },
+  {
+   "name": "Noorwegen",
+   "osm": "relation/9506970",
+   "area": true,
+   "lat": 12.15135,
+   "lon": -68.93814
+  },
+  {
+   "name": "Normandie",
+   "osm": "relation/9506965",
+   "area": true,
+   "lat": 12.14498,
+   "lon": -68.92735
+  },
+  {
+   "name": "Onverwacht",
+   "osm": "relation/9507009",
+   "area": true,
+   "lat": 12.1532,
+   "lon": -68.90485
+  },
+  {
+   "name": "Oost Santa Rosa",
+   "osm": "node/297297083",
+   "area": false,
+   "lat": 12.12825,
+   "lon": -68.86811
+  },
+  {
+   "name": "Oostpunt",
+   "osm": "relation/9507075",
+   "area": true,
+   "lat": 12.09291,
+   "lon": -68.79436
+  },
+  {
+   "name": "Otrobanda",
+   "osm": "relation/9507102",
+   "area": true,
+   "lat": 12.11035,
+   "lon": -68.94114
+  },
+  {
+   "name": "Oudewater",
+   "osm": "relation/9507166",
+   "area": true,
+   "lat": 12.12205,
+   "lon": -68.84774
+  },
+  {
+   "name": "Palma Real Resort",
+   "osm": "way/551537997",
+   "area": true,
+   "lat": 12.12464,
+   "lon": -68.87501
+  },
+  {
+   "name": "Palu Blanku",
+   "osm": "node/3196411017",
+   "area": false,
+   "lat": 12.13353,
+   "lon": -68.94883
+  },
+  {
+   "name": "Panama",
+   "osm": "relation/9507033",
+   "area": true,
+   "lat": 12.11383,
+   "lon": -68.9384
+  },
+  {
+   "name": "Pannekoek",
+   "osm": "relation/11947034",
+   "area": true,
+   "lat": 12.27051,
+   "lon": -69.08936
+  },
+  {
+   "name": "Papaya Abou",
+   "osm": "relation/9507027",
+   "area": true,
+   "lat": 12.17262,
+   "lon": -68.93996
+  },
+  {
+   "name": "Paradijs",
+   "osm": "relation/9507053",
+   "area": true,
+   "lat": 12.13936,
+   "lon": -68.95326
+  },
+  {
+   "name": "Paradijs bij Hel",
+   "osm": "relation/9507186",
+   "area": true,
+   "lat": 12.10619,
+   "lon": -68.91605
+  },
+  {
+   "name": "Parasasa",
+   "osm": "relation/9507042",
+   "area": true,
+   "lat": 12.11977,
+   "lon": -68.96629
+  },
+  {
+   "name": "Parera",
+   "osm": "relation/9507170",
+   "area": true,
+   "lat": 12.11139,
+   "lon": -68.91886
+  },
+  {
+   "name": "Parera wijk",
+   "osm": "relation/9507185",
+   "area": true,
+   "lat": 12.10504,
+   "lon": -68.91839
+  },
+  {
+   "name": "Peninsula",
+   "osm": "node/4680624358",
+   "area": false,
+   "lat": 12.08021,
+   "lon": -68.85508
+  },
+  {
+   "name": "Pietermaai",
+   "osm": "relation/7237824",
+   "area": true,
+   "lat": 12.10283,
+   "lon": -68.92722
+  },
+  {
+   "name": "Piscadera Berde",
+   "osm": "relation/9507141",
+   "area": true,
+   "lat": 12.14538,
+   "lon": -68.9685
+  },
+  {
+   "name": "Plantersrust",
+   "osm": "relation/9507037",
+   "area": true,
+   "lat": 12.11649,
+   "lon": -68.95227
+  },
+  {
+   "name": "Popo",
+   "osm": "relation/9506907",
+   "area": true,
+   "lat": 12.14129,
+   "lon": -68.85679
+  },
+  {
+   "name": "Porta Blancu",
+   "osm": "node/3196411021",
+   "area": false,
+   "lat": 12.06497,
+   "lon": -68.84774
+  },
+  {
+   "name": "Pos Cabai",
+   "osm": "relation/9506935",
+   "area": true,
+   "lat": 12.12048,
+   "lon": -68.90706
+  },
+  {
+   "name": "Pretu",
+   "osm": "node/8155540916",
+   "area": false,
+   "lat": 12.14117,
+   "lon": -68.95808
+  },
+  {
+   "name": "Pretu bij De Savaan",
+   "osm": "relation/9507056",
+   "area": true,
+   "lat": 12.14108,
+   "lon": -68.95804
+  },
+  {
+   "name": "Punda",
+   "osm": "relation/7237830",
+   "area": true,
+   "lat": 12.10502,
+   "lon": -68.9337
+  },
+  {
+   "name": "Quinta Violeta",
+   "osm": "relation/9506962",
+   "area": true,
+   "lat": 12.14695,
+   "lon": -68.92312
+  },
+  {
+   "name": "Rancho",
+   "osm": "relation/9507011",
+   "area": true,
+   "lat": 12.15795,
+   "lon": -68.90162
+  },
+  {
+   "name": "Raphael",
+   "osm": "node/3196411022",
+   "area": false,
+   "lat": 12.13936,
+   "lon": -68.96487
+  },
+  {
+   "name": "Recompensa",
+   "osm": "relation/9506900",
+   "area": true,
+   "lat": 12.11069,
+   "lon": -68.84461
+  },
+  {
+   "name": "Rehder Lust",
+   "osm": "node/3196411023",
+   "area": false,
+   "lat": 12.11399,
+   "lon": -68.86065
+  },
+  {
+   "name": "Rio Canario",
+   "osm": "node/297230623",
+   "area": false,
+   "lat": 12.14556,
+   "lon": -68.92272
+  },
+  {
+   "name": "Ronde Klip",
+   "osm": "relation/9507167",
+   "area": true,
+   "lat": 12.15972,
+   "lon": -68.86253
+  },
+  {
+   "name": "Ronde Klip Zuid",
+   "osm": "relation/9506910",
+   "area": true,
+   "lat": 12.14702,
+   "lon": -68.86497
+  },
+  {
+   "name": "Rooi Catochi",
+   "osm": "relation/9506947",
+   "area": true,
+   "lat": 12.1261,
+   "lon": -68.90178
+  },
+  {
+   "name": "Rooi Santu",
+   "osm": "relation/9506999",
+   "area": true,
+   "lat": 12.1009,
+   "lon": -68.8715
+  },
+  {
+   "name": "Roosendaal",
+   "osm": "relation/9506993",
+   "area": true,
+   "lat": 12.13787,
+   "lon": -68.94892
+  },
+  {
+   "name": "Rozenburg",
+   "osm": "relation/9506929",
+   "area": true,
+   "lat": 12.10075,
+   "lon": -68.89428
+  },
+  {
+   "name": "Rust en Burgh",
+   "osm": "node/3196411027",
+   "area": false,
+   "lat": 12.13551,
+   "lon": -68.91021
+  },
+  {
+   "name": "Rust en Vrede",
+   "osm": "node/8156058634",
+   "area": false,
+   "lat": 12.14371,
+   "lon": -68.89463
+  },
+  {
+   "name": "Rust en Vrede bij Brievengat",
+   "osm": "relation/9506941",
+   "area": true,
+   "lat": 12.14352,
+   "lon": -68.89452
+  },
+  {
+   "name": "Rust en Vrede bij Tucacas",
+   "osm": "relation/9506879",
+   "area": true,
+   "lat": 12.13044,
+   "lon": -68.86315
+  },
+  {
+   "name": "Sabana Baca",
+   "osm": "node/3196517969",
+   "area": false,
+   "lat": 12.09954,
+   "lon": -68.83228
+  },
+  {
+   "name": "Sabana Cras",
+   "osm": "relation/9507004",
+   "area": true,
+   "lat": 12.09642,
+   "lon": -68.8314
+  },
+  {
+   "name": "Sabana Hundu",
+   "osm": "relation/9507015",
+   "area": true,
+   "lat": 12.16,
+   "lon": -68.91316
+  },
+  {
+   "name": "Saliña",
+   "osm": "relation/9507179",
+   "area": true,
+   "lat": 12.10647,
+   "lon": -68.90649
+  },
+  {
+   "name": "Saliña Ariba",
+   "osm": "relation/9507180",
+   "area": true,
+   "lat": 12.10997,
+   "lon": -68.90075
+  },
+  {
+   "name": "Salsbach",
+   "osm": "relation/9507022",
+   "area": true,
+   "lat": 12.16023,
+   "lon": -68.94374
+  },
+  {
+   "name": "Sami Liber",
+   "osm": "relation/9507135",
+   "area": true,
+   "lat": 12.15882,
+   "lon": -68.97727
+  },
+  {
+   "name": "San Domingo",
+   "osm": "node/8156210941",
+   "area": false,
+   "lat": 12.14696,
+   "lon": -68.91928
+  },
+  {
+   "name": "San Domingo bij Rio Canario",
+   "osm": "relation/9506960",
+   "area": true,
+   "lat": 12.14711,
+   "lon": -68.91944
+  },
+  {
+   "name": "San Fuego",
+   "osm": "relation/9506913",
+   "area": true,
+   "lat": 12.13661,
+   "lon": -68.8849
+  },
+  {
+   "name": "San Juan",
+   "osm": "relation/11946958",
+   "area": true,
+   "lat": 12.24435,
+   "lon": -69.09325
+  },
+  {
+   "name": "San Mateowijk",
+   "osm": "relation/9507162",
+   "area": true,
+   "lat": 12.113,
+   "lon": -68.94074
+  },
+  {
+   "name": "San Pedro",
+   "osm": "node/3197111448",
+   "area": false,
+   "lat": 12.24545,
+   "lon": -69.04472
+  },
+  {
+   "name": "San Souci",
+   "osm": "node/8156209264",
+   "area": false,
+   "lat": 12.13277,
+   "lon": -68.95297
+  },
+  {
+   "name": "Sans Souci",
+   "osm": "relation/9507048",
+   "area": true,
+   "lat": 12.13207,
+   "lon": -68.95334
+  },
+  {
+   "name": "Santa Barbara",
+   "osm": "relation/9507146",
+   "area": true,
+   "lat": 12.06968,
+   "lon": -68.83133
+  },
+  {
+   "name": "Santa Catharina",
+   "osm": "node/333425348",
+   "area": false,
+   "lat": 12.1421,
+   "lon": -68.83449
+  },
+  {
+   "name": "Santa Helena",
+   "osm": "relation/9507036",
+   "area": true,
+   "lat": 12.12076,
+   "lon": -68.95296
+  },
+  {
+   "name": "Santa Maria",
+   "osm": "relation/9507023",
+   "area": true,
+   "lat": 12.15762,
+   "lon": -68.94372
+  },
+  {
+   "name": "Santa Rosa",
+   "osm": "relation/9506882",
+   "area": true,
+   "lat": 12.12202,
+   "lon": -68.87207
+  },
+  {
+   "name": "Santa Theresa",
+   "osm": "node/3196517973",
+   "area": false,
+   "lat": 12.10592,
+   "lon": -68.83592
+  },
+  {
+   "name": "Sapate",
+   "osm": "node/3196517974",
+   "area": false,
+   "lat": 12.12992,
+   "lon": -68.87698
+  },
+  {
+   "name": "Savaan Juan Antonie",
+   "osm": "relation/9506969",
+   "area": true,
+   "lat": 12.14966,
+   "lon": -68.93752
+  },
+  {
+   "name": "Scharloo",
+   "osm": "relation/9507098",
+   "area": true,
+   "lat": 12.10713,
+   "lon": -68.92789
+  },
+  {
+   "name": "Schelpwijk",
+   "osm": "relation/9507006",
+   "area": true,
+   "lat": 12.15985,
+   "lon": -68.88646
+  },
+  {
+   "name": "Scherpen Heuvel",
+   "osm": "node/3196411030",
+   "area": false,
+   "lat": 12.1124,
+   "lon": -68.87698
+  },
+  {
+   "name": "Scherpenheuvel",
+   "osm": "relation/9506920",
+   "area": true,
+   "lat": 12.11207,
+   "lon": -68.87746
+  },
+  {
+   "name": "Schooneboom",
+   "osm": "relation/9506874",
+   "area": true,
+   "lat": 12.1238,
+   "lon": -68.86222
+  },
+  {
+   "name": "Selinda",
+   "osm": "relation/9506988",
+   "area": true,
+   "lat": 12.14454,
+   "lon": -68.94635
+  },
+  {
+   "name": "Semikok",
+   "osm": "relation/9506892",
+   "area": true,
+   "lat": 12.12753,
+   "lon": -68.88269
+  },
+  {
+   "name": "Ser'i Domi",
+   "osm": "relation/9507163",
+   "area": true,
+   "lat": 12.11935,
+   "lon": -68.94241
+  },
+  {
+   "name": "Seritu",
+   "osm": "relation/9506924",
+   "area": true,
+   "lat": 12.11628,
+   "lon": -68.90036
+  },
+  {
+   "name": "Seru di Domi",
+   "osm": "node/3196411032",
+   "area": false,
+   "lat": 12.11588,
+   "lon": -68.94437
+  },
+  {
+   "name": "Seru di Kandela",
+   "osm": "relation/9507125",
+   "area": true,
+   "lat": 12.17539,
+   "lon": -68.9687
+  },
+  {
+   "name": "Seru di Otrobanda",
+   "osm": "relation/9507034",
+   "area": true,
+   "lat": 12.11356,
+   "lon": -68.93524
+  },
+  {
+   "name": "Seru di Papaya",
+   "osm": "relation/9507028",
+   "area": true,
+   "lat": 12.17393,
+   "lon": -68.9372
+  },
+  {
+   "name": "Seru Fortuna",
+   "osm": "relation/9507025",
+   "area": true,
+   "lat": 12.1761,
+   "lon": -68.92701
+  },
+  {
+   "name": "Seru Grandi",
+   "osm": "node/3197111453",
+   "area": false,
+   "lat": 12.09455,
+   "lon": -68.82923
+  },
+  {
+   "name": "Seru Lora",
+   "osm": "node/3196411033",
+   "area": false,
+   "lat": 12.11403,
+   "lon": -68.88555
+  },
+  {
+   "name": "Seru Machu",
+   "osm": "node/8156390834",
+   "area": false,
+   "lat": 12.08389,
+   "lon": -68.81435
+  },
+  {
+   "name": "Seru Mahuma",
+   "osm": "relation/9507130",
+   "area": true,
+   "lat": 12.17814,
+   "lon": -68.95447
+  },
+  {
+   "name": "Seru Otrobanda",
+   "osm": "relation/9507031",
+   "area": true,
+   "lat": 12.11175,
+   "lon": -68.93789
+  },
+  {
+   "name": "Seru Pretu",
+   "osm": "node/3196411034",
+   "area": false,
+   "lat": 12.12172,
+   "lon": -68.95921
+  },
+  {
+   "name": "Seru Pretu bij Jan Luis",
+   "osm": "relation/9506906",
+   "area": true,
+   "lat": 12.1351,
+   "lon": -68.84517
+  },
+  {
+   "name": "Sinia Theresa",
+   "osm": "relation/9506992",
+   "area": true,
+   "lat": 12.13862,
+   "lon": -68.94368
+  },
+  {
+   "name": "Sint Jacob",
+   "osm": "relation/9507016",
+   "area": true,
+   "lat": 12.16525,
+   "lon": -68.91809
+  },
+  {
+   "name": "Sint Jago",
+   "osm": "relation/9507159",
+   "area": true,
+   "lat": 12.10512,
+   "lon": -68.92354
+  },
+  {
+   "name": "Sint Jansberg",
+   "osm": "relation/9506890",
+   "area": true,
+   "lat": 12.12452,
+   "lon": -68.87609
+  },
+  {
+   "name": "Sint Michiel Liber",
+   "osm": "node/3196411029",
+   "area": false,
+   "lat": 12.15821,
+   "lon": -68.97984
+  },
+  {
+   "name": "Sint Thomas",
+   "osm": "relation/9506872",
+   "area": true,
+   "lat": 12.12122,
+   "lon": -68.86119
+  },
+  {
+   "name": "Soledad",
+   "osm": "node/8156405515",
+   "area": false,
+   "lat": 12.11579,
+   "lon": -68.85324
+  },
+  {
+   "name": "Soledad bij Francia",
+   "osm": "relation/9506949",
+   "area": true,
+   "lat": 12.13478,
+   "lon": -68.90263
+  },
+  {
+   "name": "Soledad bij Jan Boos",
+   "osm": "relation/9506997",
+   "area": true,
+   "lat": 12.11547,
+   "lon": -68.853
+  },
+  {
+   "name": "Soledad bij Thorenquest",
+   "osm": "relation/9507051",
+   "area": true,
+   "lat": 12.1364,
+   "lon": -68.95383
+  },
+  {
+   "name": "Sorsaka (Zuurzak)",
+   "osm": "node/3196411047",
+   "area": false,
+   "lat": 12.10086,
+   "lon": -68.88031
+  },
+  {
+   "name": "Sosiegu bij Montaña",
+   "osm": "relation/9506901",
+   "area": true,
+   "lat": 12.11242,
+   "lon": -68.85011
+  },
+  {
+   "name": "Sosiegu bij Waterloo",
+   "osm": "relation/9507010",
+   "area": true,
+   "lat": 12.15518,
+   "lon": -68.9045
+  },
+  {
+   "name": "Souax",
+   "osm": "node/335613499",
+   "area": false,
+   "lat": 12.17122,
+   "lon": -68.97071
+  },
+  {
+   "name": "Steen Wijk",
+   "osm": "node/3196411036",
+   "area": false,
+   "lat": 12.09044,
+   "lon": -68.8997
+  },
+  {
+   "name": "Steenrijk",
+   "osm": "relation/9507175",
+   "area": true,
+   "lat": 12.09939,
+   "lon": -68.91266
+  },
+  {
+   "name": "Stenen Koraal",
+   "osm": "relation/9507024",
+   "area": true,
+   "lat": 12.16279,
+   "lon": -68.93411
+  },
+  {
+   "name": "Sucasa",
+   "osm": "relation/9507046",
+   "area": true,
+   "lat": 12.12969,
+   "lon": -68.95749
+  },
+  {
+   "name": "Suffisant",
+   "osm": "relation/9506964",
+   "area": true,
+   "lat": 12.15287,
+   "lon": -68.9245
+  },
+  {
+   "name": "Tera Corá",
+   "osm": "relation/9507070",
+   "area": true,
+   "lat": 12.22113,
+   "lon": -69.03056
+  },
+  {
+   "name": "Tera Pretu",
+   "osm": "relation/9507061",
+   "area": true,
+   "lat": 12.29849,
+   "lon": -69.13672
+  },
+  {
+   "name": "Theresa",
+   "osm": "node/3196517985",
+   "area": false,
+   "lat": 12.13254,
+   "lon": -68.86646
+  },
+  {
+   "name": "Thorenquest",
+   "osm": "relation/9507050",
+   "area": true,
+   "lat": 12.13717,
+   "lon": -68.95271
+  },
+  {
+   "name": "Toni Kunchi",
+   "osm": "node/8156519958",
+   "area": false,
+   "lat": 12.12217,
+   "lon": -68.88709
+  },
+  {
+   "name": "Trai Seru",
+   "osm": "relation/9506943",
+   "area": true,
+   "lat": 12.1423,
+   "lon": -68.89864
+  },
+  {
+   "name": "Tucacas",
+   "osm": "relation/9506878",
+   "area": true,
+   "lat": 12.13032,
+   "lon": -68.86066
+  },
+  {
+   "name": "Urdal",
+   "osm": "node/3196411037",
+   "area": false,
+   "lat": 12.12814,
+   "lon": -68.89905
+  },
+  {
+   "name": "Van Engelen",
+   "osm": "relation/9506938",
+   "area": true,
+   "lat": 12.12593,
+   "lon": -68.8928
+  },
+  {
+   "name": "Veeris",
+   "osm": "relation/9507043",
+   "area": true,
+   "lat": 12.13221,
+   "lon": -68.96581
+  },
+  {
+   "name": "Vergenoegen bij Kolonchi",
+   "osm": "relation/9506897",
+   "area": true,
+   "lat": 12.12654,
+   "lon": -68.88946
+  },
+  {
+   "name": "Vergenoeging",
+   "osm": "relation/9507144",
+   "area": true,
+   "lat": 12.14644,
+   "lon": -68.95528
+  },
+  {
+   "name": "Vers",
+   "osm": "relation/9507052",
+   "area": true,
+   "lat": 12.1375,
+   "lon": -68.95624
+  },
+  {
+   "name": "Vetter",
+   "osm": "relation/9506909",
+   "area": true,
+   "lat": 12.1423,
+   "lon": -68.86431
+  },
+  {
+   "name": "Vista Montana",
+   "osm": "node/3196411039",
+   "area": false,
+   "lat": 12.10278,
+   "lon": -68.86069
+  },
+  {
+   "name": "Vista Royal",
+   "osm": "node/3196411040",
+   "area": false,
+   "lat": 12.07771,
+   "lon": -68.87217
+  },
+  {
+   "name": "Vivir Contento",
+   "osm": "relation/9507178",
+   "area": true,
+   "lat": 12.10201,
+   "lon": -68.90122
+  },
+  {
+   "name": "Vredenberg bij Kintjan",
+   "osm": "relation/9507177",
+   "area": true,
+   "lat": 12.09506,
+   "lon": -68.90442
+  },
+  {
+   "name": "Vredenberg bij Santa Maria",
+   "osm": "relation/9506980",
+   "area": true,
+   "lat": 12.15439,
+   "lon": -68.94489
+  },
+  {
+   "name": "Vreugdenberg",
+   "osm": "node/3196411042",
+   "area": false,
+   "lat": 12.11913,
+   "lon": -68.88706
+  },
+  {
+   "name": "Wanapa",
+   "osm": "relation/9506975",
+   "area": true,
+   "lat": 12.15034,
+   "lon": -68.94356
+  },
+  {
+   "name": "Wastuin",
+   "osm": "node/3196411043",
+   "area": false,
+   "lat": 12.09251,
+   "lon": -68.89027
+  },
+  {
+   "name": "Waterloo",
+   "osm": "node/3196517989",
+   "area": false,
+   "lat": 12.162,
+   "lon": -68.90662
+  },
+  {
+   "name": "Wawu bij Ludunu",
+   "osm": "relation/9507128",
+   "area": true,
+   "lat": 12.16576,
+   "lon": -68.96454
+  },
+  {
+   "name": "Weis",
+   "osm": "relation/9506953",
+   "area": true,
+   "lat": 12.14681,
+   "lon": -68.90934
+  },
+  {
+   "name": "Weis Afo",
+   "osm": "relation/7236136",
+   "area": true,
+   "lat": 12.14641,
+   "lon": -68.92642
+  },
+  {
+   "name": "Welatina",
+   "osm": "relation/9506989",
+   "area": true,
+   "lat": 12.1418,
+   "lon": -68.94575
+  },
+  {
+   "name": "Welgelegen",
+   "osm": "node/3196411044",
+   "area": false,
+   "lat": 12.09874,
+   "lon": -68.8392
+  },
+  {
+   "name": "Welgelegen bij Habaai",
+   "osm": "relation/9507035",
+   "area": true,
+   "lat": 12.11998,
+   "lon": -68.94921
+  },
+  {
+   "name": "Weltevreden",
+   "osm": "relation/9507126",
+   "area": true,
+   "lat": 12.16937,
+   "lon": -68.96258
+  },
+  {
+   "name": "Wespunt",
+   "osm": "node/8162014691",
+   "area": false,
+   "lat": 12.37019,
+   "lon": -69.13855
+  },
+  {
+   "name": "Westpunt",
+   "osm": "relation/9507059",
+   "area": true,
+   "lat": 12.37022,
+   "lon": -69.13004
+  },
+  {
+   "name": "Weto",
+   "osm": "relation/9506885",
+   "area": true,
+   "lat": 12.11806,
+   "lon": -68.86179
+  },
+  {
+   "name": "Wetu",
+   "osm": "node/8156570911",
+   "area": false,
+   "lat": 12.11793,
+   "lon": -68.86236
+  },
+  {
+   "name": "Wishi",
+   "osm": "relation/9507045",
+   "area": true,
+   "lat": 12.12602,
+   "lon": -68.95494
+  },
+  {
+   "name": "Zakitó",
+   "osm": "relation/9507041",
+   "area": true,
+   "lat": 12.11388,
+   "lon": -68.95767
+  },
+  {
+   "name": "Zeelandia",
+   "osm": "relation/11937989",
+   "area": true,
+   "lat": 12.11251,
+   "lon": -68.90797
+  },
+  {
+   "name": "Zegu",
+   "osm": "relation/9507132",
+   "area": true,
+   "lat": 12.16576,
+   "lon": -68.99071
+  },
+  {
+   "name": "Zuid Abrahamsz",
+   "osm": "relation/9506876",
+   "area": true,
+   "lat": 12.13466,
+   "lon": -68.86142
+  },
+  {
+   "name": "Zuid Santa Rosa",
+   "osm": "node/337915252",
+   "area": false,
+   "lat": 12.11322,
+   "lon": -68.86896
+  },
+  {
+   "name": "Zuurzak",
+   "osm": "relation/9506927",
+   "area": true,
+   "lat": 12.1004,
+   "lon": -68.88014
+  },
+  {
+   "name": "Zuurzak bij Blomonte",
+   "osm": "relation/9506974",
+   "area": true,
+   "lat": 12.15062,
+   "lon": -68.94493
+  }
+ ]
+}

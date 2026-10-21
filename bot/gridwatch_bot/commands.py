@@ -85,6 +85,24 @@ def describe_event(e: dict, n: int | None = None) -> str:
     return f"{head}{e.get('type', '').replace('_', ' ')} since {e.get('start_local', '')[:16].replace('T', ' ')} ({where})\n{e.get('summary_en', '')}"
 
 
+def describe_report(r: dict) -> str:
+    kind = "with a source" if r.get("kind") == "sourced" else "community, no source"
+    when = r.get("date", "")
+    if r.get("start_time"):
+        when += f" from {r['start_time']}"
+    if r.get("end_time"):
+        when += f" to {r['end_time']}"
+    elif r.get("ongoing"):
+        when += ", ongoing"
+    where = "island-wide" if r.get("scope") == "island" else ", ".join(r.get("areas") or []) or "area not given"
+    out = f"{r.get('type', '').replace('_', ' ')} ({kind}), {when}, {where}"
+    if r.get("source_url"):
+        out += f"\nSource: {r['source_url']}"
+    if r.get("note"):
+        out += f"\nNote: {r['note'][:300]}"
+    return out
+
+
 def pb_date(t: dt.datetime) -> str:
     return t.astimezone(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S.000Z")
 
@@ -121,6 +139,8 @@ class Bot:
     pending: dict[int, Pending] = field(default_factory=dict)
     usage: dict[int, list[float]] = field(default_factory=dict)
     runs: dict[str, tuple[int, float]] = field(default_factory=dict)  # request id -> (chat, requested at)
+    reports_after: str | None = None  # PocketBase date of the last report announced
+    reports_checked: float = 0.0
 
     # ---------- entry point ----------
 
@@ -258,8 +278,8 @@ class Bot:
         return "Run requested. The pipeline picks it up within a minute; I'll report back."
 
     def tick(self) -> list[tuple[int, str]]:
-        """Reports finished manual runs (called from the polling loop)."""
-        out = []
+        """Reports finished manual runs and new public reports (called from the polling loop)."""
+        out = self._new_reports()
         if not self.control_dir:
             return out
         for rid, (chat, since) in list(self.runs.items()):
@@ -276,6 +296,28 @@ class Bot:
                 del self.runs[rid]
                 out.append((chat, "No result after 15 minutes; check the pipeline in Coolify."))
         return out
+
+    def _new_reports(self) -> list[tuple[int, str]]:
+        """New public reports, at most once a minute, to every allowlisted user. Only reports
+        sent after the bot started: a restart never repeats old ones."""
+        now = self.clock()
+        if now - self.reports_checked < 60:
+            return []
+        self.reports_checked = now
+        if self.reports_after is None:
+            self.reports_after = pb_date(dt.datetime.fromtimestamp(now, dt.timezone.utc))
+            return []
+        try:
+            items = self.cms.new_reports(self.reports_after)
+        except CmsError:
+            return []  # the CMS is down: try again next minute
+        if not items:
+            return []
+        self.reports_after = max(i.get("created", "") for i in items) or self.reports_after
+        lines = [describe_report(i) for i in items[:5]]
+        more = f"\n\n…and {len(items) - 5} more." if len(items) > 5 else ""
+        text = ("New report:\n\n" if len(items) == 1 else f"{len(items)} new reports:\n\n") + "\n\n".join(lines) + more + "\n\nReview them in the CMS (reports)."
+        return [(user, text) for user in sorted(self.allowed)]
 
     def _status(self) -> str:
         if not self.control_dir:

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, use
 import type { Forecast, GridEvent } from "@/lib/schema";
 import { isStale, loadCmsEvents, loadCmsIsland, loadCmsSites, loadEvents, loadForecast, snapshotIsland, snapshotSites, validOutline } from "@/lib/data";
 import { loadNotices } from "@/lib/notices";
+import { loadCommunity, type CommunityDay } from "@/lib/community";
 import { northAngle, project, projectWithOffset, type IslandGeo } from "@/lib/projection";
 import { stylisedXZ, type SceneIsland } from "@/scene/IslandScene";
 import { loadConfig } from "@/lib/config";
@@ -83,6 +84,8 @@ export function Dashboard() {
   const [island, setIsland] = useState<Island>(SNAPSHOT_ISLAND);
   const [news, setNews] = useState<NewsItem[]>([]);
   const [notices, setNotices] = useState<NewsItem[]>([]);
+  const [community, setCommunity] = useState<CommunityDay[]>([]);
+  const [canReport, setCanReport] = useState(false);
   const [dismissed, setDismissed] = useState<string[]>([]);
   const pref = useSyncExternalStore(subscribeModePref, getModePref, () => "auto" as ModePref);
   // false while hydrating the static HTML: mode-init.js already set data-mode before paint
@@ -107,9 +110,13 @@ export function Dashboard() {
       });
     // CMS content is optional: news and site records load in the background and the page
     // never waits for them (spec 7.3, 7.4)
-    loadConfig(ac.signal).then(({ cmsOrigin, events: withEvents }) => {
+    loadConfig(ac.signal).then(({ cmsOrigin, events: withEvents, turnstile }) => {
       if (withEvents && !ac.signal.aborted) {
         setEventsOn(true);
+        setCanReport(!!turnstile && !!cmsOrigin);
+        loadCommunity(cmsOrigin, ac.signal).then((c) => {
+          if (!ac.signal.aborted) setCommunity(c);
+        });
         // from the CMS (decision 25); the stored copy in /data when the CMS cannot be reached
         loadCmsEvents(cmsOrigin, ac.signal).then((cms) => {
           if (ac.signal.aborted) return;
@@ -246,7 +253,7 @@ export function Dashboard() {
         )}
         {events.length > 0 && (
           <section id="evCard" className="card">
-            <EventsList events={events} dates={dates} t={t} lang={lang} now={now} />
+            <EventsList events={events} dates={dates} t={t} lang={lang} now={now} community={community} canReport={canReport} />
           </section>
         )}
       </div>
@@ -299,7 +306,7 @@ export function Dashboard() {
         {papPending && <p className="langnote">{t("lang.papPending")}</p>}
       </header>
       <aside id="events" ref={eventsRef} className="card" hidden={!eventsOpen} aria-label={eventsOn ? t("events.title") : t("limits.button")}>
-        {eventsOn ? <EventsList events={events} dates={dates} t={t} lang={lang} now={now} onClose={closeEvents} /> : <LimitsNote t={t} onClose={closeEvents} />}
+        {eventsOn ? <EventsList events={events} dates={dates} t={t} lang={lang} now={now} community={community} canReport={canReport} onClose={closeEvents} /> : <LimitsNote t={t} onClose={closeEvents} />}
         <p className="credit">{t("app.credit")}</p>
       </aside>
 

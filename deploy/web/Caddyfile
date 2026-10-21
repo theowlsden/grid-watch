@@ -37,7 +37,8 @@
 		# EVENTS_ENABLED=true shows the reported events section (spec 4.6), RESULTS_ENABLED=true the
 		# results page (spec 5.3); anything else hides them
 		# ANALYTICS_TOKEN: the Cloudflare Web Analytics token, empty for off
-		respond `\{"cmsOrigin":"{$CMS_ORIGIN:}","events":"{$EVENTS_ENABLED:}","results":"{$RESULTS_ENABLED:}","analytics":"{$ANALYTICS_TOKEN:}"\}` 200
+		# TURNSTILE_SITEKEY: opens the public report form (its secret is on the cms service)
+		respond `\{"cmsOrigin":"{$CMS_ORIGIN:}","events":"{$EVENTS_ENABLED:}","results":"{$RESULTS_ENABLED:}","analytics":"{$ANALYTICS_TOKEN:}","turnstile":"{$TURNSTILE_SITEKEY:}"\}` 200
 	}
 
 	# Forecast data: pipeline output on the shared volume wins over the copy in the build,

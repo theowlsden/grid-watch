@@ -5,13 +5,42 @@ import os
 import subprocess
 import time
 
+import json
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import parse_qs
+
 import pytest
 
 from pb_helpers import BOT, ROOT, SUPERUSER, Api, _free_port
 
 
+class _Turnstile(BaseHTTPRequestHandler):
+    """Stand-in for Cloudflare's siteverify: only the token "good-token" passes."""
+
+    def do_POST(self):  # noqa: N802
+        form = parse_qs(self.rfile.read(int(self.headers.get("content-length", 0))).decode())
+        ok = form.get("secret") == ["test-secret"] and form.get("response") == ["good-token"]
+        body = json.dumps({"success": ok}).encode()
+        self.send_response(200)
+        self.send_header("content-type", "application/json")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def log_message(self, *args):
+        pass
+
+
 @pytest.fixture(scope="session")
-def pb(tmp_path_factory):
+def turnstile():
+    server = HTTPServer(("127.0.0.1", 0), _Turnstile)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    yield f"http://127.0.0.1:{server.server_address[1]}/verify"
+    server.shutdown()
+
+
+@pytest.fixture(scope="session")
+def pb(tmp_path_factory, turnstile):
     binary = os.environ.get("POCKETBASE_BIN")
     if not binary:
         pytest.skip("POCKETBASE_BIN not set")
@@ -21,6 +50,9 @@ def pb(tmp_path_factory):
         **os.environ,
         "PB_SEED_FILE": str(ROOT / "data/sites.snapshot.json"),
         "PB_I18N_DIR": str(ROOT / "web/src/i18n"),
+        "PB_NEIGHBOURHOODS": str(ROOT / "data/neighbourhoods.json"),
+        "TURNSTILE_SECRET": "test-secret",
+        "TURNSTILE_VERIFY_URL": turnstile,
         "PB_BOT_EMAIL": BOT[0],
         "PB_BOT_PASSWORD": BOT[1],
     }
@@ -28,10 +60,12 @@ def pb(tmp_path_factory):
     subprocess.run([binary, "migrate", "up", *args], env=env, check=True, capture_output=True)
     subprocess.run([binary, "superuser", "upsert", *SUPERUSER, *args], env=env, check=True, capture_output=True)
     port = _free_port()
+    # the log goes to a file: an unread pipe fills up after ~64 KB and then blocks the server
+    log = open(data / "serve.log", "w")
     proc = subprocess.Popen(
         [binary, "serve", f"--http=127.0.0.1:{port}", "--origins=https://grid.example.org", *args],
         env=env,
-        stdout=subprocess.PIPE,
+        stdout=log,
         stderr=subprocess.STDOUT,
     )
     api = Api(f"http://127.0.0.1:{port}")
@@ -44,7 +78,7 @@ def pb(tmp_path_factory):
         time.sleep(0.1)
     else:
         proc.kill()
-        raise RuntimeError(proc.stdout.read().decode())
+        raise RuntimeError((data / "serve.log").read_text())
     yield api
     proc.terminate()
     proc.wait(timeout=10)

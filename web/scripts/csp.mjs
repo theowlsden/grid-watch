@@ -25,6 +25,8 @@ function* htmlFiles(d) {
 // switch needs no rebuild.
 const ANALYTICS_SCRIPT = "https://static.cloudflareinsights.com";
 const ANALYTICS_REPORT = "https://cloudflareinsights.com";
+// Cloudflare Turnstile on the report form (TURNSTILE_SITEKEY): its script and its widget frame.
+const TURNSTILE = "https://challenges.cloudflare.com";
 
 export function buildPolicy(dir, cmsOrigin = "") {
   const scripts = new Set();
@@ -37,11 +39,12 @@ export function buildPolicy(dir, cmsOrigin = "") {
   }
   return [
     "default-src 'none'",
-    `script-src 'self' ${ANALYTICS_SCRIPT} ${[...scripts].sort().join(" ")}`,
+    `script-src 'self' ${ANALYTICS_SCRIPT} ${TURNSTILE} ${[...scripts].sort().join(" ")}`,
     "style-src 'self'",
     "img-src 'self' data: blob:",
     "font-src 'self'",
-    `connect-src 'self' ${ANALYTICS_REPORT}${cmsOrigin ? ` ${cmsOrigin}` : ""}`,
+    `connect-src 'self' ${ANALYTICS_REPORT} ${TURNSTILE}${cmsOrigin ? ` ${cmsOrigin}` : ""}`,
+    `frame-src ${TURNSTILE}`,
     "manifest-src 'self'",
     "base-uri 'none'",
     "form-action 'none'",

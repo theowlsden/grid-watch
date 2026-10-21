@@ -36,6 +36,8 @@ pinned by digest. Nothing is published on host ports: only Coolify's proxy reach
    |---|---|---|
    | `SITE_ORIGIN` | cms | `https://grid.example.org` (CORS: only the site may call the CMS) |
    | `CMS_ORIGIN` | web | `https://cms.grid.example.org` (added to the CSP `connect-src`) |
+   | `TURNSTILE_SITEKEY` | web | Cloudflare Turnstile site key (public); opens the report form at `/report`. Empty keeps it closed |
+   | `TURNSTILE_SECRET` | cms | the matching Turnstile **secret** (keep it secret; tick nothing else); checks every public report. Empty: reporting stays closed |
    | `ANALYTICS_TOKEN` | web | the token from Cloudflare Web Analytics' JS snippet (public), or empty for no analytics; restart web to apply |
    | `RESULTS_ENABLED` | web | empty (off) until the backtest has sourced events to score, then `true`: publishes `/results` and links it from the methodology page; restart web to apply |
    | `EVENTS_ENABLED` | web | empty (off) until the events in `data/events/events.yaml` have reliable public sources, then `true`; restart web to apply |
@@ -198,6 +200,13 @@ which starts first and takes the visits, leaving the snippet's entry at zero.
 
 The pipeline's archive of issued outlooks (`gridwatch-data` volume) is not covered by the CMS
 backup; see Backups above.
+
+**Report form (Turnstile)**: in Cloudflare → Turnstile → Add widget: name "Grid Watch reports",
+hostname `grid.example.org`, mode Managed. Put the site key in `TURNSTILE_SITEKEY` (web) and the
+secret in `TURNSTILE_SECRET` (cms), redeploy both. Reports land in the CMS collection
+**reports** (status "new"); the Telegram bot announces them. Turn a sourced one into an event or
+notice and set the report to "used"; mark junk "spam" or "rejected". Unsourced community reports
+are only ever shown as grouped counts (two or more per day) under the events.
 
 ## Load testing
 

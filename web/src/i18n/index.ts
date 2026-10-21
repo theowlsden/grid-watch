@@ -74,10 +74,13 @@ export function dateNames(lang: Lang): DateNames {
   };
 }
 
+// Pages with their own "being translated" note; their keys do not count towards the dashboard's.
+const OWN_NOTE = ["results.", "report."];
+
 /** Share of English keys that have a translation (for the "being translated" note). By
- *  default the results page's own keys (results.*) are left out: that page has its own note.
- *  Pass a prefix to measure one part, e.g. "results.". */
+ *  default the keys of pages with their own note (OWN_NOTE) are left out. Pass a prefix to
+ *  measure one part, e.g. "results.". */
 export function coverage(lang: Lang, prefix?: string): number {
-  const keys = (Object.keys(en) as MessageKey[]).filter((k) => (prefix ? k.startsWith(prefix) : !k.startsWith("results.")));
+  const keys = (Object.keys(en) as MessageKey[]).filter((k) => (prefix ? k.startsWith(prefix) : !OWN_NOTE.some((p) => k.startsWith(p))));
   return keys.filter((k) => remote[lang]?.[k] || MESSAGES[lang][k]).length / keys.length;
 }

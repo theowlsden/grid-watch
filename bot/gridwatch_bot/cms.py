@@ -83,6 +83,11 @@ class Cms:
     def set_event_end(self, rid: str, end_local: str) -> dict:
         return self._call("PATCH", f"/api/collections/events/records/{urllib.parse.quote(rid)}", {"end_local": end_local})  # type: ignore[return-value]
 
+    def new_reports(self, after: str, per_page: int = 20) -> list[dict]:
+        """Public reports (decision 26) with status "new", created after `after` (PocketBase date), oldest first."""
+        q = urllib.parse.urlencode({"filter": f'status = "new" && created > "{after}"', "sort": "created", "perPage": per_page})
+        return self._call("GET", f"/api/collections/reports/records?{q}")["items"]  # type: ignore[index]
+
     def latest_draft(self) -> dict | None:
         items = self.list('status = "draft" && source = "telegram"', "-created", 1)
         return items[0] if items else None

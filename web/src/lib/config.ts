@@ -12,6 +12,9 @@ export interface RuntimeConfig {
   // Cloudflare Web Analytics token (ANALYTICS_TOKEN); "" leaves analytics off. Public by design:
   // it is visible in every page that loads the beacon.
   analytics: string;
+  // Cloudflare Turnstile site key (TURNSTILE_SITEKEY) for the public report form; "" keeps the
+  // form closed. Public by design; its secret lives on the cms service only.
+  turnstile: string;
 }
 
 /** "true", "1", "yes" or "on" (any case), or a JSON true. */
@@ -26,9 +29,10 @@ export async function loadConfig(signal?: AbortSignal): Promise<RuntimeConfig> {
     const raw = typeof data.cmsOrigin === "string" ? data.cmsOrigin.trim().replace(/\/+$/, "") : "";
     const origin = /^https?:\/\/[^/\s]+$/.test(raw) ? raw : "";
     const token = typeof data.analytics === "string" && /^[0-9a-f]{32}$/.test(data.analytics.trim()) ? data.analytics.trim() : "";
-    return { cmsOrigin: origin, events: flag(data.events), results: flag(data.results), analytics: token };
+    const sitekey = typeof data.turnstile === "string" && /^[0-9A-Za-z_-]{10,64}$/.test(data.turnstile.trim()) ? data.turnstile.trim() : "";
+    return { cmsOrigin: origin, events: flag(data.events), results: flag(data.results), analytics: token, turnstile: sitekey };
   } catch {
-    return { cmsOrigin: "", events: false, results: false, analytics: "" };
+    return { cmsOrigin: "", events: false, results: false, analytics: "", turnstile: "" };
   }
 }
 

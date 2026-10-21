@@ -28,6 +28,8 @@ COPY cms/pb_hooks /pb/pb_hooks
 COPY data/sites.snapshot.json /pb/seed/sites.snapshot.json
 # interface text: keys and English are synced into the translations collection on every start
 COPY web/src/i18n/en.json web/src/i18n/pap.json /pb/seed/i18n/
+# neighbourhood names (OpenStreetMap, ODbL) for checking the areas in public reports
+COPY data/neighbourhoods.json /pb/seed/neighbourhoods.json
 COPY deploy/cms/entrypoint.sh /usr/local/bin/entrypoint.sh
 USER 10002
 WORKDIR /pb

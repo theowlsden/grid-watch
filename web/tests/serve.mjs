@@ -37,7 +37,7 @@ createServer((req, res) => {
   if (req.url.split("?")[0] === "/config.json") {
     // like production: runtime config from the environment (deploy/web/Caddyfile)
     res.writeHead(200, { ...SECURITY, "content-type": TYPES[".json"], "cache-control": "no-cache" });
-    res.end(JSON.stringify({ cmsOrigin, events: process.env.EVENTS_ENABLED ?? "", results: process.env.RESULTS_ENABLED ?? "", analytics: process.env.ANALYTICS_TOKEN ?? "" }));
+    res.end(JSON.stringify({ cmsOrigin, events: process.env.EVENTS_ENABLED ?? "", results: process.env.RESULTS_ENABLED ?? "", analytics: process.env.ANALYTICS_TOKEN ?? "", turnstile: process.env.TURNSTILE_SITEKEY ?? "" }));
     return;
   }
   const path = normalize(decodeURIComponent(new URL(req.url, "http://x").pathname)).replace(/^(\.\.[/\\])+/, "");

@@ -2419,3 +2419,204 @@ html[lang="pap"] .doc[data-doc-lang="pap"] {
   }
 }
 
+
+/* ---------- Public report form (decision 26) ---------- */
+.report form {
+  display: grid;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.report fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.report legend,
+.report .field > span {
+  margin-bottom: 4px;
+  font: 800 14px/1.3 var(--font-body);
+}
+
+.report .field {
+  display: grid;
+  gap: 2px;
+}
+
+.report .field small,
+.report .choice small {
+  display: block;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.report input[type="date"],
+.report input[type="time"],
+.report input[type="url"],
+.report input:not([type]),
+.report select,
+.report textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--ink);
+  font: 600 15px/1.3 var(--font-body);
+}
+
+.report input:focus-visible,
+.report select:focus-visible,
+.report textarea:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 1px;
+}
+
+.report .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.report .row .field {
+  flex: 1 1 140px;
+}
+
+.report .row .grow {
+  flex: 3 1 200px;
+}
+
+.report .choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.report .choice.inline {
+  display: inline-flex;
+  margin-right: 8px;
+  padding: 6px 10px;
+}
+
+.report .choice input {
+  margin-top: 3px;
+  accent-color: var(--sel-bg);
+}
+
+.report .picked {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.report .picked li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px 4px 12px;
+  border-radius: 999px;
+  background: var(--soft);
+  font-weight: 700;
+}
+
+.report .picked button {
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.report .primary,
+.report .secondary {
+  justify-self: start;
+  padding: 11px 20px;
+  border: 0;
+  border-radius: 999px;
+  font: 800 14px/1 var(--font-body);
+  cursor: pointer;
+}
+
+.report .primary {
+  background: var(--sel-bg);
+  color: var(--sel-fg);
+}
+
+.report .primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.report .secondary {
+  background: var(--soft);
+  color: var(--ink);
+}
+
+.report .field-error {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.report .field-error::before {
+  content: "⚠ ";
+}
+
+/* the honeypot: out of sight and out of the tab order, for bots only */
+.report .hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.report .turnstile {
+  min-height: 65px;
+}
+
+.report .notice-closed,
+.report .report-done {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--soft);
+}
+
+/* community counts and the report link under the events */
+.evreport {
+  margin: 10px 0 4px;
+  font-weight: 800;
+}
+
+.evreport a {
+  color: var(--blue-text);
+}
+
+.community h3 {
+  margin: 14px 0 2px;
+  font: 800 15px/1.3 var(--font-display);
+}
+
+.community ul {
+  margin: 6px 0;
+  padding-left: 18px;
+}
+
+.community li {
+  margin: 3px 0;
+  font-size: 13px;
+}

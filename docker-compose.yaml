@@ -22,6 +22,8 @@ services:
       RESULTS_ENABLED: ${RESULTS_ENABLED:-}
       # Cloudflare Web Analytics token (public, from the dashboard's JS snippet); empty: off
       ANALYTICS_TOKEN: ${ANALYTICS_TOKEN:-}
+      # Cloudflare Turnstile site key (public): opens the report form; empty keeps it closed
+      TURNSTILE_SITEKEY: ${TURNSTILE_SITEKEY:-}
     volumes:
       - gridwatch-data:/var/lib/gridwatch:ro
     read_only: true
@@ -55,6 +57,8 @@ services:
       # restricted account for the Telegram bot (news only), kept in sync on every start
       PB_BOT_EMAIL: ${PB_BOT_EMAIL:-}
       PB_BOT_PASSWORD: ${PB_BOT_PASSWORD:-}
+      # Cloudflare Turnstile secret: checks every public report; empty keeps reporting closed
+      TURNSTILE_SECRET: ${TURNSTILE_SECRET:-}
     volumes:
       - pb-data:/pb/pb_data
     cap_drop: [ALL]

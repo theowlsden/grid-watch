@@ -39,6 +39,10 @@ class FakeCms:
         return [dict(v) for v in reversed(self.items.values())][:per_page]
 
     events: list = []
+    reports: list = []
+
+    def new_reports(self, after, per_page=20):
+        return [dict(r) for r in self.reports if r["created"] > after][:per_page]
 
     def ongoing_events(self, per_page=10):
         return [dict(e) for e in self.events if not e.get("end_local")]
@@ -206,4 +210,25 @@ def test_restored_rejects_nonsense(bot):
     bot.cms.events = ongoing("ev1")
     assert "Usage" in say(bot, "/restored tomorrow")
     assert "Usage" in say(bot, "/restored 25:00")
+
+
+# ---------- alerts for new public reports (decision 26) ----------
+
+
+def test_new_reports_are_announced_once_to_every_allowed_user(bot):
+    assert bot.tick() == []  # the first check only sets the starting point
+
+    bot.cms.reports = [
+        {"created": "2000-01-01 00:00:00.000Z", "kind": "community", "type": "load_shedding", "date": "2026-10-21", "scope": "areas", "areas": ["Punda"]},
+        {"created": "2099-01-01 00:00:00.000Z", "kind": "community", "type": "load_shedding", "date": "2026-10-21", "start_time": "19:30", "ongoing": True, "scope": "areas", "areas": ["Santa Rosa"], "note": "No power."},
+    ]
+    bot.clock.t += 61
+    out = bot.tick()
+    assert [chat for chat, _ in out] == [ME]
+    text = out[0][1]
+    assert "Santa Rosa" in text and "19:30, ongoing" in text and "No power." in text and "Punda" not in text
+    bot.clock.t += 61
+    assert bot.tick() == []  # not again
+    bot.clock.t += 10
+    assert bot.tick() == []  # and not more than once a minute
 
