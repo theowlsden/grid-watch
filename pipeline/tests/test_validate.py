@@ -290,3 +290,73 @@ def test_open_outline_is_rejected(sites):
     report = Report()
     check_sites(sites, report)
     assert any("closed" in e for e in report.errors)
+
+
+# ---------- scope, cause, notices (event vs notice model) ----------
+
+
+def test_events_need_scope_and_cause(events):
+    del events[0]["scope"]
+    report = Report()
+    check_events(events, report, published=False)
+    assert not report.ok
+
+
+def test_areas_only_with_scope_areas(events):
+    events[0]["scope"] = "areas"
+    report = Report()
+    check_events(events, report, published=False)
+    assert any("no areas" in e for e in report.errors)
+    events[0]["areas"] = ["Punda", "Otrobanda"]
+    report = Report()
+    check_events(events, report, published=False)
+    assert report.ok, report.errors
+    events[0]["scope"] = "island"
+    report = Report()
+    check_events(events, report, published=False)
+    assert any("not areas" in e for e in report.errors)
+
+
+def test_announcements_are_not_an_event_type(events):
+    events[0]["type"] = "warning"
+    report = Report()
+    check_events(events, report, published=False)
+    assert not report.ok
+
+
+def notice(**kw):
+    n = {
+        "id": "2026-10-13-load-shedding",
+        "published_local": "2026-10-13T14:20:00-04:00",
+        "publisher": "Aqualectra",
+        "announced": "load_shedding",
+        "starts_local": "2026-10-13T18:00:00-04:00",
+        "ends_local": None,
+        "scope": "unknown",
+        "summary": "Rotating load shedding announced from 18:00.",
+        "sources": [dict(SOURCE)],
+    }
+    n.update(kw)
+    return n
+
+
+def test_a_sourced_notice_is_valid():
+    from validate import check_notices
+
+    report = Report()
+    check_notices([notice()], report)
+    assert report.ok, report.errors
+
+
+def test_notice_rules():
+    from validate import check_notices
+
+    for bad, why in [
+        (notice(sources=[dict(SOURCE, url="TODO")]), "source"),
+        (notice(id="2026-10-12-x"), "date"),
+        (notice(ends_local="2026-10-13T17:00:00-04:00"), "before"),
+        (notice(scope="areas"), "areas"),
+    ]:
+        report = Report()
+        check_notices([bad], report)
+        assert any(why in e for e in report.errors), (why, report.errors)

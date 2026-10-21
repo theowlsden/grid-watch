@@ -70,3 +70,11 @@ from the Iowa Environmental Mesonet into `data/observations/tncc/`. `python
 pipeline/tools/run_backtest.py` then scores the hindcasts (spec 5.3) and writes
 `data/backtests/rules-v0-gfs.json` and `docs/results.md`, from stored files only.
 
+### Events and notices (spec 8.4, decision 25)
+
+Events and notices are edited in the CMS. `python pipeline/tools/export_events.py --cms
+https://cms.grid.example.org` writes their published records to `data/events/events.yaml` and
+`notices.yaml` (validated); then `python pipeline/tools/build_events.py` rebuilds the site's
+`events.json`. Commit both, so the backtest runs from stored files. Only supply-related events
+are scored (`backtest.counts_as_outcome`).
+

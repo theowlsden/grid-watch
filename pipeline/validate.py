@@ -20,12 +20,13 @@ from pathlib import Path
 from typing import Any
 
 from jsonschema import Draft202012Validator, FormatChecker
+from referencing import Registry, Resource
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from events import build_events, dumps, load_events_yaml  # noqa: E402
-from paths import EVENTS_JSON, EVENTS_YAML, FORECAST_JSON, SCHEMAS, SITES_SNAPSHOT  # noqa: E402
+from paths import EVENTS_JSON, EVENTS_YAML, NOTICES_YAML, FORECAST_JSON, SCHEMAS, SITES_SNAPSHOT  # noqa: E402
 
 # Level thresholds from spec 5.1; keep in step with web/src/lib/levels.ts.
 THRESHOLDS = [(60, "high"), (45, "elevated"), (25, "moderate")]
@@ -77,8 +78,20 @@ def load_schema(name: str) -> dict[str, Any]:
     return json.loads((SCHEMAS / name).read_text(encoding="utf-8"))
 
 
+def _registry() -> Registry:
+    """Every schema in schemas/ under its $id and its file name, so references between them
+    (e.g. notices to the event source) resolve locally, never over the network."""
+    reg = Registry()
+    for path in sorted(SCHEMAS.glob("*.json")):
+        schema = json.loads(path.read_text(encoding="utf-8"))
+        res = Resource.from_contents(schema)
+        reg = reg.with_resource(schema["$id"], res).with_resource(path.name, res)
+        reg = reg.with_resource(schema["$id"].rsplit("/", 1)[0] + "/" + path.name, res)
+    return reg
+
+
 def check_schema(data: Any, schema_name: str, where: str, report: Report) -> bool:
-    validator = Draft202012Validator(load_schema(schema_name), format_checker=FORMATS)
+    validator = Draft202012Validator(load_schema(schema_name), format_checker=FORMATS, registry=_registry())
     errors = sorted(validator.iter_errors(data), key=lambda e: list(e.absolute_path))
     for e in errors:
         path = "/".join(str(p) for p in e.absolute_path) or "(root)"
@@ -195,6 +208,35 @@ def check_events(data: Any, report: Report, published: bool, where: str = "event
             report.warn(at, f"not published until its source is filled in ({', '.join(todo)})")
         if published and not e["verified"]:
             report.warn(at, "published but not yet verified against its sources")
+        if e["scope"] == "areas" and not e.get("areas"):
+            report.error(at, "scope is areas but no areas are listed")
+        if e["scope"] != "areas" and e.get("areas"):
+            report.error(at, "areas are listed but scope is not areas")
+
+
+def _instant(value: str) -> dt.datetime:
+    """A local date (taken as midnight) or a local date-time, as an aware datetime."""
+    return dt.datetime.fromisoformat(value if len(value) > 10 else f"{value}T00:00:00-04:00")
+
+
+def check_notices(data: Any, report: Report, where: str = "notices") -> None:
+    """Announcements (notices.yaml): schema, unique ids, a real source, sensible times."""
+    if not check_schema(data, "notices.schema.json", where, report):
+        return
+    seen: set[str] = set()
+    for i, n in enumerate(data):
+        at = f"{where}: {i} ({n['id']})"
+        if n["id"] in seen:
+            report.error(at, "duplicate id")
+        seen.add(n["id"])
+        if n["id"][:10] != n["published_local"][:10]:
+            report.error(at, "id must start with the date it was published")
+        if _todo_fields(n):
+            report.error(at, "a notice needs its public source")
+        if n.get("starts_local") and n.get("ends_local") and _instant(n["ends_local"]) < _instant(n["starts_local"]):
+            report.error(at, "ends_local is before starts_local")
+        if (n["scope"] == "areas") != bool(n.get("areas")):
+            report.error(at, "areas must be listed exactly when scope is areas")
 
 
 def check_events_built(yaml_path: Path, json_path: Path, report: Report) -> None:
@@ -230,6 +272,8 @@ def run(args: argparse.Namespace) -> Report:
         published = read_json(args.events, report)
         if published is not None:
             check_events(published, report, published=True, where="events.json")
+    if args.notices_yaml.exists():
+        check_notices(load_events_yaml(args.notices_yaml), report, where="notices.yaml")
     return report
 
 
@@ -238,6 +282,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--forecast", type=Path, default=FORECAST_JSON)
     p.add_argument("--events", type=Path, default=EVENTS_JSON)
     p.add_argument("--events-yaml", type=Path, default=EVENTS_YAML)
+    p.add_argument("--notices-yaml", type=Path, default=NOTICES_YAML)
     p.add_argument("--sites", type=Path, default=SITES_SNAPSHOT)
     args = p.parse_args(argv)
 

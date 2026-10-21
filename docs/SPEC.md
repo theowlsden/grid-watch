@@ -277,7 +277,9 @@ Decisions to confirm (recommendation in bold):
     "id": "2025-08-27-blackout",
     "start_local": "2025-08-27T02:30:00-04:00",
     "end_local": null,
-    "type": "blackout | outage | controlled_switching | shortage | warning",
+    "type": "blackout | outage | load_shedding | shortage",
+    "scope": "island | areas | unknown",
+    "cause": "supply | network | unknown",
     "severity": "major | minor",
     "drivers": ["wind_drop", "heat", "high_demand", "maintenance", "capacity_shortfall", "battery_reliance"],
     "summary": "",
@@ -499,6 +501,7 @@ Acceptance by phase:
 22. **DECIDED, Web Analytics (13 Oct 2026)**: Cloudflare Web Analytics in manual setup (no automatic injection), switched by the web service's `ANALYTICS_TOKEN` (served in `/config.json`; empty is off). The site adds the beacon itself; the CSP allows exactly `static.cloudflareinsights.com` (script) and `cloudflareinsights.com` (reporting). Cookieless; the methodology page has a Privacy section that mentions the counting only while it is on.
 23. **DECIDED, Weather-forecast grade instead of "confidence" (13 Oct 2026)**: the label graded only the weather forecast (horizon and ensemble spread), but "Confidence: high" read as confidence in the outlook, which an uncalibrated rule without generation data cannot have. It is now shown as "Weather forecast: reliable / fair / uncertain", and rules 0.1.1 cap it at "fair" (`confidence.best: medium`) until Phase 3 calibration. The data contract keeps `confidence: low|medium|high`. Translations whose English changed are no longer served until an editor has checked them (CMS migration 1792000000).
 24. **DECIDED, Gauge on the risk card (20 Oct 2026)**: a half-circle gauge shows the 0 to 100 index, with the number under its needle. The bands follow the level thresholds (25, 45, 60); the band the needle is in is drawn at full strength, and the needle takes the level colour (green, yellow, orange, red; grey when out of date). The gauge is decoration (`aria-hidden`): the number, the "Stress outlook" caption and the level word stay as text. In the readout row the gauge sits on the left beside the emoji and the caption with the level pill on the right; it is smaller on short landscape screens so the card fits without scrolling.
+25. **DECIDED, Events and notices (21 Oct 2026)**: three kinds of item. *News* is a message from the project (free text, never scored). A *notice* is an announcement by the utility or another official source of what may or will happen (announced: load shedding, possible shortage, maintenance, other), with its source, and it expires on its own. An *event* is something that happened (type: blackout, outage, load shedding, shortage), with **scope** (island, areas: OSM neighbourhood names, or unknown), **cause** (supply: not enough generation, which is what the outlook is about; network: a local fault; unknown) and times; it shows "Ongoing" until an end time is added, and "End time not reported" after 12 hours without one. Only supply-related events count as outcomes in the backtest and scorecard: cause supply, or cause unknown for a blackout, load shedding or shortage; network outages are listed but not scored. Events and notices are edited in the CMS (collections `events` and `notices`; the seed list was imported as drafts); `data/events/events.yaml` and `notices.yaml` are their stored copies, written by `pipeline/tools/export_events.py`. The old event types `controlled_switching` (now `load_shedding`) and `warning` (now a notice) are gone.
 
 ## 12b. Licensing and public repository
 

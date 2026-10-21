@@ -37,7 +37,7 @@ def record(issue_day: dt.date, indexes: list[int], hour_local: int = 6) -> dict:
     }
 
 
-EVENT = {"id": "2025-08-20-test", "start_local": "2025-08-20", "end_local": None, "type": "outage", "severity": "minor"}
+EVENT = {"id": "2025-08-20-test", "start_local": "2025-08-20", "end_local": None, "type": "outage", "severity": "minor", "cause": "supply"}
 
 
 def test_events_dates_and_starts():
@@ -152,3 +152,14 @@ def test_every_caveat_has_a_site_message_with_the_same_placeholders():
         python_params = set(re.findall(r"\{(\w+)", text)) - {"s"}
         site_params = set(re.findall(r"\{(\w+)\}", en[key]))
         assert python_params == site_params, cid
+
+
+def test_only_supply_related_events_are_outcomes():
+    from backtest import counts_as_outcome
+
+    assert counts_as_outcome({"type": "outage", "cause": "supply"})
+    assert counts_as_outcome({"type": "load_shedding", "cause": "unknown"})
+    assert not counts_as_outcome({"type": "outage", "cause": "network"})
+    assert not counts_as_outcome({"type": "outage", "cause": "unknown"})  # could be a local fault
+    local = {**EVENT, "id": "2025-08-21-cable", "start_local": "2025-08-21", "type": "outage", "cause": "network"}
+    assert [e.id for e in to_events([EVENT, local])] == ["2025-08-20-test"]

@@ -5,6 +5,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SCHEMAS = ROOT / "schemas"
 EVENTS_YAML = ROOT / "data" / "events" / "events.yaml"
+NOTICES_YAML = ROOT / "data" / "events" / "notices.yaml"
 SITES_SNAPSHOT = ROOT / "data" / "sites.snapshot.json"
 # Files served under /data. In production the pipeline writes to a volume mounted there;
 # the copies in web/public/data are what the static build and local development use.

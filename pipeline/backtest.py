@@ -46,9 +46,22 @@ class Event:
     severity: str
 
 
+# What the outlook is about: not enough generation for the demand. A local network fault is real
+# for the people affected but says nothing about wind or heat, so it is not an outcome here.
+SUPPLY_TYPES = {"blackout", "load_shedding", "shortage"}
+
+
+def counts_as_outcome(e: dict) -> bool:
+    """Supply-related: cause supply, or cause unknown with a supply-type event."""
+    cause = e.get("cause", "unknown")
+    return cause == "supply" or (cause == "unknown" and e.get("type") in SUPPLY_TYPES)
+
+
 def to_events(rows: list[dict], window_start_h: int = 19) -> list[Event]:
     out = []
     for e in rows:
+        if not counts_as_outcome(e):
+            continue
         s = str(e["start_local"])
         if len(s) == 10:
             d0 = dt.date.fromisoformat(s)

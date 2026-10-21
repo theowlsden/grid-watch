@@ -33,7 +33,10 @@ export interface Forecast {
   limitations: string[];
 }
 
-export type EventType = "blackout" | "outage" | "controlled_switching" | "shortage" | "warning";
+// What happened; advance announcements are notices (see Notice below).
+export type EventType = "blackout" | "outage" | "load_shedding" | "shortage";
+export type Scope = "island" | "areas" | "unknown";
+export type Cause = "supply" | "network" | "unknown";
 
 export interface EventSource {
   publisher: string;
@@ -49,6 +52,10 @@ export interface GridEvent {
   start_local: string; // date (YYYY-MM-DD) or local date-time with offset
   end_local: string | null;
   type: EventType;
+  scope?: Scope; // island-wide, the neighbourhoods in `areas`, or not reported
+  areas?: string[]; // neighbourhood names as in OpenStreetMap
+  cause?: Cause; // supply: what the outlook is about; network: a local fault
+  notice?: string; // id of the notice that announced it
   severity: "major" | "minor";
   drivers: string[];
   summary: string;
