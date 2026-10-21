@@ -28,7 +28,11 @@ HELP = """Grid Watch news bot. Everything starts as a draft.
 /delete <id>  delete an item (asks for /confirm)
 /confirm, /cancel
 /run          new stress outlook now (at most every 30 minutes)
-/status       last pipeline run"""
+/status       last pipeline run
+
+/ongoing      events that are still ongoing
+/restored     power is back: end the ongoing event now (asks for /confirm)
+/restored 2 18:30   end event 2 from /ongoing at 18:30 today (Curaçao time)"""
 
 TITLE_MAX = 140
 BODY_MAX = 2000
@@ -59,6 +63,28 @@ def parse_expiry(arg: str, now: dt.datetime) -> dt.datetime | None:
     return dt.datetime(d.year, d.month, d.day, 23, 59, tzinfo=dt.timezone(dt.timedelta(hours=-4))).astimezone(dt.timezone.utc)
 
 
+CURACAO = dt.timezone(dt.timedelta(hours=-4))
+
+
+def parse_restored(arg: str, now: dt.datetime) -> tuple[int | None, str] | None:
+    """'' | '2' | '18:30' | '2 18:30' -> (event number or None, local end time 'YYYY-MM-DD HH:MM')."""
+    num, at = None, now.astimezone(CURACAO)
+    for part in arg.split():
+        if re.fullmatch(r"\d{1,2}", part):
+            num = int(part)
+        elif m := re.fullmatch(r"([01]?\d|2[0-3]):([0-5]\d)", part):
+            at = at.replace(hour=int(m.group(1)), minute=int(m.group(2)), second=0, microsecond=0)
+        else:
+            return None
+    return num, at.strftime("%Y-%m-%d %H:%M")
+
+
+def describe_event(e: dict, n: int | None = None) -> str:
+    where = "island-wide" if e.get("scope") == "island" else ", ".join(e.get("areas") or []) or "area not reported"
+    head = f"{n}. " if n is not None else ""
+    return f"{head}{e.get('type', '').replace('_', ' ')} since {e.get('start_local', '')[:16].replace('T', ' ')} ({where})\n{e.get('summary_en', '')}"
+
+
 def pb_date(t: dt.datetime) -> str:
     return t.astimezone(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S.000Z")
 
@@ -81,7 +107,7 @@ def describe(item: dict) -> str:
 
 @dataclass
 class Pending:
-    action: str  # "publish" | "delete"
+    action: str  # "publish" | "delete" | "restored" (record_id is then "id|end time")
     record_id: str
     expires: float
 
@@ -147,6 +173,11 @@ class Bot:
             return self._confirm(user)
         if cmd == "/cancel":
             return "Cancelled." if self.pending.pop(user, None) else "Nothing to cancel."
+        if cmd == "/ongoing":
+            events = self.cms.ongoing_events()
+            return "\n\n".join(describe_event(e, i + 1) for i, e in enumerate(events)) or "No ongoing events."
+        if cmd == "/restored":
+            return self._restored(arg, user)
         if cmd == "/run":
             return self._request_run(chat)
         if cmd == "/status":
@@ -187,8 +218,29 @@ class Bot:
         if p.action == "publish":
             rec = self.cms.update(p.record_id, {"status": "published"})
             return f"Published.\n\n{describe(rec)}"
+        if p.action == "restored":
+            rid, end = p.record_id.split("|", 1)
+            rec = self.cms.set_event_end(rid, end)
+            return f"Done: the site now shows it ended at {rec.get('end_local', end)[:16].replace('T', ' ')}."
         self.cms.delete(p.record_id)
         return "Deleted."
+
+    def _restored(self, arg: str, user: int) -> str:
+        parsed = parse_restored(arg, dt.datetime.fromtimestamp(self.clock(), dt.timezone.utc))
+        if not parsed:
+            return "Usage: /restored, /restored 18:30, or /restored 2 18:30 (number from /ongoing)"
+        num, end = parsed
+        events = self.cms.ongoing_events()
+        if not events:
+            return "No ongoing events."
+        if num is None and len(events) > 1:
+            return "Several events are ongoing; say which one:\n\n" + "\n\n".join(describe_event(e, i + 1) for i, e in enumerate(events))
+        idx = (num or 1) - 1
+        if not 0 <= idx < len(events):
+            return f"There is no event {num}; /ongoing lists them."
+        ev = events[idx]
+        self.pending[user] = Pending("restored", f"{ev['id']}|{end}", self.clock() + CONFIRM_SECONDS)
+        return f"End this event at {end} (Curaçao time)?\n\n{describe_event(ev)}\n\nReply /confirm within 10 minutes, or /cancel."
 
     # ---------- pipeline runs (decision 17) ----------
 

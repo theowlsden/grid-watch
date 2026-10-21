@@ -21,6 +21,8 @@ which can only read and change news.
 | `/confirm`, `/cancel` | |
 | `/run` | new stress outlook now; the pipeline picks it up within a minute and the bot reports back (at most one manual run per 30 minutes) |
 | `/status` | the last manual run |
+| `/ongoing` | published events that are still ongoing (no end time yet), numbered |
+| `/restored` | power is back: end the ongoing event now; `/restored 18:30` at a time today, `/restored 2 18:30` for event 2 of `/ongoing`. Asks for `/confirm`. The bot account can only set an event's end time, nothing else (`cms/pb_hooks/events.pb.js`). |
 
 ## Security (spec 7.3)
 

@@ -26,8 +26,17 @@ onRecordCreateRequest((e) => {
 }, "events", "notices");
 
 onRecordUpdateRequest((e) => {
-  const { actor } = require(`${__hooks}/lib/actor.js`);
+  const { actor, isBot } = require(`${__hooks}/lib/actor.js`);
+  const before = e.record.original();
+  if (isBot(e)) {
+    // the bot may only add or correct the end time (/restored); everything else stays
+    const end = e.record.get("end_local");
+    for (const f of e.record.collection().fields) {
+      if (f.name !== "id") e.record.set(f.name, before.get(f.name));
+    }
+    e.record.set("end_local", end);
+  }
   e.record.set("updatedBy", actor(e));
-  e.record.set("author", e.record.original().get("author"));
+  e.record.set("author", before.get("author"));
   e.next();
 }, "events", "notices");

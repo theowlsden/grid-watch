@@ -19,6 +19,7 @@ from gridwatch_bot.cms import Cms, CmsError  # noqa: E402
 from gridwatch_bot.commands import Bot  # noqa: E402
 
 BOT = ("bot@example.org", "bot-password-1234567")
+SUPER = ("admin@example.org", "admin-password-1234567")
 
 
 @pytest.fixture(scope="module")
@@ -30,6 +31,7 @@ def base(tmp_path_factory):
     args = [f"--dir={data}", f"--migrationsDir={ROOT / 'cms/pb_migrations'}", f"--hooksDir={ROOT / 'cms/pb_hooks'}", "--hooksWatch=false"]
     env = {**os.environ, "PB_SEED_FILE": str(ROOT / "data/sites.snapshot.json"), "PB_BOT_EMAIL": BOT[0], "PB_BOT_PASSWORD": BOT[1]}
     subprocess.run([binary, "migrate", "up", *args], env=env, check=True, capture_output=True)
+    subprocess.run([binary, "superuser", "upsert", *SUPER, *args], env=env, check=True, capture_output=True)
     with socket.socket() as s:
         s.bind(("127.0.0.1", 0))
         port = s.getsockname()[1]
@@ -88,3 +90,44 @@ def test_wrong_password_is_reported(base):
     with pytest.raises(CmsError) as err:
         Cms(base, BOT[0], "wrong-password-123456").token()
     assert err.value.status == 400
+
+
+_TOKENS: dict[str, str] = {}
+
+
+def _admin_call(base, method, path, body=None):
+    def req(m, p, b, token=None):
+        r = urllib.request.Request(base + p, data=json.dumps(b).encode() if b is not None else None, method=m, headers={"Content-Type": "application/json"})
+        if token:
+            r.add_header("Authorization", token)
+        with urllib.request.urlopen(r) as res:
+            return json.loads(res.read())
+
+    # one sign-in per test run: sign-ins are rate-limited (2 per 3 s)
+    if base not in _TOKENS:
+        _TOKENS[base] = req("POST", "/api/collections/_superusers/auth-with-password", {"identity": SUPER[0], "password": SUPER[1]})["token"]
+    return req(method, path, body, _TOKENS[base])
+
+
+def test_bot_closes_an_ongoing_event_and_nothing_else(base, cms):
+    ev = _admin_call(base, "POST", "/api/collections/events/records", {
+        "type": "load_shedding", "severity": "minor", "scope": "areas", "areas": ["Punda"], "cause": "supply",
+        "start_local": "2026-10-21 14:00", "summary_en": "Load shedding in Punda.", "status": "published",
+        "source_publisher": "Aqualectra", "source_title": "Notice", "source_url": "https://example.org/n", "source_published": "2026-10-21",
+    })
+    assert [e["id"] for e in cms.ongoing_events()] == [ev["id"]]
+    rec = cms.set_event_end(ev["id"], "2026-10-21 18:30")
+    assert rec["end_local"] == "2026-10-21T18:30:00-04:00" and rec["endsAt"].startswith("2026-10-21 22:30")
+    assert cms.ongoing_events() == []
+    # the bot cannot rewrite the event itself
+    cms._call("PATCH", f"/api/collections/events/records/{ev['id']}", {"summary_en": "Changed by the bot", "status": "draft"})
+    after = _admin_call(base, "GET", f"/api/collections/events/records/{ev['id']}")
+    assert after["summary_en"] == "Load shedding in Punda." and after["status"] == "published"
+    assert after["updatedBy"].startswith("bot:")
+    # nor touch drafts
+    draft = _admin_call(base, "POST", "/api/collections/events/records", {
+        "type": "outage", "severity": "minor", "scope": "unknown", "cause": "unknown", "start_local": "2026-10-20", "summary_en": "Draft.", "status": "draft",
+    })
+    with pytest.raises(CmsError):
+        cms.set_event_end(draft["id"], "2026-10-20 12:00")
+

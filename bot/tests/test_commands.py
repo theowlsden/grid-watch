@@ -38,6 +38,18 @@ class FakeCms:
     def list(self, filter_="", sort="-created", per_page=5):
         return [dict(v) for v in reversed(self.items.values())][:per_page]
 
+    events: list = []
+
+    def ongoing_events(self, per_page=10):
+        return [dict(e) for e in self.events if not e.get("end_local")]
+
+    def set_event_end(self, rid, end_local):
+        for e in self.events:
+            if e["id"] == rid:
+                e["end_local"] = end_local
+                return dict(e)
+        raise CmsError(404, "not found")
+
     def latest_draft(self):
         drafts = [v for v in self.items.values() if v["status"] == "draft"]
         return dict(drafts[-1]) if drafts else None
@@ -161,3 +173,37 @@ def test_allowlist_parsing():
     assert allowed_ids("123, 456") == {123, 456}
     with pytest.raises(ValueError):
         allowed_ids("@someone")
+
+
+# ---------- /ongoing and /restored (decision 25) ----------
+
+
+def ongoing(*ids):
+    return [{"id": i, "type": "load_shedding", "start_local": "2026-10-21T14:00:00-04:00", "scope": "areas", "areas": ["Punda"], "summary_en": f"Event {i}.", "end_local": ""} for i in ids]
+
+
+def test_restored_ends_the_only_ongoing_event_after_confirm(bot):
+    bot.cms.events = ongoing("ev1")
+    assert "Event ev1." in say(bot, "/ongoing")
+    reply = say(bot, "/restored 18:30")
+    assert "18:30" in reply and "/confirm" in reply
+    assert bot.cms.events[0]["end_local"] == ""  # nothing changes before /confirm
+    assert "ended" in say(bot, "/confirm")
+    assert bot.cms.events[0]["end_local"].endswith("18:30")
+    assert say(bot, "/ongoing") == "No ongoing events."
+
+
+def test_restored_asks_which_one_when_several_are_ongoing(bot):
+    bot.cms.events = ongoing("ev1", "ev2")
+    assert "Several events" in say(bot, "/restored")
+    assert "There is no event 3" in say(bot, "/restored 3")
+    say(bot, "/restored 2")
+    say(bot, "/confirm")
+    assert [e["end_local"] != "" for e in bot.cms.events] == [False, True]
+
+
+def test_restored_rejects_nonsense(bot):
+    bot.cms.events = ongoing("ev1")
+    assert "Usage" in say(bot, "/restored tomorrow")
+    assert "Usage" in say(bot, "/restored 25:00")
+

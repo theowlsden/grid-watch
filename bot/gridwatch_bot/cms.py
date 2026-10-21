@@ -73,6 +73,16 @@ class Cms:
         q = urllib.parse.urlencode({"filter": filter_, "sort": sort, "perPage": per_page})
         return self._call("GET", f"/api/collections/news/records?{q}")["items"]  # type: ignore[index]
 
+    # ---------- events (decision 25): the bot may only close an ongoing one ----------
+
+    def ongoing_events(self, per_page: int = 10) -> list[dict]:
+        """Published events without an end time, newest first."""
+        q = urllib.parse.urlencode({"filter": 'status = "published" && end_local = ""', "sort": "-startsAt", "perPage": per_page})
+        return self._call("GET", f"/api/collections/events/records?{q}")["items"]  # type: ignore[index]
+
+    def set_event_end(self, rid: str, end_local: str) -> dict:
+        return self._call("PATCH", f"/api/collections/events/records/{urllib.parse.quote(rid)}", {"end_local": end_local})  # type: ignore[return-value]
+
     def latest_draft(self) -> dict | None:
         items = self.list('status = "draft" && source = "telegram"', "-created", 1)
         return items[0] if items else None
