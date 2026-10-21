@@ -1,7 +1,8 @@
 "use client";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { Forecast, GridEvent } from "@/lib/schema";
-import { isStale, loadCmsIsland, loadCmsSites, loadEvents, loadForecast, snapshotIsland, snapshotSites, validOutline } from "@/lib/data";
+import { isStale, loadCmsEvents, loadCmsIsland, loadCmsSites, loadEvents, loadForecast, snapshotIsland, snapshotSites, validOutline } from "@/lib/data";
+import { loadNotices } from "@/lib/notices";
 import { northAngle, project, projectWithOffset, type IslandGeo } from "@/lib/projection";
 import { stylisedXZ, type SceneIsland } from "@/scene/IslandScene";
 import { loadConfig } from "@/lib/config";
@@ -81,6 +82,7 @@ export function Dashboard() {
   const [sites, setSites] = useState<Site[]>(SNAPSHOT_SITES);
   const [island, setIsland] = useState<Island>(SNAPSHOT_ISLAND);
   const [news, setNews] = useState<NewsItem[]>([]);
+  const [notices, setNotices] = useState<NewsItem[]>([]);
   const [dismissed, setDismissed] = useState<string[]>([]);
   const pref = useSyncExternalStore(subscribeModePref, getModePref, () => "auto" as ModePref);
   // false while hydrating the static HTML: mode-init.js already set data-mode before paint
@@ -108,8 +110,17 @@ export function Dashboard() {
     loadConfig(ac.signal).then(({ cmsOrigin, events: withEvents }) => {
       if (withEvents && !ac.signal.aborted) {
         setEventsOn(true);
-        loadEvents(ac.signal).then(setEvents);
+        // from the CMS (decision 25); the stored copy in /data when the CMS cannot be reached
+        loadCmsEvents(cmsOrigin, ac.signal).then((cms) => {
+          if (ac.signal.aborted) return;
+          if (cms) setEvents(cms);
+          else loadEvents(ac.signal).then(setEvents);
+        });
       }
+      // notices show whenever one is published and not expired, independent of EVENTS_ENABLED
+      loadNotices(cmsOrigin, ac.signal).then((n) => {
+        if (!ac.signal.aborted) setNotices(n);
+      });
       loadNews(cmsOrigin, ac.signal).then((n) => {
         if (ac.signal.aborted) return;
         setDismissed(readDismissed());
@@ -165,7 +176,8 @@ export function Dashboard() {
     setDismissed(next);
     storeDismissed(next);
   };
-  const visibleNews = news.filter((n) => !dismissed.includes(n.id));
+  // the utility's notices first, then the project's news
+  const visibleNews = [...notices, ...news].filter((n) => !dismissed.includes(n.id));
 
   // One projection for the outline and the sites (spec 7.4). Without an outline the scene uses
   // the stylised island and each site's placeholder position.
@@ -234,7 +246,7 @@ export function Dashboard() {
         )}
         {events.length > 0 && (
           <section id="evCard" className="card">
-            <EventsList events={events} dates={dates} t={t} />
+            <EventsList events={events} dates={dates} t={t} lang={lang} now={now} />
           </section>
         )}
       </div>
@@ -287,7 +299,7 @@ export function Dashboard() {
         {papPending && <p className="langnote">{t("lang.papPending")}</p>}
       </header>
       <aside id="events" ref={eventsRef} className="card" hidden={!eventsOpen} aria-label={eventsOn ? t("events.title") : t("limits.button")}>
-        {eventsOn ? <EventsList events={events} dates={dates} t={t} onClose={closeEvents} /> : <LimitsNote t={t} onClose={closeEvents} />}
+        {eventsOn ? <EventsList events={events} dates={dates} t={t} lang={lang} now={now} onClose={closeEvents} /> : <LimitsNote t={t} onClose={closeEvents} />}
         <p className="credit">{t("app.credit")}</p>
       </aside>
 

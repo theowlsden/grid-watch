@@ -34,6 +34,58 @@ export async function loadEvents(signal?: AbortSignal): Promise<GridEvent[]> {
   }
 }
 
+// Events from the CMS (decision 25), newest first; null when the CMS cannot be reached, so the
+// caller falls back to the stored copy in /data/events.json.
+const EVENT_TYPES = ["blackout", "outage", "load_shedding", "shortage"];
+const SCOPES = ["island", "areas", "unknown"];
+const CAUSES = ["supply", "network", "unknown"];
+const LOCAL_TIME = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?-04:00)?$/;
+const EVENT_FIELDS =
+  "id,slug,title,type,severity,scope,areas,cause,start_local,end_local,summary_en,summary_pap,source_publisher,source_title,source_url,source_published,source_retrieved,more_sources,verified";
+
+export function parseCmsEvents(data: unknown): GridEvent[] {
+  const items = (data as { items?: unknown[] })?.items;
+  if (!Array.isArray(items)) return [];
+  const s = (v: unknown, max = 400) => (typeof v === "string" ? v.slice(0, max) : "");
+  const out: GridEvent[] = [];
+  for (const raw of items) {
+    const r = raw as Record<string, unknown>;
+    const url = s(r.source_url, 500);
+    if (!EVENT_TYPES.includes(s(r.type)) || !LOCAL_TIME.test(s(r.start_local)) || !/^https:\/\/\S+$/.test(url) || !s(r.summary_en)) continue;
+    const more = Array.isArray(r.more_sources) ? (r.more_sources as Record<string, unknown>[]).filter((m) => /^https:\/\/\S+$/.test(s(m?.url, 500))) : [];
+    out.push({
+      id: s(r.slug, 80) || s(r.id, 40),
+      title: s(r.title, 200) || undefined,
+      start_local: s(r.start_local),
+      end_local: LOCAL_TIME.test(s(r.end_local)) ? s(r.end_local) : null,
+      type: s(r.type) as GridEvent["type"],
+      severity: s(r.severity) === "major" ? "major" : "minor",
+      scope: (SCOPES.includes(s(r.scope)) ? s(r.scope) : "unknown") as GridEvent["scope"],
+      areas: Array.isArray(r.areas) ? (r.areas as unknown[]).filter((a): a is string => typeof a === "string").slice(0, 40) : [],
+      cause: (CAUSES.includes(s(r.cause)) ? s(r.cause) : "unknown") as GridEvent["cause"],
+      drivers: [],
+      summary: s(r.summary_en, 1000),
+      summary_pap: s(r.summary_pap, 1000) || undefined,
+      sources: [
+        { publisher: s(r.source_publisher, 120), title: s(r.source_title, 300), url, published_at: s(r.source_published, 40), retrieved_at: s(r.source_retrieved, 40) },
+        ...more.map((m) => ({ publisher: s(m.publisher, 120), title: s(m.title, 300), url: s(m.url, 500), published_at: s(m.published_at, 40), retrieved_at: s(m.retrieved_at, 40) })),
+      ],
+      verified: r.verified === true,
+    });
+  }
+  return out;
+}
+
+export async function loadCmsEvents(cmsOrigin: string, signal?: AbortSignal): Promise<GridEvent[] | null> {
+  if (!cmsOrigin) return null;
+  const q = new URLSearchParams({ perPage: "200", sort: "-startsAt", fields: EVENT_FIELDS });
+  try {
+    return parseCmsEvents(await fetchJson(`${cmsOrigin}/api/collections/events/records?${q}`, 4000, signal));
+  } catch {
+    return null;
+  }
+}
+
 function enabledSorted(sites: Site[]): Site[] {
   return sites.filter((s) => s.enabled).sort((a, b) => a.sortOrder - b.sortOrder);
 }

@@ -16,6 +16,12 @@ export interface NewsItem {
   pinned: boolean;
   publishedAt: string;
   expiresAt: string; // "" when it does not expire
+  // news: a message from the project; notice: an announcement by the utility (lib/notices.ts)
+  kind: "news" | "notice";
+  publisher?: string; // notices: who announced it
+  announced?: string; // notices: load_shedding | possible_shortage | maintenance | other
+  starts_local?: string; // notices: the announced period, local
+  ends_local?: string;
 }
 
 const CACHE_KEY = "gridwatch-news";
@@ -47,6 +53,7 @@ export function parseNews(data: unknown): NewsItem[] {
       pinned: r.pinned === true,
       publishedAt: str(r.publishedAt, 40),
       expiresAt: str(r.expiresAt, 40),
+      kind: "news",
     };
     if (item.id && item.title_en && severity) out.push(item);
   }

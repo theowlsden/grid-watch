@@ -77,6 +77,20 @@ export function eventRange(start: string, end: string, n: DateNames, join: (a: s
   return join(String(a.d), full(b));
 }
 
+// An event's or notice's period with times where they were reported (decision 25):
+// "21 Oct 2026, 14:00", "21 Oct 2026, 14:00 to 18:30", "30 Aug 2026, 22:00 to 1 Sep 2026, 06:00".
+// Dates without a time read as before: "25 to 26 Apr 2026".
+export function eventPeriod(start: string, end: string | null | undefined, n: DateNames, join: (a: string, b: string) => string): string {
+  const withTime = (v: string) => v.length > 10;
+  const a = fromEvent(start);
+  const one = (p: Local, time: boolean) => `${p.d} ${n.monthsShort[p.m]} ${p.y}${time ? `, ${pad(p.hh)}:${pad(p.mm)}` : ""}`;
+  if (!end) return one(a, withTime(start));
+  const b = fromEvent(end);
+  if (!withTime(start) && !withTime(end)) return a.y === b.y && a.m === b.m && a.d === b.d ? one(a, false) : eventRange(start, end, n, join);
+  const sameDay = a.y === b.y && a.m === b.m && a.d === b.d;
+  return join(one(a, withTime(start)), sameDay && withTime(end) ? `${pad(b.hh)}:${pad(b.mm)}` : one(b, withTime(end)));
+}
+
 // "7 Oct 08:00" for the issue time.
 export function issuedShort(iso: string, n: DateNames): string {
   const p = fromInstant(iso);

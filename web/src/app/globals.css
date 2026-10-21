@@ -2348,3 +2348,74 @@ html[lang="pap"] .doc[data-doc-lang="pap"] {
   }
 }
 
+/* ---------- Events: status and chips; notices (decision 25) ---------- */
+.evwhen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.evstatus {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font: 800 10.5px/1.4 var(--font-body);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.evstatus.ongoing {
+  background: var(--crit);
+  color: var(--on-tone);
+}
+
+.evstatus.endUnknown {
+  background: var(--soft);
+  color: var(--muted);
+}
+
+.evchips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.evchips span {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--ink);
+  font: 700 11.5px/1.4 var(--font-body);
+}
+
+#news .kind-notice .ntag {
+  background: var(--warn);
+  color: var(--on-tone);
+}
+
+#news .nwhen {
+  margin: 4px 0 0;
+  font-weight: 800;
+}
+
+/* notice tag: "Notice from Aqualectra" in the wide card, "Aqualectra" on the narrow chip */
+#news .nshort {
+  display: none;
+}
+
+@media (max-width: 1500px), (max-height: 1181px) {
+  #news .nfull {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  #news .nshort {
+    display: inline;
+  }
+}
+

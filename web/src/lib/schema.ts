@@ -59,6 +59,7 @@ export interface GridEvent {
   severity: "major" | "minor";
   drivers: string[];
   summary: string;
+  summary_pap?: string; // from the CMS; the stored copy has English only
   sources: EventSource[];
   verified: boolean;
 }
