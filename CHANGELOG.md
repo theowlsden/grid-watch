@@ -2,7 +2,7 @@
 
 What changed on the live site, per release. Releases are tagged `vX.Y.Z` and only a tag goes
 live (decision 28 in [docs/SPEC.md](docs/SPEC.md); how to release: [deploy/README.md](deploy/README.md#releases)).
-Write the notes under **Unreleased** as work lands on `main`, in plain words for visitors.
+Each pull request adds its notes under **Unreleased**, in plain words for visitors.
 
 ## [Unreleased]
 

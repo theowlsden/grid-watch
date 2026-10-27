@@ -61,19 +61,22 @@ pinned by digest. Nothing is published on host ports: only Coolify's proxy reach
 
 ## Releases
 
-Only a tagged release goes live (decision 28). Work lands on `main` as before, with CI on
-every push; the site keeps running the last release until the next tag.
+Only a tagged release goes live (decision 28); the site keeps running the last release until
+the next tag.
 
-1. Write what changed for visitors under **Unreleased** in [CHANGELOG.md](../CHANGELOG.md),
-   commit and push to `main`.
-2. `python3 tools/release.py 0.2.0` on an up-to-date, clean `main`. It sets the version in
-   `web/package.json`, moves the notes under `0.2.0` with today's date, commits
-   `chore(release): v0.2.0` and makes the tag. Check `git show v0.2.0`, then
-   `git push --atomic origin main v0.2.0` (or pass `--push`).
-3. The **Release** workflow checks that the tag is on `main`, matches `web/package.json` and has
+Every change reaches `main` through a pull request with passing CI (`main` is protected).
+
+1. In each pull request, write what changed for visitors under **Unreleased** in
+   [CHANGELOG.md](../CHANGELOG.md).
+2. To release, on an up-to-date, clean `main`: `python3 tools/release.py 0.2.0`. It makes the
+   branch `release-0.2.0` with the version in `web/package.json` and the notes moved under
+   `0.2.0` with today's date, pushes it and opens the pull request "Release 0.2.0".
+3. Merge that pull request once CI passes, `git pull`, then `python3 tools/release.py --tag 0.2.0`.
+   It checks that `main` has that version and its notes and pushes the tag `v0.2.0`.
+4. The **Release** workflow checks that the tag is on `main`, matches `web/package.json` and has
    notes, runs the web and data tests on it, then moves the branch `release` to the tag and
    makes a GitHub release with the notes. Coolify sees the push to `release` and deploys.
-4. The methodology page shows "Version 0.2.0 (abc1234)" once it is live.
+5. The methodology page shows "Version 0.2.0 (abc1234)" once it is live.
 
 Versions follow semantic versioning while the project is below 1.0: the middle number for
 new features, the last for fixes only. **Roll back** by running the Release workflow by hand
