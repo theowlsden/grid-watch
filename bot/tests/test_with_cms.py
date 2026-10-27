@@ -1,5 +1,6 @@
 """The bot against a real PocketBase with the committed migrations (spec 11): drafts are not
-public until /publish is confirmed, and the bot account can only touch news."""
+public until /publish is confirmed, and the bot account can only touch what it is meant to:
+news, its own event and notice drafts, the end of a published event, a report's status."""
 
 import os
 import socket
@@ -67,7 +68,7 @@ def test_bot_flow_against_pocketbase(base, cms, tmp_path):
     assert "Draft saved" in say("/news Telegram test\nBody text")
     assert "Telegram test" not in public_titles(base), "a draft is not public"
     assert "Telegram test" in say("/show")
-    say("/notice")
+    say("/level notice")
     assert "/confirm" in say("/publish")
     assert "Telegram test" not in public_titles(base)
     assert "Published" in say("/confirm")
@@ -131,3 +132,56 @@ def test_bot_closes_an_ongoing_event_and_nothing_else(base, cms):
     with pytest.raises(CmsError):
         cms.set_event_end(draft["id"], "2026-10-20 12:00")
 
+
+
+def public_events(base, coll="events"):
+    with urllib.request.urlopen(f"{base}/api/collections/{coll}/records?perPage=200") as r:
+        return {i["slug"]: i for i in json.loads(r.read())["items"]}
+
+
+def test_a_report_becomes_a_published_event_through_the_bot(base, cms):
+    report = _admin_call(base, "POST", "/api/collections/reports/records", {
+        "kind": "community", "type": "load_shedding", "date": "2026-10-26", "start_time": "21:00", "end_date": "2026-10-27", "end_time": "12:00",
+        "scope": "areas", "areas": ["Punda"], "note": "bot flow test",
+    })
+    bot = Bot(cms, {1})
+    say = lambda t: bot.handle({"message": {"from": {"id": 1}, "chat": {"id": 1}, "text": t}})[1]  # noqa: E731
+    listing = say("/reports")
+    n = next(line.split(".")[0] for line in listing.splitlines() if "2026-10-26 from 21:00 to 2026-10-27 12:00" in line)
+    assert "Event draft made" in say(f"/event {n}")
+    slug = "2026-10-26-load-shedding"
+    assert slug not in public_events(base), "a draft is not public"
+    after = _admin_call(base, "GET", f"/api/collections/reports/records/{report['id']}")
+    assert after["status"] == "used" and after["event"] and after["note"] == "bot flow test"
+    assert "The CMS refused it" in say("/set end 2026-10-26 20:00")  # before the start: the hook says why
+    for line in ["/set source https://example.org/ls", "/set publisher Aqualectra", "/set title Load shedding", "/set published 2026-10-26", "/set cause supply"]:
+        assert "Updated" in say(line), line
+    say("/publish")
+    assert "Published" in say("/confirm")
+    ev = public_events(base)[slug]
+    assert ev["end_local"] == "2026-10-27T12:00:00-04:00" and ev["verified"] is True and ev["author"].startswith("bot:")
+    # published: the bot is back to setting the end time only
+    cms.update(ev["id"], {"summary_en": "Changed later by the bot"}, "events")
+    assert public_events(base)[slug]["summary_en"] == "Load shedding in Punda."
+
+
+def test_the_bot_cannot_publish_directly_or_touch_others_drafts(base, cms):
+    rec = cms.create({"publisher": "Aqualectra", "announced": "other", "scope": "island", "published_local": "2026-10-25 10:00",
+                      "summary_en": "Straight to the site?", "source_url": "https://example.org/x", "status": "published"}, "notices")
+    assert rec["status"] == "draft", "the bot only makes drafts"
+    cms.update(rec["id"], {"status": "published"}, "notices")
+    with pytest.raises(CmsError):
+        cms.update(rec["id"], {"summary_en": "Changed after publishing"}, "notices")
+    admin_draft = _admin_call(base, "POST", "/api/collections/notices/records", {
+        "publisher": "Aqualectra", "announced": "other", "scope": "island", "published_local": "2026-10-25 11:00", "summary_en": "Editor draft.", "status": "draft",
+    })
+    for call in (lambda: cms.get(admin_draft["id"], "notices"), lambda: cms.update(admin_draft["id"], {"status": "published"}, "notices"), lambda: cms.delete(admin_draft["id"], "notices")):
+        with pytest.raises(CmsError):
+            call()
+
+
+def test_the_bot_changes_only_a_reports_status(base, cms):
+    report = _admin_call(base, "POST", "/api/collections/reports/records", {"kind": "community", "type": "outage", "date": "2026-10-25", "scope": "island", "note": "keep me"})
+    cms.update(report["id"], {"status": "rejected", "note": "rewritten", "scope": "unknown"}, "reports")
+    after = _admin_call(base, "GET", f"/api/collections/reports/records/{report['id']}")
+    assert after["status"] == "rejected" and after["note"] == "keep me" and after["scope"] == "island"

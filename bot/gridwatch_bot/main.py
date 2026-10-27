@@ -3,7 +3,7 @@
 Environment:
   TELEGRAM_BOT_TOKEN          from @BotFather (secret)
   TELEGRAM_ALLOWED_USER_IDS   comma-separated numeric Telegram user ids; everyone else is ignored
-  PB_BOT_EMAIL / PB_BOT_PASSWORD   the CMS's restricted bot account (news only)
+  PB_BOT_EMAIL / PB_BOT_PASSWORD   the CMS's restricted bot account (news, event and notice drafts)
   CMS_INTERNAL_URL            the CMS inside the Docker network (default http://cms:8090)
   GRIDWATCH_CONTROL_DIR       shared with the pipeline, for /run (default /var/lib/gridwatch-control)
 

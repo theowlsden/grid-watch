@@ -20,6 +20,20 @@ onRecordCreateRequest((e) => {
   e.next();
 }, "reports");
 
+// The bot (decision 29) may only set a report's status and link the event or notice it made
+// from it; every other field stays as the reporter sent it.
+onRecordUpdateRequest((e) => {
+  const { isBot } = require(`${__hooks}/lib/actor.js`);
+  if (isBot(e)) {
+    const before = e.record.original();
+    const keep = ["status", "event", "notice"];
+    for (const f of e.record.collection().fields) {
+      if (f.name !== "id" && !keep.includes(f.name)) e.record.set(f.name, before.get(f.name));
+    }
+  }
+  e.next();
+}, "reports");
+
 // Grouped counts of unverified community reports for the site (never single reports, never
 // events): the last `days` days (at most 30), only dates with at least MIN reports.
 routerAdd("GET", "/api/gridwatch/community", (e) => {

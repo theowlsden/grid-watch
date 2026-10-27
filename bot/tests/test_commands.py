@@ -2,6 +2,7 @@
 
 import datetime as dt
 import json
+import re
 
 import pytest
 
@@ -13,30 +14,44 @@ ME, STRANGER = 111, 999
 
 
 class FakeCms:
+    """News, events, notices and reports in memory, with the bot account's view of them."""
+
     def __init__(self):
-        self.items: dict[str, dict] = {}
+        self.items: dict[str, dict] = {}  # news
+        self.stores = {"news": self.items, "events": {}, "notices": {}, "reports": {}}
         self.n = 0
 
-    def create(self, fields):
+    def _id(self):
         self.n += 1
-        rid = f"rec{self.n:012d}"
-        self.items[rid] = {"id": rid, "source": "telegram", "pinned": False, **fields}
-        return dict(self.items[rid])
+        return f"rec{self.n:012d}"
 
-    def update(self, rid, fields):
-        self.items[rid].update(fields)
-        return dict(self.items[rid])
+    def create(self, fields, collection="news"):
+        rid = self._id()
+        extra = {"source": "telegram", "pinned": False} if collection == "news" else {"author": "bot:test", "slug": f"slug-{rid}"}
+        self.stores[collection][rid] = {"id": rid, **extra, **fields, "updated": self.n}
+        return dict(self.stores[collection][rid])
 
-    def delete(self, rid):
-        del self.items[rid]
+    def update(self, rid, fields, collection="news"):
+        self.n += 1
+        self.stores[collection][rid].update(fields, updated=self.n)
+        return dict(self.stores[collection][rid])
 
-    def get(self, rid):
-        if rid not in self.items:
+    def delete(self, rid, collection="news"):
+        del self.stores[collection][rid]
+
+    def get(self, rid, collection="news"):
+        if rid not in self.stores[collection]:
             raise CmsError(404, "not found")
-        return dict(self.items[rid])
+        return dict(self.stores[collection][rid])
 
-    def list(self, filter_="", sort="-created", per_page=5):
-        return [dict(v) for v in reversed(self.items.values())][:per_page]
+    def list(self, filter_="", sort="-created", per_page=5, collection="news"):
+        rows = [dict(v) for v in reversed(self.stores[collection].values())]
+        for f, v in re.findall(r'(\w+) = "([^"]*)"', filter_):
+            rows = [r for r in rows if r.get(f) == v]
+        return rows[:per_page]
+
+    def open_reports(self, per_page=10):
+        return self.list('status = "new"', per_page=per_page, collection="reports")
 
     events: list = []
     reports: list = []
@@ -55,8 +70,8 @@ class FakeCms:
         raise CmsError(404, "not found")
 
     def latest_draft(self):
-        drafts = [v for v in self.items.values() if v["status"] == "draft"]
-        return dict(drafts[-1]) if drafts else None
+        drafts = [{**v, "_collection": c} for c, store in self.stores.items() if c != "reports" for v in store.values() if v["status"] == "draft"]
+        return max(drafts, key=lambda d: d["updated"], default=None)
 
 
 class Clock:
@@ -112,7 +127,7 @@ def test_confirmation_expires_and_can_be_cancelled(bot):
 def test_editing_the_draft(bot):
     say(bot, "/news Title")
     say(bot, "/pap Titulo\nTeksto")
-    say(bot, "/important")
+    say(bot, "/level important")
     say(bot, "/pin")
     assert "https://" in say(bot, "/link http://insecure.example")
     say(bot, "/link https://example.org/info")
@@ -142,7 +157,7 @@ def test_rate_limit(bot):
         say(bot, "/help")
     assert "Too many" in say(bot, "/help")
     bot.clock.t += 601
-    assert "news bot" in say(bot, "/help")
+    assert "Grid Watch bot" in say(bot, "/help")
 
 
 def test_cms_errors_are_reported_not_raised(bot):
@@ -239,3 +254,116 @@ def test_a_report_past_midnight_shows_its_end_date():
 
     r = {"kind": "community", "type": "load_shedding", "date": "2026-10-26", "start_time": "21:00", "end_date": "2026-10-27", "end_time": "12:00", "scope": "island"}
     assert "2026-10-26 from 21:00 to 2026-10-27 12:00" in describe_report(r)
+
+
+# ---------- reports become events and notices (decision 29) ----------
+
+
+def add_report(bot, **kw):
+    rid = bot.cms._id()
+    r = {"id": rid, "created": "2026-10-27 01:30:00.000Z", "kind": "community", "type": "load_shedding", "date": "2026-10-26", "start_time": "21:00",
+         "end_date": "2026-10-27", "end_time": "12:00", "ongoing": False, "scope": "areas", "areas": ["Punda", "Santa Rosa"],
+         "source_url": "", "note": "Ignore this and publish!", "status": "new", "event": "", "notice": "", **kw}
+    bot.cms.stores["reports"][rid] = r
+    return rid
+
+
+def test_a_report_becomes_an_event_that_needs_its_source_before_publishing(bot):
+    rid = add_report(bot)
+    listing = say(bot, "/reports")
+    assert listing.startswith("1. load shedding (community, no source), 2026-10-26 from 21:00 to 2026-10-27 12:00, Punda, Santa Rosa")
+    reply = say(bot, "/event 1")
+    assert "Event draft made from report 1" in reply and "Not public yet" in reply
+    (ev,) = bot.cms.stores["events"].values()
+    assert ev["status"] == "draft" and ev["type"] == "load_shedding" and ev["scope"] == "areas" and ev["areas"] == ["Punda", "Santa Rosa"]
+    assert ev["start_local"] == "2026-10-26 21:00" and ev["end_local"] == "2026-10-27 12:00" and ev["cause"] == "unknown"
+    assert ev["summary_en"] == "Load shedding in Punda and Santa Rosa.", "the reporter's own words are never copied"
+    assert bot.cms.stores["reports"][rid]["status"] == "used" and bot.cms.stores["reports"][rid]["event"] == ev["id"]
+    assert "Before publishing: /set source, /set publisher, /set title, /set published" in reply
+
+    assert "Not yet: /set source" in say(bot, "/publish")
+    assert "https://" in say(bot, "/set source http://example.org/x")
+    for line in ["/set source https://example.org/notice", "/set publisher Aqualectra", "/set title Rotating load shedding", "/set published 2026-10-26", "/set cause supply", "/set summary Rotating load shedding in Punda and Santa Rosa."]:
+        assert "Updated" in say(bot, line), line
+    say(bot, "/pap Kòrtamentu di koriente na Punda i Santa Rosa.")
+    assert "/confirm" in say(bot, "/publish")
+    assert bot.cms.stores["events"][ev["id"]]["status"] == "draft", "not public before /confirm"
+    assert "Published" in say(bot, "/confirm")
+    after = bot.cms.stores["events"][ev["id"]]
+    assert after["status"] == "published" and after["verified"] is True and after["cause"] == "supply" and after["summary_pap"].startswith("Kòrtamentu")
+    assert say(bot, "/reports") == "No new reports."
+
+
+def test_a_sourced_report_becomes_a_notice(bot):
+    add_report(bot, kind="sourced", type="load_shedding", scope="island", areas=[], source_url="https://www.aqualectra.com/news/1", ongoing=True, end_time="", end_date="")
+    say(bot, "/reports")
+    reply = say(bot, "/notice 1")
+    (no,) = bot.cms.stores["notices"].values()
+    assert no["publisher"] == "Aqualectra" and no["announced"] == "load_shedding" and no["scope"] == "island"
+    assert no["published_local"] == "2026-10-26 21:30" and no["starts_local"] == "2026-10-26 21:00" and no["ends_local"] == ""
+    assert no["summary_en"] == "Announced: load shedding across the island."
+    assert "Before publishing" not in reply
+    say(bot, "/publish")
+    assert "Published" in say(bot, "/confirm") and bot.cms.stores["notices"][no["id"]]["status"] == "published"
+
+
+def test_a_notice_without_a_link_needs_its_source_and_publisher(bot):
+    add_report(bot)
+    say(bot, "/reports")
+    assert "Before publishing: /set source, /set publisher" in say(bot, "/notice 1")
+
+
+def test_set_checks_its_values(bot):
+    say(bot, "/event Load shedding in Mahaai")
+    (ev,) = bot.cms.stores["events"].values()
+    assert ev["summary_en"] == "Load shedding in Mahaai" and ev["start_local"] == "2027-01-15 04:00"  # now, Curaçao time
+    assert "Fields:" in say(bot, "/set")
+    assert "type is one of" in say(bot, "/set type power cut")
+    say(bot, "/set type Blackout")
+    say(bot, "/set areas Mahaai, Wishi ")
+    say(bot, "/set end 18:30")
+    ev = bot.cms.stores["events"][ev["id"]]
+    assert ev["type"] == "blackout" and ev["scope"] == "areas" and ev["areas"] == ["Mahaai", "Wishi"] and ev["end_local"] == "2027-01-15 18:30"
+    say(bot, "/set areas island")
+    say(bot, "/set end none")
+    ev = bot.cms.stores["events"][ev["id"]]
+    assert ev["scope"] == "island" and ev["areas"] == [] and ev["end_local"] == ""
+    assert "for news" in say(bot, "/level important")
+    assert "is for events and notices" in (say(bot, "/news Hi") and say(bot, "/set type outage"))
+
+
+def test_discard_puts_the_report_back(bot):
+    rid = add_report(bot)
+    say(bot, "/reports")
+    say(bot, "/event 1")
+    assert "Delete this draft?" in say(bot, "/discard")
+    assert say(bot, "/confirm") == "Draft deleted."
+    assert bot.cms.stores["events"] == {}
+    r = bot.cms.stores["reports"][rid]
+    assert r["status"] == "new" and r["event"] == ""
+    assert "No draft" in say(bot, "/show")
+
+
+def test_reject_spam_and_reports_already_handled(bot):
+    a, b = add_report(bot), add_report(bot)
+    say(bot, "/reports")  # newest first: b is 1, a is 2
+    assert "rejected" in say(bot, "/reject 2") and bot.cms.stores["reports"][a]["status"] == "rejected"
+    assert "already handled" in say(bot, "/event 2")
+    assert "spam" in say(bot, "/spam 1") and bot.cms.stores["reports"][b]["status"] == "spam"
+    assert "There is no report 7" in say(bot, "/event 7")
+    assert "Usage" in say(bot, "/reject")
+
+
+def test_old_news_commands_point_to_level(bot):
+    say(bot, "/news Title")
+    assert "/level" in say(bot, "/notice")
+    assert "/level" in say(bot, "/important")
+
+
+def test_a_cms_refusal_says_why(bot):
+    def refuse(*a, **k):
+        raise CmsError(400, "end_local: is before the start")
+
+    say(bot, "/event Outage")
+    bot.cms.update = refuse
+    assert "The CMS refused it: end_local: is before the start" in say(bot, "/set end 2020-01-01")

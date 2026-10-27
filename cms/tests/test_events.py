@@ -97,10 +97,14 @@ def test_an_id_set_by_hand_starts_with_its_date(pb, admin):
     assert status == 400 and "2026-10-19" in str(body), body
 
 
-def test_public_and_bot_cannot_write(pb, bot):
-    for token in (None, bot):
-        assert pb.call("POST", EV, event(), token=token)[0] in (400, 401, 403)
-        assert pb.call("POST", NO, notice(), token=token)[0] in (400, 401, 403)
+def test_public_cannot_write_and_the_bot_only_makes_drafts(pb, bot):
+    assert pb.call("POST", EV, event(), token=None)[0] in (400, 401, 403)
+    assert pb.call("POST", NO, notice(), token=None)[0] in (400, 401, 403)
+    # the Telegram bot (decision 29): drafts only, whatever status it sends
+    status, body, _ = pb.call("POST", EV, event(status="published", start_local="2026-10-22 19:00", **SOURCE), token=bot)
+    assert status == 200 and body["status"] == "draft" and body["author"].startswith("bot:"), body
+    status, body, _ = pb.call("POST", NO, notice(status="published", published_local="2026-10-22 09:00", source_url="https://example.org/n"), token=bot)
+    assert status == 200 and body["status"] == "draft", body
 
 
 def test_public_reads_are_cacheable(pb):

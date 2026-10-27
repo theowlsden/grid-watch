@@ -1,4 +1,5 @@
-"""PocketBase client for the bot's restricted account (news only, spec 7.3)."""
+"""PocketBase client for the bot's restricted account (spec 7.3): news, drafts of events and
+notices made from reports (decision 29), the end time of a published event, report status."""
 
 from __future__ import annotations
 
@@ -57,21 +58,23 @@ class Cms:
                 return self._request(method, path, body)
             raise
 
-    def create(self, fields: dict) -> dict:
-        return self._call("POST", "/api/collections/news/records", fields)  # type: ignore[return-value]
+    # ---------- any collection the bot may use: news, events, notices, reports ----------
 
-    def update(self, rid: str, fields: dict) -> dict:
-        return self._call("PATCH", f"/api/collections/news/records/{urllib.parse.quote(rid)}", fields)  # type: ignore[return-value]
+    def create(self, fields: dict, collection: str = "news") -> dict:
+        return self._call("POST", f"/api/collections/{collection}/records", fields)  # type: ignore[return-value]
 
-    def delete(self, rid: str) -> None:
-        self._call("DELETE", f"/api/collections/news/records/{urllib.parse.quote(rid)}")
+    def update(self, rid: str, fields: dict, collection: str = "news") -> dict:
+        return self._call("PATCH", f"/api/collections/{collection}/records/{urllib.parse.quote(rid)}", fields)  # type: ignore[return-value]
 
-    def get(self, rid: str) -> dict:
-        return self._call("GET", f"/api/collections/news/records/{urllib.parse.quote(rid)}")  # type: ignore[return-value]
+    def delete(self, rid: str, collection: str = "news") -> None:
+        self._call("DELETE", f"/api/collections/{collection}/records/{urllib.parse.quote(rid)}")
 
-    def list(self, filter_: str = "", sort: str = "-created", per_page: int = 5) -> list[dict]:
+    def get(self, rid: str, collection: str = "news") -> dict:
+        return self._call("GET", f"/api/collections/{collection}/records/{urllib.parse.quote(rid)}")  # type: ignore[return-value]
+
+    def list(self, filter_: str = "", sort: str = "-created", per_page: int = 5, collection: str = "news") -> list[dict]:
         q = urllib.parse.urlencode({"filter": filter_, "sort": sort, "perPage": per_page})
-        return self._call("GET", f"/api/collections/news/records?{q}")["items"]  # type: ignore[index]
+        return self._call("GET", f"/api/collections/{collection}/records?{q}")["items"]  # type: ignore[index]
 
     # ---------- events (decision 25): the bot may only close an ongoing one ----------
 
@@ -88,6 +91,14 @@ class Cms:
         q = urllib.parse.urlencode({"filter": f'status = "new" && created > "{after}"', "sort": "created", "perPage": per_page})
         return self._call("GET", f"/api/collections/reports/records?{q}")["items"]  # type: ignore[index]
 
+    def open_reports(self, per_page: int = 10) -> list[dict]:
+        """Reports still waiting for review (status "new"), newest first."""
+        return self.list('status = "new"', "-created", per_page, "reports")
+
     def latest_draft(self) -> dict | None:
-        items = self.list('status = "draft" && source = "telegram"', "-created", 1)
-        return items[0] if items else None
+        """The newest draft the bot made, of any kind, with "_collection" set: news, events or notices."""
+        found = []
+        for coll, mine in (("news", 'source = "telegram"'), ("events", 'author ~ "bot:"'), ("notices", 'author ~ "bot:"')):
+            for item in self.list(f'status = "draft" && {mine}', "-updated", 1, coll):
+                found.append({**item, "_collection": coll})
+        return max(found, key=lambda i: i.get("updated", ""), default=None)
