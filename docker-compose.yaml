@@ -10,6 +10,8 @@ services:
     build:
       context: .
       dockerfile: deploy/web/Dockerfile
+      args:
+        SOURCE_COMMIT: ${SOURCE_COMMIT:-}
     restart: unless-stopped
     expose:
       - "8080"

@@ -118,6 +118,7 @@
   "method.contact.h": "Korekshonnan",
   "method.contact.p": "Bo a mira un eror, of bo ta representá e kompania di utilidat of MDC i bo ke pa koregí of kita algu? Habri un issue riba GitHub (ta nesesario un fuente públiko pa korekshon di datos). Korekshonnan válido ta wòrdu hasí mesora.",
   "method.contact.link": "Reportá un korekshon",
+  "method.version": "Vershon {version}",
   "events.close": "Sera eventonan reportá",
   "date.daysShort": "Dum,Lun,Mar,Ras,Webs,Bie,Sab",
   "date.daysLong": "Djadumingu,Djaluna,Djamars,Djarason,Djaweps,Djabièrnè,Djasabra",

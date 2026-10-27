@@ -8,6 +8,8 @@ import { runtimeConfig } from "@/lib/config";
 import type { StressConfig } from "@/lib/model";
 
 const REPO = "https://github.com/theowlsden/grid-watch";
+// set at build time from web/package.json and the commit (next.config.ts)
+const VERSION = [process.env.NEXT_PUBLIC_VERSION, process.env.NEXT_PUBLIC_COMMIT && `(${process.env.NEXT_PUBLIC_COMMIT})`].filter(Boolean).join(" ");
 
 // One language of the methodology page. The page is built with every language; Papiamentu
 // text published in the CMS replaces the built text once it loads (spec 4.7, 8.2).
@@ -101,7 +103,9 @@ export function MethodologyBody({ lang, c }: { lang: Lang; c: StressConfig }) {
           </a>
         </p>
 
-        <p className="credit">{t("app.credit")}</p>
+        <p className="credit">
+          {t("app.credit")} · {t("method.version", { version: VERSION })}
+        </p>
       </main>
     </>
   );
