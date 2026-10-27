@@ -149,6 +149,7 @@
   "method.contact.h": "Corrections",
   "method.contact.p": "Spotted a mistake, or represent the utility or MDC and want something corrected or removed? Open an issue on GitHub (a public source is needed for data corrections). Valid corrections are made promptly.",
   "method.contact.link": "Report a correction",
+  "method.version": "Version {version}",
   "events.close": "Close reported events",
   "limits.button": "What this can't show",
   "limits.close": "Close note",

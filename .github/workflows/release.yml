@@ -1,0 +1,85 @@
+name: Release
+
+# Tagged releases go live (decision 28). A tag vX.Y.Z on main is checked, tested with the same
+# workflows as every push, then the branch `release` is moved to it; Coolify deploys `release`.
+# Running this by hand with an older tag deploys that one again (a rollback), without retesting.
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to deploy again, e.g. v0.1.0"
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - id: tag
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::$TAG is not vX.Y.Z"; exit 1; }
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.tag.outputs.tag }}
+          fetch-depth: 0
+
+      - name: The tag is on main, matches the version and has release notes
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          git merge-base --is-ancestor "$TAG^{commit}" origin/main || { echo "::error::$TAG is not on main"; exit 1; }
+          version=$(node -p "require('./web/package.json').version")
+          [ "v$version" = "$TAG" ] || { echo "::error::web/package.json says $version, the tag says $TAG"; exit 1; }
+          grep -q "^## \[${TAG#v}\]" CHANGELOG.md || { echo "::error::CHANGELOG.md has no section for ${TAG#v}"; exit 1; }
+
+  web:
+    needs: check
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/web.yml
+
+  data:
+    needs: check
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/data.yml
+
+  publish:
+    needs: [check, web, data]
+    # a rollback skips the tests: the tag passed them when it was released
+    if: ${{ !cancelled() && needs.check.result == 'success' && (github.event_name != 'push' || (needs.web.result == 'success' && needs.data.result == 'success')) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.check.outputs.tag }}
+          fetch-depth: 0
+
+      - name: Move the release branch to the tag (Coolify deploys it)
+        env:
+          TAG: ${{ needs.check.outputs.tag }}
+        run: git push --force origin "$(git rev-parse "$TAG^{commit}"):refs/heads/release"
+
+      - name: GitHub release with the changelog section
+        if: github.event_name == 'push'
+        env:
+          TAG: ${{ needs.check.outputs.tag }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          awk -v v="${TAG#v}" '$0 ~ "^## \\[" v "\\]" {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md > notes.md
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "$TAG" --notes-file notes.md

@@ -23,9 +23,10 @@ pinned by digest. Nothing is published on host ports: only Coolify's proxy reach
 
 1. **DNS**: `A` records for `grid.example.org` and `cms.grid.example.org` pointing
    to the VPS IP. Coolify issues the TLS certificates.
-2. **Coolify**: New resource → *Docker Compose* from this Git repository, branch `main`,
-   base directory `/`, compose file `/docker-compose.yaml`. Turn on automatic deploys
-   on push.
+2. **Coolify**: New resource → *Docker Compose* from this Git repository, branch `release`
+   (not `main`: only tagged releases go live, see [Releases](#releases)), base directory `/`,
+   compose file `/docker-compose.yaml`. Turn on automatic deploys on push, and
+   **Include Source Commit in Build** so the methodology page shows the commit.
 3. **Domains** (per service in Coolify, `domain:port` means the container port):
    - web: `https://grid.example.org:8080`
    - cms: `https://cms.grid.example.org:8090`
@@ -57,6 +58,32 @@ pinned by digest. Nothing is published on host ports: only Coolify's proxy reach
    setup link in its log. Creating the account from the environment closes that window. After
    the first successful start you may remove `PB_SUPERUSER_PASSWORD`; the account stays.
 5. Deploy. All three services must turn **healthy** in Coolify.
+
+## Releases
+
+Only a tagged release goes live (decision 28). Work lands on `main` as before, with CI on
+every push; the site keeps running the last release until the next tag.
+
+1. Write what changed for visitors under **Unreleased** in [CHANGELOG.md](../CHANGELOG.md),
+   commit and push to `main`.
+2. `python3 tools/release.py 0.2.0` on an up-to-date, clean `main`. It sets the version in
+   `web/package.json`, moves the notes under `0.2.0` with today's date, commits
+   `chore(release): v0.2.0` and makes the tag. Check `git show v0.2.0`, then
+   `git push --atomic origin main v0.2.0` (or pass `--push`).
+3. The **Release** workflow checks that the tag is on `main`, matches `web/package.json` and has
+   notes, runs the web and data tests on it, then moves the branch `release` to the tag and
+   makes a GitHub release with the notes. Coolify sees the push to `release` and deploys.
+4. The methodology page shows "Version 0.2.0 (abc1234)" once it is live.
+
+Versions follow semantic versioning while the project is below 1.0: the middle number for
+new features, the last for fixes only. **Roll back** by running the Release workflow by hand
+(Actions → Release → Run workflow) with an earlier tag: it moves `release` back without
+retesting. Never push to `release` yourself. A CMS migration is not undone by a rollback;
+check the release notes before rolling back past one.
+
+**Switching an existing install**: let the first Release run create the branch `release`, then
+in Coolify change the resource's branch from `main` to `release` and tick *Include Source Commit
+in Build*. From then on a push to `main` no longer deploys.
 
 ## CMS content
 
