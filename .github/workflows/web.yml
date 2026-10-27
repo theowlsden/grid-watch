@@ -1,9 +1,10 @@
 name: Web
 
 on:
-  # branches only: a release tag runs these through release.yml
+  # main and pull requests (not once more for the branch push); a release tag runs these
+  # through release.yml
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
   workflow_call:
 
