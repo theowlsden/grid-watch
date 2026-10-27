@@ -5,7 +5,8 @@
 //   - publishing needs a public https source, sensible times, and areas exactly when the
 //     scope is "areas";
 //   - a notice expires on its own: 2 h after the announced end, 12 h after the announced start,
-//     or 24 h after it was published, unless an expiry is set.
+//     or 24 h after it was published, unless an expiry is set;
+//   - the Telegram bot creates drafts only, and changes a published event's end time only.
 // Each handler runs in its own context, so the rules live in lib/events.js.
 
 onRecordValidate((e) => {
@@ -19,7 +20,9 @@ onRecordValidate((e) => {
 }, "notices");
 
 onRecordCreateRequest((e) => {
-  const { actor } = require(`${__hooks}/lib/actor.js`);
+  const { actor, isBot } = require(`${__hooks}/lib/actor.js`);
+  // the bot starts drafts only; publishing is a separate, confirmed step (decision 29)
+  if (isBot(e)) e.record.set("status", "draft");
   e.record.set("author", actor(e));
   e.record.set("updatedBy", actor(e));
   e.next();
@@ -28,8 +31,9 @@ onRecordCreateRequest((e) => {
 onRecordUpdateRequest((e) => {
   const { actor, isBot } = require(`${__hooks}/lib/actor.js`);
   const before = e.record.original();
-  if (isBot(e)) {
-    // the bot may only add or correct the end time (/restored); everything else stays
+  if (isBot(e) && before.getString("status") === "published") {
+    // on a published event the bot may only add or correct the end time (/restored); its own
+    // drafts it may edit and publish (the collection rules allow nothing else)
     const end = e.record.get("end_local");
     for (const f of e.record.collection().fields) {
       if (f.name !== "id") e.record.set(f.name, before.get(f.name));

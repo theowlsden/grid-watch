@@ -6,6 +6,13 @@ Write the notes under **Unreleased** as work lands on `main`, in plain words for
 
 ## [Unreleased]
 
+### Added
+- Editors can turn a report from the site into an event or a notice from Telegram (`/reports`,
+  `/event 2`, `/notice 2`), fill it in with `/set` and publish it after `/confirm`.
+
+### Changed
+- In the bot, how prominent news is moves from `/info`, `/notice` and `/important` to `/level`.
+
 ## [0.1.0] - 2026-10-27
 
 ### Added
