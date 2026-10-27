@@ -66,7 +66,9 @@ export function MethodologyBody({ lang, c }: { lang: Lang; c: StressConfig }) {
         </ul>
 
         <h2>{t("method.gaps.h")}</h2>
-        <p>{t("method.gaps.p")}</p>
+        <p>
+          {t("method.gaps.p")} <Link href="/data">{t("data.link")} →</Link>
+        </p>
 
         <h2>{t("method.record.h")}</h2>
         <p>{t("method.record.p", { hours: c.stale_after_hours })}</p>
