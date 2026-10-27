@@ -6,6 +6,8 @@ Write the notes under **Unreleased** as work lands on `main`, in plain words for
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-27
+
 ### Added
 - Report a power cut, load shedding or a utility notice at `/report`, by neighbourhood, without
   a name or contact details. Reports with a source are checked by an editor; reports without one
@@ -23,3 +25,4 @@ Write the notes under **Unreleased** as work lands on `main`, in plain words for
 
 ### Security
 - Next.js 16.4.3 (GHSA-2464-fhr4-w9xw, GHSA-p3m5-59mp-jv5r, GHSA-673q-mjm6-r5xr).
+
