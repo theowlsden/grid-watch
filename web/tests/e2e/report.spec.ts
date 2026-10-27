@@ -49,7 +49,34 @@ test("a community report: neighbourhoods from the list, the token, and nothing p
   expect(sent).toHaveLength(1);
   const b = sent[0];
   expect(b).toMatchObject({ kind: "community", type: "load_shedding", start_time: "19:30", ongoing: true, end_time: "", scope: "areas", areas: ["Punda", "Santa Rosa"], website: "", "cf-turnstile-response": "test-token" });
-  expect(Object.keys(b).sort()).toEqual(["areas", "cf-turnstile-response", "date", "end_time", "kind", "note", "ongoing", "scope", "source_url", "start_time", "type", "website"]);
+  expect(Object.keys(b).sort()).toEqual(["areas", "cf-turnstile-response", "date", "end_date", "end_time", "kind", "note", "ongoing", "scope", "source_url", "start_time", "type", "website"]);
+});
+
+test("load shedding past midnight: an end time before the start moves the end date to the next day", async ({ page }) => {
+  const sent: Record<string, unknown>[] = [];
+  await openForm(page, sent);
+  const today = new Date(Date.now() - 4 * 3600_000).toISOString().slice(0, 10);
+  const yesterday = new Date(Date.parse(today) - 86400_000).toISOString().slice(0, 10);
+  await page.getByLabel(en["report.date"]).fill(yesterday);
+  await page.getByLabel(en["report.start"]).fill("21:00");
+  await page.getByLabel(en["report.end"]).fill("12:00");
+  await expect(page.getByLabel(en["report.endDate"])).toHaveValue(today);
+  await page.getByRole("radio", { name: en["report.where.island"], exact: true }).check();
+  await page.getByRole("button", { name: en["report.send"] }).click();
+  await expect(page.getByRole("status")).toContainText(en["report.thanks"]);
+  expect(sent[0]).toMatchObject({ date: yesterday, start_time: "21:00", end_date: today, end_time: "12:00" });
+});
+
+test("an end before the start on the same day is caught before sending", async ({ page }) => {
+  const sent: unknown[] = [];
+  await openForm(page, sent);
+  await page.getByLabel(en["report.start"]).fill("21:00");
+  await page.getByLabel(en["report.end"]).fill("12:00"); // today: there is no next day yet
+  await expect(page.getByLabel(en["report.endDate"])).toHaveValue(await page.getByLabel(en["report.date"]).inputValue());
+  await page.getByRole("radio", { name: en["report.where.island"], exact: true }).check();
+  await page.getByRole("button", { name: en["report.send"] }).click();
+  await expect(page.locator(".field-error[role=alert]")).toHaveText(en["report.endBefore"]);
+  expect(sent).toHaveLength(0);
 });
 
 test("a sourced report needs its link; 'a notice' is only offered with a link", async ({ page }) => {

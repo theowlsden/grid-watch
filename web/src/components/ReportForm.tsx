@@ -24,6 +24,7 @@ interface TurnstileApi {
 }
 
 const localToday = () => new Date(Date.now() - 4 * 3600_000).toISOString().slice(0, 10);
+const nextDay = (d: string) => new Date(Date.parse(d) + 86400_000).toISOString().slice(0, 10);
 
 export function ReportForm() {
   const { lang, t } = useI18n();
@@ -33,6 +34,8 @@ export function ReportForm() {
   const [date, setDate] = useState(localToday);
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
+  // "" while it is the start date; set when an event went past midnight
+  const [endDate, setEndDate] = useState("");
   const [ongoing, setOngoing] = useState(false);
   const [scope, setScope] = useState<"island" | "areas" | "unknown">("areas");
   const [areas, setAreas] = useState<string[]>([]);
@@ -93,6 +96,11 @@ export function ReportForm() {
   const submit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!cfg) return;
+    const lastDay = ongoing ? "" : endDate && endDate !== date ? endDate : "";
+    if (start && end && `${lastDay || date} ${end}` < `${date} ${start}`) {
+      setState({ s: "error", msg: t("report.endBefore") });
+      return;
+    }
     if (!token) {
       setState({ s: "error", msg: t("report.needCheck") });
       return;
@@ -104,6 +112,7 @@ export function ReportForm() {
       date,
       start_time: start,
       end_time: ongoing ? "" : end,
+      end_date: lastDay,
       ongoing,
       scope,
       areas: scope === "areas" ? areas : [],
@@ -135,6 +144,7 @@ export function ReportForm() {
   const restart = () => {
     setStart("");
     setEnd("");
+    setEndDate("");
     setOngoing(false);
     setAreas([]);
     setSource("");
@@ -192,15 +202,46 @@ export function ReportForm() {
           <div className="row">
             <label className="field">
               <span>{t("report.date")}</span>
-              <input type="date" required min={FIRST_DATE} max={localToday()} value={date} onChange={(e) => setDate(e.target.value)} />
+              <input
+                type="date"
+                required
+                min={FIRST_DATE}
+                max={localToday()}
+                value={date}
+                onChange={(e) => {
+                  setDate(e.target.value);
+                  if (endDate && endDate <= e.target.value) setEndDate("");
+                }}
+              />
             </label>
             <label className="field">
               <span>{t("report.start")}</span>
               <input type="time" value={start} onChange={(e) => setStart(e.target.value)} />
             </label>
             <label className="field">
+              <span>{t("report.endDate")}</span>
+              <input
+                type="date"
+                min={date}
+                max={localToday()}
+                value={endDate || date}
+                disabled={ongoing}
+                onChange={(e) => setEndDate(e.target.value === date ? "" : e.target.value)}
+              />
+            </label>
+            <label className="field">
               <span>{t("report.end")}</span>
-              <input type="time" value={end} disabled={ongoing} onChange={(e) => setEnd(e.target.value)} />
+              <input
+                type="time"
+                value={end}
+                disabled={ongoing}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setEnd(v);
+                  // an end time before the start on the same day: most likely the next morning
+                  if (v && start && v < start && !endDate && nextDay(date) <= localToday()) setEndDate(nextDay(date));
+                }}
+              />
             </label>
           </div>
           <label className="choice inline">

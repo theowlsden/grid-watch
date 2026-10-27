@@ -34,9 +34,21 @@ function check(r) {
     const v = r.getString(f);
     if (v && !/^([01]\d|2[0-3]):[0-5]\d$/.test(v)) bad(`${f}: use HH:MM`);
   }
-  if (r.getBool("ongoing")) r.set("end_time", "");
+  // the end date is for events past midnight; empty means the start date
+  if (r.getBool("ongoing")) {
+    r.set("end_time", "");
+    r.set("end_date", "");
+  }
+  let endDate = r.getString("end_date");
+  if (endDate === date) endDate = "";
+  if (endDate) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(endDate) || isNaN(Date.parse(endDate))) bad("end_date: use YYYY-MM-DD");
+    if (endDate < date || endDate > today) bad("end_date: between the start date and today");
+    if (Date.parse(endDate) - Date.parse(date) > 7 * 86400000) bad("end_date: at most 7 days after the start");
+  }
+  r.set("end_date", endDate);
   const st = r.getString("start_time"), en = r.getString("end_time");
-  if (st && en && en < st) bad("end_time: before the start (an event past midnight: report the end separately)");
+  if (st && en && !endDate && en < st) bad("end_time: before the start (if it ended after midnight, set the end date)");
   let areas;
   try {
     const raw = r.getString("areas").trim();

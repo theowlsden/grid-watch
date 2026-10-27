@@ -232,3 +232,10 @@ def test_new_reports_are_announced_once_to_every_allowed_user(bot):
     bot.clock.t += 10
     assert bot.tick() == []  # and not more than once a minute
 
+
+
+def test_a_report_past_midnight_shows_its_end_date():
+    from gridwatch_bot.commands import describe_report
+
+    r = {"kind": "community", "type": "load_shedding", "date": "2026-10-26", "start_time": "21:00", "end_date": "2026-10-27", "end_time": "12:00", "scope": "island"}
+    assert "2026-10-26 from 21:00 to 2026-10-27 12:00" in describe_report(r)

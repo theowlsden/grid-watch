@@ -12,6 +12,10 @@ def today():
     return (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=4)).strftime("%Y-%m-%d")
 
 
+def yesterday():
+    return (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=4, days=1)).strftime("%Y-%m-%d")
+
+
 def send(pb, body, token="good-token", **headers):
     # every report from its own address: the form allows 5 per 10 minutes per address
     h = {"X-Forwarded-For": f"198.51.100.{next(_ip) % 250 + 1}", **headers}
@@ -50,6 +54,8 @@ def test_reports_are_checked(pb):
         report(date="2099-01-01"),
         report(start_time="7pm"),
         report(start_time="20:00", end_time="19:00"),
+        report(end_date=yesterday(), end_time="10:00"),  # before the start date
+        report(end_date="2099-01-01", end_time="10:00"),
         report(areas=["Atlantis"]),
         report(scope="areas", areas=[]),
         report(kind="sourced"),
@@ -98,3 +104,16 @@ def test_community_counts_are_grouped_and_need_two_reports(pb):
     assert d["total"] == 4 and d["island"] == 1
     assert d["areas"][:2] == [{"name": "Mahaai", "count": 2}, {"name": "Santa Rosa", "count": 2}]
     assert "note" not in str(body) and "No power" not in str(body)
+
+
+def test_a_report_past_midnight_has_an_end_date(pb, admin):
+    status, body, _ = send(pb, report(date=yesterday(), start_time="21:00", end_date=today(), end_time="12:00", note="past midnight"))
+    assert status in (200, 204), body
+    item = by_note(pb, admin, "past midnight")["items"][0]
+    assert item["date"] == yesterday() and item["end_date"] == today() and item["end_time"] == "12:00"
+    # the same day as the start is stored as empty; ongoing clears the end
+    send(pb, report(end_date=today(), end_time="20:00", note="same day"))
+    assert by_note(pb, admin, "same day")["items"][0]["end_date"] == ""
+    send(pb, report(date=yesterday(), end_date=today(), end_time="10:00", ongoing=True, note="still out"))
+    item = by_note(pb, admin, "still out")["items"][0]
+    assert item["end_date"] == "" and item["end_time"] == ""

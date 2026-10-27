@@ -91,7 +91,7 @@ def describe_report(r: dict) -> str:
     if r.get("start_time"):
         when += f" from {r['start_time']}"
     if r.get("end_time"):
-        when += f" to {r['end_time']}"
+        when += f" to {r['end_date']} {r['end_time']}" if r.get("end_date") else f" to {r['end_time']}"
     elif r.get("ongoing"):
         when += ", ongoing"
     where = "island-wide" if r.get("scope") == "island" else ", ".join(r.get("areas") or []) or "area not given"
