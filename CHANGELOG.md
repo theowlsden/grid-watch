@@ -6,6 +6,10 @@ Write the notes under **Unreleased** as work lands on `main`, in plain words for
 
 ## [Unreleased]
 
+### Added
+- A page on the data that would help (`/data`): the smallest set of public grid data that
+  would let anyone check the outlook against what happened, and how it could be shared.
+
 ## [0.1.0] - 2026-10-27
 
 ### Added

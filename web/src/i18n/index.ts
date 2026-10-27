@@ -75,7 +75,7 @@ export function dateNames(lang: Lang): DateNames {
 }
 
 // Pages with their own "being translated" note; their keys do not count towards the dashboard's.
-const OWN_NOTE = ["results.", "report."];
+const OWN_NOTE = ["results.", "report.", "data."];
 
 /** Share of English keys that have a translation (for the "being translated" note). By
  *  default the keys of pages with their own note (OWN_NOTE) are left out. Pass a prefix to
